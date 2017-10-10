@@ -17,13 +17,13 @@ public class WallGenerator : MonoBehaviour
 		float height = Vector3.Distance (bottom, top);
 
 		BoxCollider2D topCol = ((GameObject)Instantiate (wallPrefab, transform)).GetComponent<BoxCollider2D> ();
-		topCol.offset = top;
-		topCol.size = new Vector3 (width, 0.05f, 0);
+		topCol.offset = top + new Vector3 (0, 0.1f, 0);
+		topCol.size = new Vector3 (width, 0.2f, 0);
 		BoxCollider2D leftCol = ((GameObject)Instantiate (wallPrefab, transform)).GetComponent<BoxCollider2D> ();
-		leftCol.offset = left;
-		leftCol.size = new Vector3 (0.05f, height, 0);
+		leftCol.offset = left - new Vector3 (0.1f, 0, 0);
+		leftCol.size = new Vector3 (0.2f, height, 0);
 		BoxCollider2D rightCol = ((GameObject)Instantiate (wallPrefab, transform)).GetComponent<BoxCollider2D> ();
-		rightCol.offset = right;
-		rightCol.size = new Vector3 (0.05f, height, 0);
+		rightCol.offset = right + new Vector3 (0.1f, 0, 0);
+		rightCol.size = new Vector3 (0.2f, height, 0);
 	}
 }

@@ -23,7 +23,7 @@ public class Ball : MonoBehaviour {
 		}
 		if (Mathf.Abs (transform.position.x) > 4 || Mathf.Abs (transform.position.y) > 6)
 			SceneManager.LoadScene ("Main"); 
-		if (Physics2D.OverlapCircleAll ((Vector2)transform.position, 0.5f).Length == 1 && rigid2D.velocity.magnitude < speedDown) {
+		if (Physics2D.OverlapCircleAll ((Vector2)transform.position, 0.3f).Length == 1 && rigid2D.velocity.magnitude < speedDown) {
 			Debug.Log ("acc");
 			rigid2D.velocity = rigid2D.velocity.normalized * speedDown;
 		}

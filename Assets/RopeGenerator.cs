@@ -5,8 +5,9 @@ using UnityEngine;
 public class RopeGenerator : MonoBehaviour
 {
 
-	public GameObject nodePrefab;
-	public float minDistance = 0.2f;
+	public GameObject ropeNodePrefab;
+	public float minVerticeNum = 5;
+	public float verticeDistance = 0.2f;
 	Vector2 startPosition;
 	Vector2 endPosition;
 	GameObject[] nodes;
@@ -26,9 +27,9 @@ public class RopeGenerator : MonoBehaviour
 		} else if (Input.GetMouseButtonUp (0)) {
 			endPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition); 
 			float distance = (startPosition - endPosition).magnitude;
-			if (distance < minDistance)
+			int nodeNum = Mathf.FloorToInt (distance / verticeDistance) + 1;
+			if (nodeNum < minVerticeNum)
 				return;
-			int nodeNum = Mathf.FloorToInt (distance / minDistance) + 1;
 			Vector2 delta = (endPosition - startPosition) / (nodeNum - 1);
 
 			if (nodes != null && nodes.Length > 0) {
@@ -38,16 +39,14 @@ public class RopeGenerator : MonoBehaviour
 			}
 
 			nodes = new GameObject[nodeNum];
-			nodes [0] = (GameObject)Instantiate (nodePrefab, transform); 
+			nodes [0] = (GameObject)Instantiate (ropeNodePrefab, transform); 
 			nodes [0].transform.position = startPosition;
-			for (int i = 1; i < nodeNum - 1; i++) {
-				nodes [i] = (GameObject)Instantiate (nodePrefab, transform);
+			for (int i = 1; i < nodeNum; i++) {
+				nodes [i] = (GameObject)Instantiate (ropeNodePrefab, transform);
 				nodes [i].transform.position = (Vector2)nodes [i - 1].transform.position + delta;
 				nodes [i].GetComponent<FixedJoint2D> ().connectedBody = nodes [i - 1].GetComponent<Rigidbody2D> (); 
-			}
-			nodes [nodeNum - 1] = (GameObject)Instantiate (nodePrefab, transform);
-			nodes [nodeNum - 1].transform.position = (Vector2)nodes [nodeNum - 2].transform.position + delta;
-			nodes [nodeNum - 2].AddComponent<FixedJoint2D> ().connectedBody = nodes [nodeNum - 1].GetComponent<Rigidbody2D> ();
+			}  
+			nodes [nodeNum - 1].AddComponent<FixedJoint2D> ();
 		}
 
 		if (nodes != null && nodes.Length > 0) {
