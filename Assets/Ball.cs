@@ -9,6 +9,7 @@ public class Ball : MonoBehaviour {
 	public float force = 1;
 	Rigidbody2D rigid2D;
 
+
 	// Use this for initialization
 	void Start () {
 		rigid2D = GetComponent<Rigidbody2D>(); 
@@ -23,9 +24,9 @@ public class Ball : MonoBehaviour {
 		}
 		if (Mathf.Abs (transform.position.x) > 4 || Mathf.Abs (transform.position.y) > 6)
 			SceneManager.LoadScene ("Main"); 
-		if (Physics2D.OverlapCircleAll ((Vector2)transform.position, 0.3f).Length == 1 && rigid2D.velocity.magnitude < speedDown) {
-			Debug.Log ("acc");
-			rigid2D.velocity = rigid2D.velocity.normalized * speedDown;
-		}
+//		if (Physics2D.OverlapCircleAll ((Vector2)transform.position, 0.3f).Length == 1 && rigid2D.velocity.magnitude < speedDown) {
+////			Debug.Log ("acc");
+//			rigid2D.velocity = rigid2D.velocity.normalized * speedDown;
+//		}
 	}
 }
