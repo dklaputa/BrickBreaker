@@ -6,6 +6,7 @@ public class RopeGenerator : MonoBehaviour
 {
 	
 	public int initialPoolSize = 2;
+	public float minLength = .5f;
 	public GameObject ropePrefab;
 
 	List<GameObject> ropePool = new List<GameObject> ();
@@ -26,15 +27,17 @@ public class RopeGenerator : MonoBehaviour
 			endPositions [0] = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		} else if (Input.GetMouseButtonUp (0)) {
 			endPositions [1] = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+			if ((endPositions [1] - endPositions [0]).magnitude < minLength)
+				return;
 			foreach (GameObject rope in ropePool) {
 				if (!rope.activeInHierarchy) {
-					rope.GetComponent<RopeScript> ().setEndPointPositions (endPositions);
+					rope.GetComponent<RopeScript> ().setEndPointPositions (endPositions[0], endPositions[1]);
 					rope.SetActive (true);
 					return;
 				}
 			}
 			GameObject newRope = (GameObject)Instantiate (ropePrefab, transform);
-			newRope.GetComponent<RopeScript> ().setEndPointPositions (endPositions);
+			newRope.GetComponent<RopeScript> ().setEndPointPositions (endPositions[0], endPositions[1]);
 			newRope.SetActive (true);
 			ropePool.Add (newRope);
 		}

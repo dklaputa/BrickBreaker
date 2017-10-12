@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Ball : MonoBehaviour {
+public class BallScript : MonoBehaviour {
 
 	public float speedDown = 10;
 	public float force = 1;
