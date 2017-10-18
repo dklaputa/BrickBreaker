@@ -29,17 +29,23 @@ public class RopeGenerator : MonoBehaviour
 			endPositions [1] = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 			if ((endPositions [1] - endPositions [0]).magnitude < minLength)
 				return;
+			bool done = false;
 			foreach (GameObject rope in ropePool) {
-				if (!rope.activeInHierarchy) {
+				if (rope.activeInHierarchy) {
+					rope.GetComponent<RopeScript> ().Remove ();
+				}
+				else if(!done) {
 					rope.GetComponent<RopeScript> ().setEndPointPositions (endPositions[0], endPositions[1]);
 					rope.SetActive (true);
-					return;
+					done = true;
 				}
 			}
-			GameObject newRope = (GameObject)Instantiate (ropePrefab, transform);
-			newRope.GetComponent<RopeScript> ().setEndPointPositions (endPositions[0], endPositions[1]);
-			newRope.SetActive (true);
-			ropePool.Add (newRope);
+			if (!done) {
+				GameObject newRope = (GameObject)Instantiate (ropePrefab, transform);
+				newRope.GetComponent<RopeScript> ().setEndPointPositions (endPositions [0], endPositions [1]);
+				newRope.SetActive (true);
+				ropePool.Add (newRope);
+			}
 		}
 	}
 }
