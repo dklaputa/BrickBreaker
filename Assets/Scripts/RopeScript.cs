@@ -6,9 +6,9 @@ public class RopeScript : MonoBehaviour
 {
 	enum Status
 	{
-		BeforeTouch,
-		DuringTouch,
-		AfterTouch
+		BeforeTouchBall,
+		DuringTouchBall,
+		AfterTouchBall
 	}
 
 	enum Direction
@@ -17,7 +17,7 @@ public class RopeScript : MonoBehaviour
 		DownUp
 	}
 
-	public float endRange = .2f;
+	public float distance = .2f;
 
 	Vector2[] endPointPositions;
 	EdgeCollider2D edgeCollider2D;
@@ -32,7 +32,7 @@ public class RopeScript : MonoBehaviour
 	SpringJoint2D springJointsRight;
 	SpringJoint2D[] springJointsMiddle;
 
-	Status status = Status.BeforeTouch;
+	Status status = Status.BeforeTouchBall;
 	Direction enterDirection;
 	Vector3[] ropePath = new Vector3[30];
 
@@ -42,7 +42,7 @@ public class RopeScript : MonoBehaviour
 	}
 
 	// Use this for initialization
-	void Start ()
+	void Awake ()
 	{
 		edgeCollider2D = GetComponent<EdgeCollider2D> ();
 		lineRenderer = GetComponent<LineRenderer> ();
@@ -56,7 +56,9 @@ public class RopeScript : MonoBehaviour
 		springJointsLeft = ropeNodeLeft.GetComponent<SpringJoint2D> ();
 		springJointsRight = ropeNodeRight.GetComponent<SpringJoint2D> ();
 		springJointsMiddle = ropeNodeMiddle.GetComponents<SpringJoint2D> ();
+	}
 
+	void OnEnable (){
 		edgeCollider2D.points = endPointPositions;
 		ropeNodeLeft.transform.position = endPointPositions [0];
 		ropeNodeRight.transform.position = endPointPositions [1];
@@ -67,13 +69,13 @@ public class RopeScript : MonoBehaviour
 	{ 
 		lineRenderer.positionCount = 30;
 		switch (status) {
-		case Status.BeforeTouch: 
+		case Status.BeforeTouchBall: 
 			ropePathBeforeTouch (ropeNodeLeft.transform.position, ropeNodeRight.transform.position, ropePath); 
 			break;
-		case Status.DuringTouch: 
-			ropePathDuringTouch (ropeNodeLeft.transform.position, ropeNodeRight.transform.position, ball.transform.position, 0.2f, enterDirection, ropePath);
+		case Status.DuringTouchBall: 
+			ropePathDuringTouch (ropeNodeLeft.transform.position, ropeNodeRight.transform.position, ball.transform.position, distance, enterDirection, ropePath);
 			break;
-		case Status.AfterTouch:   
+		case Status.AfterTouchBall:   
 			ropePathAfterTouch (ropeNodeLeft.transform.position, ropeNodeMiddle.transform.position, ropeNodeRight.transform.position, ropePath); 
 			break;
 		}
@@ -83,7 +85,7 @@ public class RopeScript : MonoBehaviour
 	void OnTriggerEnter2D (Collider2D other)
 	{ 
 		if (other.gameObject.tag == "Ball") {
-			if (status == Status.BeforeTouch) { 
+			if (status == Status.BeforeTouchBall) { 
 				Vector3 vAB = ropeNodeLeft.transform.position - ropeNodeRight.transform.position;
 				Vector3 vAC = ropeNodeLeft.transform.position - ball.transform.position;
 				Vector3 vBC = ropeNodeRight.transform.position - ball.transform.position;
@@ -92,14 +94,18 @@ public class RopeScript : MonoBehaviour
 				float lAC = vAC.magnitude;
 				float lBC = vBC.magnitude;
 				float lCD = vCD.magnitude;
-				if (lAC < endRange || lBC < endRange) {
-					ballRigidBody.velocity = -10 * Vector3.Reflect (ballRigidBody.velocity, vAB).normalized; 
-					ropeNodeMiddle.transform.position = Vector3.Lerp (ropeNodeLeft.transform.position, ropeNodeRight.transform.position, 0.5f);
-					springJointsMiddle [0].distance = lAB * .45f;
-					springJointsMiddle [1].distance = lAB * .45f;
+				if (lAC < distance || lBC < distance) {
+					if ((lAC < distance && Vector3.Dot (vAB, vCD) < -0.71 * lAB * lCD) || (lBC < distance && Vector3.Dot (vAB, vCD) > 0.71 * lAB * lCD))
+						ballRigidBody.velocity = -ballRigidBody.velocity;
+					else
+						ballRigidBody.velocity = -ballRigidBody.velocity.magnitude * Vector3.Reflect (ballRigidBody.velocity, vAB).normalized; 
+					ropeNodeMiddle.transform.position = (ropeNodeLeft.transform.position + ropeNodeRight.transform.position) / 2;
+					springJointsMiddle [0].distance = lAB * .4f;
+					springJointsMiddle [1].distance = lAB * .4f;
 					ropeNodeMiddle.SetActive (true);
 					ropeNodeMiddleRigidBody.velocity = ballRigidBody.velocity * .5f;
-					status = Status.AfterTouch;
+					status = Status.AfterTouchBall;
+					Remove ();
 				} else {
 					float sinACD = Vector3.Cross (vAC, vCD).z / (lAC * lCD);
 					float sinBCD = Vector3.Cross (vBC, vCD).z / (lBC * lCD);
@@ -109,25 +115,43 @@ public class RopeScript : MonoBehaviour
 
 					springJointsLeft.connectedBody = ballRigidBody;
 					springJointsRight.connectedBody = ballRigidBody;
-					springJointsLeft.distance = lAD * .9f;
-					springJointsRight.distance = lBD * .9f;
-					springJointsMiddle [0].distance = lAD * .9f;
-					springJointsMiddle [1].distance = lBD * .9f;
+					springJointsLeft.distance = lAD * .8f;
+					springJointsRight.distance = lBD * .8f;
+					springJointsMiddle [0].distance = lAD * .8f;
+					springJointsMiddle [1].distance = lBD * .8f;
 
-					if (sinADC < 0)
+					if (sinADC < 0) {
+						ballRigidBody.velocity = new Vector2 (vAB.y, -vAB.x).normalized * ballRigidBody.velocity.magnitude;
 						enterDirection = Direction.UpDown;
-					else
+					} else {
+						ballRigidBody.velocity = -new Vector2 (vAB.y, -vAB.x).normalized * ballRigidBody.velocity.magnitude;
 						enterDirection = Direction.DownUp;
-					status = Status.DuringTouch;
+					}
+					status = Status.DuringTouchBall;
 				}
-			} else if (status == Status.DuringTouch) { 
-				springJointsLeft.connectedBody = null;
-				springJointsRight.connectedBody = null;
-				ballRigidBody.velocity = ballRigidBody.velocity.normalized * 10;
-				ropeNodeMiddle.transform.position = ball.transform.position;
-				ropeNodeMiddle.SetActive (true);
-				ropeNodeMiddleRigidBody.velocity = ballRigidBody.velocity;
-				status = Status.AfterTouch; 
+			}
+		}
+	}
+
+	void OnTriggerExit2D (Collider2D other)
+	{ 
+		if (other.gameObject.tag == "Ball") {
+			if (status == Status.DuringTouchBall) { 
+				Vector3 vAB = ropeNodeLeft.transform.position - ropeNodeRight.transform.position;
+				Vector3 vCD = ballRigidBody.velocity;
+				float lAB = vAB.magnitude;
+				float lCD = vCD.magnitude;
+				float sinADC = Vector3.Cross (vAB, vCD).z / (lAB * lCD);
+				if (sinADC > 0 && enterDirection == Direction.UpDown || sinADC < 0 && enterDirection == Direction.DownUp) {
+					springJointsLeft.connectedBody = null;
+					springJointsRight.connectedBody = null;
+					ballRigidBody.velocity = ballRigidBody.velocity.normalized * 10;
+					ropeNodeMiddle.transform.position = ball.transform.position;
+					ropeNodeMiddle.SetActive (true);
+					ropeNodeMiddleRigidBody.velocity = ballRigidBody.velocity;
+					status = Status.AfterTouchBall; 
+					Remove ();
+				}
 			}
 		}
 	}
@@ -181,5 +205,15 @@ public class RopeScript : MonoBehaviour
 			}
 			ropePath [i] = points [0];
 		} 
+	}
+		
+	void Remove(){
+		Invoke ("Destroy", 1);
+	}
+	void Destroy(){
+		lineRenderer.positionCount = 0;
+		status = Status.BeforeTouchBall;
+		ropeNodeMiddle.SetActive (false);
+		gameObject.SetActive (false);
 	}
 }

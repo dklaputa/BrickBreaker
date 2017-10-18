@@ -29,4 +29,5 @@ public class BallScript : MonoBehaviour {
 //			rigid2D.velocity = rigid2D.velocity.normalized * speedDown;
 //		}
 	}
+
 }
