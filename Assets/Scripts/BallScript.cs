@@ -7,7 +7,7 @@ public class BallScript : MonoBehaviour
     private Rigidbody2D rigid2D;
     private SpriteRenderer spriteRenderer;
 
-    private float[] speed = {10, 11, 12, 13, 14, 15, 16};
+    private float[] speed = {10, 11, 12, 13, 14, 15, 16, 17, 18};
     private int speedLvl;
     private Color blue = new Color(17f / 255, 196f / 255, 255f / 255);
     private Color yellow = new Color(255f / 255, 196f / 255, 17f / 255);

@@ -7,12 +7,14 @@ public class RopeGenerator : MonoBehaviour
     public float minLength = .5f;
     public GameObject ropePrefab;
 
-    List<GameObject> ropePool = new List<GameObject>();
-    Vector2[] endPositions = new Vector2[2];
+    private List<GameObject> ropePool = new List<GameObject>();
+    private Vector2[] endPositions = new Vector2[2];
+    private LineRenderer lineRenderer;
 
     // Use this for initialization
     private void Start()
     {
+        lineRenderer = GetComponent<LineRenderer>();
         for (var i = 0; i < initialPoolSize; i++)
         {
             ropePool.Add(Instantiate(ropePrefab, transform));
@@ -26,8 +28,15 @@ public class RopeGenerator : MonoBehaviour
         {
             endPositions[0] = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
+        else if (Input.GetMouseButton(0))
+        {
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPositions(new Vector3[]
+                {endPositions[0], (Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition)});
+        }
         else if (Input.GetMouseButtonUp(0))
         {
+            lineRenderer.positionCount = 0;
             endPositions[1] = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             if ((endPositions[1] - endPositions[0]).magnitude < minLength)
                 return;
