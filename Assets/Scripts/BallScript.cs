@@ -1,33 +1,54 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class BallScript : MonoBehaviour {
+public class BallScript : MonoBehaviour
+{
+    public static BallScript instance;
+    private Rigidbody2D rigid2D;
+    private SpriteRenderer spriteRenderer;
 
-	public float speedDown = 10;
-	public float force = 1;
-	Rigidbody2D rigid2D;
+    private float[] speed = {10, 11, 12, 13, 14, 15, 16};
+    private int speedLvl;
+    private Color blue = new Color(17f / 255, 196f / 255, 255f / 255);
+    private Color yellow = new Color(255f / 255, 196f / 255, 17f / 255);
 
+    // Use this for initialization
+    private void Start()
+    {
+        instance = this;
+        rigid2D = GetComponent<Rigidbody2D>();
+        rigid2D.velocity = -transform.up * speed[speedLvl];
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
-	// Use this for initialization
-	void Start () {
-		rigid2D = GetComponent<Rigidbody2D>(); 
-		rigid2D.velocity = - transform.up * speedDown;
-	}
+    // Update is called once per frame
+    private void Update()
+    {
+        if (Mathf.Abs(transform.position.x) > 4 || Mathf.Abs(transform.position.y) > 6)
+            SceneManager.LoadScene("Main");
+    }
 
-	// Update is called once per frame
-	void Update () {
-		//		rigid2D.AddForce (new Vector2 (rigid2D.velocity.y, -rigid2D.velocity.x) * force);
-		if (Input.GetMouseButton (1)) {
-			rigid2D.AddForce (Vector2.down * force);
-		}
-		if (Mathf.Abs (transform.position.x) > 4 || Mathf.Abs (transform.position.y) > 6)
-			SceneManager.LoadScene ("Main"); 
-//		if (Physics2D.OverlapCircleAll ((Vector2)transform.position, 0.3f).Length == 1 && rigid2D.velocity.magnitude < speedDown) {
-////			Debug.Log ("acc");
-//			rigid2D.velocity = rigid2D.velocity.normalized * speedDown;
-//		}
-	}
+    public void SpeedUp()
+    {
+        if (speedLvl < speed.Length - 1)
+        {
+            speedLvl++;
+            rigid2D.velocity = rigid2D.velocity.normalized * speed[speedLvl];
+        }
+        else
+            KeepSpeed();
+        spriteRenderer.color = Color.Lerp(blue, yellow, (float) speedLvl / (speed.Length - 1));
+    }
 
+    public void SpeedDown()
+    {
+        speedLvl = 0;
+        rigid2D.velocity = rigid2D.velocity.normalized * speed[speedLvl];
+        spriteRenderer.color = blue;
+    }
+
+    public void KeepSpeed()
+    {
+        rigid2D.velocity = rigid2D.velocity.normalized * speed[speedLvl];
+    }
 }
