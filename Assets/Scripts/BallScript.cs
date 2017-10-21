@@ -7,18 +7,22 @@ public class BallScript : MonoBehaviour
     private Rigidbody2D rigid2D;
     private SpriteRenderer spriteRenderer;
 
-    private float[] speed = {10, 11, 12, 13, 14, 15, 16, 17, 18};
-    private int speedLvl;
-    private Color blue = new Color(17f / 255, 196f / 255, 255f / 255);
-    private Color yellow = new Color(255f / 255, 196f / 255, 17f / 255);
+    private float[] speed = {8, 10, 12, 14, 16};
+    public int speedLvl;
+    private Color blue = new Color(57f / 255, 196f / 255, 215f / 255);
+    private Color yellow = new Color(215f / 255, 165f / 255, 57f / 255);
 
     // Use this for initialization
-    private void Start()
+    private void Awake()
     {
         instance = this;
         rigid2D = GetComponent<Rigidbody2D>();
-        rigid2D.velocity = -transform.up * speed[speedLvl];
         spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    private void Start()
+    {
+        rigid2D.velocity = -transform.up * speed[speedLvl];
     }
 
     // Update is called once per frame
@@ -33,22 +37,29 @@ public class BallScript : MonoBehaviour
         if (speedLvl < speed.Length - 1)
         {
             speedLvl++;
-            rigid2D.velocity = rigid2D.velocity.normalized * speed[speedLvl];
         }
-        else
-            KeepSpeed();
-        spriteRenderer.color = Color.Lerp(blue, yellow, (float) speedLvl / (speed.Length - 1));
+        RefreshBallSpeed();
     }
 
     public void SpeedDown()
     {
         speedLvl = 0;
-        rigid2D.velocity = rigid2D.velocity.normalized * speed[speedLvl];
-        spriteRenderer.color = blue;
+        RefreshBallSpeed();
     }
 
-    public void KeepSpeed()
+    public void RefreshBallSpeed()
     {
         rigid2D.velocity = rigid2D.velocity.normalized * speed[speedLvl];
+        spriteRenderer.color = Color.Lerp(blue, yellow, (float) speedLvl / (speed.Length - 1));
+    }
+
+    public bool HitBrick(int brickLevel)
+    {
+        bool result = true;
+        if (speedLvl > brickLevel) speedLvl = speedLvl - brickLevel - 1;
+        else if (speedLvl == brickLevel) speedLvl = 0;
+        else result = false;
+        RefreshBallSpeed();
+        return result;
     }
 }

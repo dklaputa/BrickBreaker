@@ -5,7 +5,7 @@ public class WallGenerator : MonoBehaviour
     public GameObject wallPrefab;
 
     // Use this for initialization
-    private void Start()
+    private void Awake()
     {
         var top = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2f, Screen.height, 0));
         var bottom = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2f, 0f, 0));

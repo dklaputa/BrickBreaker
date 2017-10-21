@@ -17,8 +17,8 @@ public class RopeScript : MonoBehaviour
         NotEnter
     }
 
-    public float lengthStall1 = 2f;
-    public float lengthStall2 = 3f;
+    public float lengthStall1 = 1.5f;
+    public float lengthStall2 = 2.5f;
 
     private const float endRange = .175f;
 //    private const float randomBias = .1f;
@@ -50,13 +50,17 @@ public class RopeScript : MonoBehaviour
     {
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.sortingLayerName = "Rope";
-        ballRigidBody = BallScript.instance.GetComponent<Rigidbody2D>();
-        ballCircleCollider = BallScript.instance.GetComponent<CircleCollider2D>();
         ropeNodeLeft = transform.GetChild(0).gameObject;
         ropeNodeMiddle = transform.GetChild(1).gameObject;
         ropeNodeRight = transform.GetChild(2).gameObject;
         ropeNodeMiddleRigidBody = ropeNodeMiddle.GetComponent<Rigidbody2D>();
         springJointsMiddle = ropeNodeMiddle.GetComponents<SpringJoint2D>();
+    }
+
+    private void Start()
+    {
+        ballRigidBody = BallScript.instance.GetComponent<Rigidbody2D>();
+        ballCircleCollider = BallScript.instance.GetComponent<CircleCollider2D>();
     }
 
     private void OnEnable()
@@ -113,7 +117,7 @@ public class RopeScript : MonoBehaviour
                 if (ropeLength < lengthStall1)
                     BallScript.instance.SpeedUp();
                 else if (ropeLength < lengthStall2)
-                    BallScript.instance.KeepSpeed();
+                    BallScript.instance.RefreshBallSpeed();
                 else
                     BallScript.instance.SpeedDown();
                 ropeNodeMiddle.transform.position = ballRigidBody.position;
