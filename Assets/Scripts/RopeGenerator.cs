@@ -8,7 +8,8 @@ public class RopeGenerator : MonoBehaviour
     public GameObject ropePrefab;
 
     private List<GameObject> ropePool = new List<GameObject>();
-    private Vector2[] endPositions = new Vector2[2];
+    private List<Vector3> trail = new List<Vector3>();
+
     private LineRenderer lineRenderer;
 
     // Use this for initialization
@@ -26,20 +27,24 @@ public class RopeGenerator : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            endPositions[0] = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            trail.Clear();
+            trail.Add((Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition));
         }
         else if (Input.GetMouseButton(0))
         {
-            lineRenderer.positionCount = 2;
-            lineRenderer.SetPositions(new Vector3[]
-                {endPositions[0], (Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition)});
+            Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (trail.Count < 2 || Vector2.Distance(trail[trail.Count - 1], trail[trail.Count - 2]) > minLength &&
+                Vector2.Angle(point - (Vector2) trail[trail.Count - 1],
+                    trail[trail.Count - 1] - trail[trail.Count - 2]) > 120)
+                trail.Add(point);
+            else trail[trail.Count - 1] = point;
+            lineRenderer.positionCount = trail.Count;
+            lineRenderer.SetPositions(trail.ToArray());
         }
         else if (Input.GetMouseButtonUp(0))
         {
             lineRenderer.positionCount = 0;
-            endPositions[1] = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if ((endPositions[1] - endPositions[0]).magnitude < minLength)
-                return;
+            if (trail.Count < 2 || trail.Count == 2 && Vector2.Distance(trail[0], trail[1]) < minLength) return;
             var done = false;
             foreach (var rope in ropePool)
             {
@@ -49,14 +54,14 @@ public class RopeGenerator : MonoBehaviour
                 }
                 else if (!done)
                 {
-                    rope.GetComponent<RopeScript>().SetEndPointPositions(endPositions[0], endPositions[1]);
+                    rope.GetComponent<RopeScript>().SetEndPointPositions(trail[0], trail[1]);
                     rope.SetActive(true);
                     done = true;
                 }
             }
             if (done) return;
             var newRope = Instantiate(ropePrefab, transform);
-            newRope.GetComponent<RopeScript>().SetEndPointPositions(endPositions[0], endPositions[1]);
+            newRope.GetComponent<RopeScript>().SetEndPointPositions(trail[0], trail[1]);
             newRope.SetActive(true);
             ropePool.Add(newRope);
         }

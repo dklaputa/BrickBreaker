@@ -17,8 +17,8 @@ public class RopeScript : MonoBehaviour
         NotEnter
     }
 
-    public float lengthStall1 = 1.5f;
-    public float lengthStall2 = 2.5f;
+    public float lengthStall1 = 2f;
+    public float lengthStall2 = 3f;
 
     private const float endRange = .175f;
 //    private const float randomBias = .1f;
@@ -106,7 +106,7 @@ public class RopeScript : MonoBehaviour
         if (isRemoving) return;
         if (status == Status.DuringTouchBall)
         {
-            var acceleration = 2 * AccelerationDirection * (15 + Mathf.Pow(ballRigidBody.velocity.magnitude, 2));
+            var acceleration = AccelerationDirection * (30 + 15 * ballRigidBody.velocity.magnitude);
             var ballStatus = CheckTrigger(endPointPositions[0], endPointPositions[1], ballRigidBody.position,
                 (ballRigidBody.velocity + acceleration * Time.deltaTime) * Time.deltaTime);
             if (ballStatus == BallEnterStatus.NotEnter)
