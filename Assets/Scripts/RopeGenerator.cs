@@ -5,6 +5,7 @@ public class RopeGenerator : MonoBehaviour
 {
     public int initialPoolSize = 2;
     public float minLength = .5f;
+    public float maxLength = 4f;
     public GameObject ropePrefab;
 
     private List<GameObject> ropePool = new List<GameObject>();
@@ -36,13 +37,26 @@ public class RopeGenerator : MonoBehaviour
             if (trail.Count < 2 || Vector2.Distance(trail[trail.Count - 1], trail[trail.Count - 2]) > minLength &&
                 Vector2.Angle(point - (Vector2) trail[trail.Count - 1],
                     trail[trail.Count - 1] - trail[trail.Count - 2]) > 120)
+            {
                 trail.Add(point);
+                if (trail.Count > 3) ApplicationScript.instance.SetRopeTimes(trail.Count - 1);
+            }
             else trail[trail.Count - 1] = point;
-            lineRenderer.positionCount = trail.Count;
-            lineRenderer.SetPositions(trail.ToArray());
+            var d = Vector2.Distance(trail[trail.Count - 1], trail[trail.Count - 2]);
+            if (d > maxLength)
+                trail[trail.Count - 1] = Vector2.Lerp(trail[trail.Count - 2], trail[trail.Count - 1], maxLength / d);
+            if (trail.Count == 2)
+            {
+                lineRenderer.positionCount = 30;
+                for (var i = 0; i < 30; i++)
+                {
+                    lineRenderer.SetPosition(i, Vector3.Lerp(trail[0], trail[1], i / 29f));
+                }
+            }
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            ApplicationScript.instance.SetRopeTimes(-1);
             lineRenderer.positionCount = 0;
             if (trail.Count < 2 || trail.Count == 2 && Vector2.Distance(trail[0], trail[1]) < minLength) return;
             var done = false;
@@ -54,14 +68,14 @@ public class RopeGenerator : MonoBehaviour
                 }
                 else if (!done)
                 {
-                    rope.GetComponent<RopeScript>().SetEndPointPositions(trail[0], trail[1]);
+                    rope.GetComponent<RopeScript>().Initialize(trail[0], trail[1], trail.Count - 1);
                     rope.SetActive(true);
                     done = true;
                 }
             }
             if (done) return;
             var newRope = Instantiate(ropePrefab, transform);
-            newRope.GetComponent<RopeScript>().SetEndPointPositions(trail[0], trail[1]);
+            newRope.GetComponent<RopeScript>().Initialize(trail[0], trail[1], trail.Count - 1);
             newRope.SetActive(true);
             ropePool.Add(newRope);
         }

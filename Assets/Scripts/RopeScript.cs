@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class RopeScript : MonoBehaviour
 {
@@ -17,13 +16,14 @@ public class RopeScript : MonoBehaviour
         NotEnter
     }
 
-    public float lengthStall1 = 2f;
-    public float lengthStall2 = 3f;
+    public float lengthStall1 = 1.5f;
+    public float lengthStall2 = 2.5f;
 
-    private const float endRange = .175f;
+    private const float ballRange = .175f;
 //    private const float randomBias = .1f;
 
     private Vector2[] endPointPositions;
+    private int times;
     private LineRenderer lineRenderer;
     private Rigidbody2D ballRigidBody;
     private CircleCollider2D ballCircleCollider;
@@ -40,9 +40,10 @@ public class RopeScript : MonoBehaviour
     private BallEnterStatus enterDirection;
     private Vector3[] ropePath = new Vector3[30];
 
-    public void SetEndPointPositions(Vector2 position1, Vector2 position2)
+    public void Initialize(Vector2 position1, Vector2 position2, int ropeTimes)
     {
         endPointPositions = new[] {position1, position2};
+        times = ropeTimes;
     }
 
     // Use this for initialization
@@ -83,7 +84,7 @@ public class RopeScript : MonoBehaviour
                 RopePathBeforeTouch(endPointPositions[0], endPointPositions[1], ropePath);
                 break;
             case Status.DuringTouchBall:
-                RopePathDuringTouch(endPointPositions[0], endPointPositions[1], ballRigidBody.position, .175f,
+                RopePathDuringTouch(endPointPositions[0], endPointPositions[1], ballRigidBody.position, ballRange,
                     enterDirection, ropePath);
                 break;
             case Status.AfterTouchBall:
@@ -103,7 +104,7 @@ public class RopeScript : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isRemoving) return;
+        if (isRemoving || status == Status.AfterTouchBall) return;
         if (status == Status.DuringTouchBall)
         {
             var acceleration = AccelerationDirection * (30 + 15 * ballRigidBody.velocity.magnitude);
@@ -115,11 +116,20 @@ public class RopeScript : MonoBehaviour
             {
                 var ropeLength = (endPointPositions[0] - endPointPositions[1]).magnitude;
                 if (ropeLength < lengthStall1)
-                    BallScript.instance.SpeedUp();
+                {
+                    if (times < 2) BallScript.instance.SpeedLevelChange(1);
+                    else BallScript.instance.SpeedLevelChange(times);
+                }
                 else if (ropeLength < lengthStall2)
-                    BallScript.instance.RefreshBallSpeed();
+                {
+                    if (times < 2) BallScript.instance.SpeedLevelChange(0);
+                    else BallScript.instance.SpeedLevelChange(times / 2);
+                }
                 else
-                    BallScript.instance.SpeedDown();
+                {
+                    if (times < 2) BallScript.instance.SpeedLevelToZero();
+                    else BallScript.instance.SpeedLevelChange(times / 3);
+                }
                 ropeNodeMiddle.transform.position = ballRigidBody.position;
                 ropeNodeMiddle.SetActive(true);
                 ropeNodeMiddleRigidBody.velocity = ballRigidBody.velocity * .5f;
@@ -146,8 +156,9 @@ public class RopeScript : MonoBehaviour
 
             var vAC = endPointPositions[0] - ballRigidBody.position;
             var vBC = endPointPositions[1] - ballRigidBody.position;
-            if (Mathf.Abs(Vector3.Cross(vAC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude) < endRange ||
-                Mathf.Abs(Vector3.Cross(vBC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude) < endRange)
+            if (Mathf.Abs(Vector3.Cross(vAC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude) <
+                ballRange ||
+                Mathf.Abs(Vector3.Cross(vBC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude) < ballRange)
             {
                 ballRigidBody.velocity = -ballRigidBody.velocity;
                 ropeNodeMiddle.SetActive(true);

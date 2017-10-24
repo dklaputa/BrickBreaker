@@ -5,11 +5,11 @@ public class BallScript : MonoBehaviour
 {
     public static BallScript instance;
     public int speedLvl;
-    
+
     private Rigidbody2D rigid2D;
     private SpriteRenderer spriteRenderer;
 
-    private static readonly float[] Speed = {8, 10, 12, 14, 16};
+    private static readonly float[] Speed = {8, 9, 10, 11, 12, 13, 14, 15, 16};
     private static readonly Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
     private static readonly Color Yellow = new Color(215f / 255, 165f / 255, 57f / 255);
 
@@ -51,34 +51,21 @@ public class BallScript : MonoBehaviour
         rigid2D.isKinematic = false;
     }
 
-    public void SpeedUp()
+    public void SpeedLevelChange(int lvlChange)
     {
-        if (speedLvl < Speed.Length - 1)
-        {
-            speedLvl++;
-        }
+        speedLvl = Mathf.Clamp(speedLvl + lvlChange, 0, Speed.Length - 1);
         RefreshBallSpeed();
     }
 
-    public void SpeedDown()
+    public void SpeedLevelToZero()
     {
         speedLvl = 0;
         RefreshBallSpeed();
     }
 
-    public void RefreshBallSpeed()
+    private void RefreshBallSpeed()
     {
         rigid2D.velocity = rigid2D.velocity.normalized * Speed[speedLvl];
         spriteRenderer.color = Color.Lerp(Blue, Yellow, (float) speedLvl / (Speed.Length - 1));
-    }
-
-    public bool HitBrick(int brickLevel)
-    {
-        bool result = true;
-        if (speedLvl > brickLevel) speedLvl = speedLvl - brickLevel - 1;
-        else if (speedLvl == brickLevel) speedLvl = 0;
-        else result = false;
-        RefreshBallSpeed();
-        return result;
     }
 }
