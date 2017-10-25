@@ -2,14 +2,14 @@
 
 public class RopeScript : MonoBehaviour
 {
-    private enum Status
+    protected enum Status
     {
         BeforeTouchBall,
         DuringTouchBall,
         AfterTouchBall
     }
 
-    private enum BallEnterStatus
+    protected enum BallEnterStatus
     {
         UpDown,
         DownUp,
@@ -23,23 +23,23 @@ public class RopeScript : MonoBehaviour
     private const float perfectRange = .125f;
 //    private const float randomBias = .1f;
 
-    private Vector2[] endPointPositions;
+    protected Vector2[] endPointPositions;
     private int times;
     private LineRenderer lineRenderer;
-    private Rigidbody2D ballRigidBody;
-    private CircleCollider2D ballCircleCollider;
+    protected Rigidbody2D ballRigidBody;
+    protected CircleCollider2D ballCircleCollider;
     private GameObject ropeNodeLeft;
-    private GameObject ropeNodeMiddle;
+    protected GameObject ropeNodeMiddle;
     private GameObject ropeNodeRight;
-    private Rigidbody2D ropeNodeMiddleRigidBody;
+    protected Rigidbody2D ropeNodeMiddleRigidBody;
     private SpringJoint2D[] springJointsMiddle;
 
-    private Status status = Status.BeforeTouchBall;
+    protected Status status = Status.BeforeTouchBall;
     private bool isPerfect;
     private bool isRemovable = true;
-    private bool isRemoving;
-    private Vector2 AccelerationDirection;
-    private BallEnterStatus enterDirection;
+    protected bool isRemoving;
+    protected Vector2 AccelerationDirection;
+    protected BallEnterStatus enterDirection;
     private Vector3[] ropePath = new Vector3[30];
 
     public void Initialize(Vector2 position1, Vector2 position2, int ropeTimes)
@@ -60,13 +60,7 @@ public class RopeScript : MonoBehaviour
         springJointsMiddle = ropeNodeMiddle.GetComponents<SpringJoint2D>();
     }
 
-    private void Start()
-    {
-        ballRigidBody = BallScript.instance.GetComponent<Rigidbody2D>();
-        ballCircleCollider = BallScript.instance.GetComponent<CircleCollider2D>();
-    }
-
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         ropeNodeLeft.transform.position = endPointPositions[0];
         ropeNodeRight.transform.position = endPointPositions[1];
@@ -74,6 +68,8 @@ public class RopeScript : MonoBehaviour
         var ropeLength = (endPointPositions[0] - endPointPositions[1]).magnitude;
         springJointsMiddle[0].distance = ropeLength * .4f;
         springJointsMiddle[1].distance = springJointsMiddle[0].distance;
+        ballRigidBody = BallScript.instance.GetComponent<Rigidbody2D>();
+        ballCircleCollider = BallScript.instance.GetComponent<CircleCollider2D>();
     }
 
     // Update is called once per frame
@@ -104,7 +100,7 @@ public class RopeScript : MonoBehaviour
         lineRenderer.endColor = color2;
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         if (isRemoving || status == Status.AfterTouchBall) return;
         if (status == Status.DuringTouchBall)
@@ -168,7 +164,7 @@ public class RopeScript : MonoBehaviour
                 status = Status.AfterTouchBall;
                 Remove();
                 ApplicationScript.instance.ShowMiss();
-                ApplicationScript.instance.resetPerfectCount();
+                ApplicationScript.instance.ResetPerfectCount();
                 return;
             }
             if (Mathf.Abs(Vector3.Cross(vAC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude -
@@ -177,7 +173,7 @@ public class RopeScript : MonoBehaviour
                 isPerfect = true; 
                 ApplicationScript.instance.ShowPerfect();
             }
-            else ApplicationScript.instance.resetPerfectCount();
+            else ApplicationScript.instance.ResetPerfectCount();
 
             ballCircleCollider.enabled = false;
             status = Status.DuringTouchBall;
@@ -185,7 +181,7 @@ public class RopeScript : MonoBehaviour
         }
     }
 
-    private static BallEnterStatus CheckTrigger(Vector2 ropeNodeLeftPosition, Vector2 ropeNodeRightPosition,
+    protected static BallEnterStatus CheckTrigger(Vector2 ropeNodeLeftPosition, Vector2 ropeNodeRightPosition,
         Vector2 ballPosition, Vector2 ballDisplacement)
     {
         var pointD = ballPosition + ballDisplacement;

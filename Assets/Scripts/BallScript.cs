@@ -6,11 +6,11 @@ public class BallScript : MonoBehaviour
     public static BallScript instance;
     public int speedLvl;
     public int scoreTimes;
+    public float[] speed = {8, 9, 10, 11, 12, 13, 14, 15, 16};
 
     private Rigidbody2D rigid2D;
     private SpriteRenderer spriteRenderer;
-
-    private static readonly float[] Speed = {8, 9, 10, 11, 12, 13, 14, 15, 16};
+ 
     private static readonly Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
     private static readonly Color Yellow = new Color(215f / 255, 165f / 255, 57f / 255);
 
@@ -22,10 +22,10 @@ public class BallScript : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void Start()
-    {
-        rigid2D.velocity = -transform.up * Speed[speedLvl];
-    }
+//    private void Start()
+//    {
+//        rigid2D.velocity = -transform.up * speed[speedLvl];
+//    }
 
     // Update is called once per frame
     private void Update()
@@ -54,7 +54,7 @@ public class BallScript : MonoBehaviour
 
     public void SpeedLevelChange(int lvlChange)
     {
-        speedLvl = Mathf.Clamp(speedLvl + lvlChange, 0, Speed.Length - 1);
+        speedLvl = Mathf.Clamp(speedLvl + lvlChange, 0, speed.Length - 1);
         RefreshBallSpeed();
     }
 
@@ -70,7 +70,7 @@ public class BallScript : MonoBehaviour
 
     private void RefreshBallSpeed()
     {
-        rigid2D.velocity = rigid2D.velocity.normalized * Speed[speedLvl];
-        spriteRenderer.color = Color.Lerp(Blue, Yellow, (float) speedLvl / (Speed.Length - 1));
+        rigid2D.velocity = rigid2D.velocity.normalized * speed[speedLvl];
+        spriteRenderer.color = Color.Lerp(Blue, Yellow, (float) speedLvl / (speed.Length - 1));
     }
 }
