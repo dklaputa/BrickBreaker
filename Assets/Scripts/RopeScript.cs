@@ -20,6 +20,7 @@ public class RopeScript : MonoBehaviour
     public float lengthStall2 = 2.5f;
 
     private const float ballRange = .175f;
+    private const float perfectRange = .125f;
 //    private const float randomBias = .1f;
 
     private Vector2[] endPointPositions;
@@ -34,6 +35,7 @@ public class RopeScript : MonoBehaviour
     private SpringJoint2D[] springJointsMiddle;
 
     private Status status = Status.BeforeTouchBall;
+    private bool isPerfect;
     private bool isRemovable = true;
     private bool isRemoving;
     private Vector2 AccelerationDirection;
@@ -115,21 +117,21 @@ public class RopeScript : MonoBehaviour
             else if (ballStatus != enterDirection)
             {
                 var ropeLength = (endPointPositions[0] - endPointPositions[1]).magnitude;
+                int speedUp;
                 if (ropeLength < lengthStall1)
                 {
-                    if (times < 2) BallScript.instance.SpeedLevelChange(1);
-                    else BallScript.instance.SpeedLevelChange(times);
+                    speedUp = times < 2 ? 2 : times;
                 }
                 else if (ropeLength < lengthStall2)
                 {
-                    if (times < 2) BallScript.instance.SpeedLevelChange(0);
-                    else BallScript.instance.SpeedLevelChange(times / 2);
+                    speedUp = times < 2 ? 1 : times / 2;
                 }
                 else
                 {
-                    if (times < 2) BallScript.instance.SpeedLevelToZero();
-                    else BallScript.instance.SpeedLevelChange(times / 3);
+                    speedUp = times / 3;
                 }
+                if (isPerfect) speedUp *= 2;
+                BallScript.instance.SpeedLevelChange(speedUp);
                 ropeNodeMiddle.transform.position = ballRigidBody.position;
                 ropeNodeMiddle.SetActive(true);
                 ropeNodeMiddleRigidBody.velocity = ballRigidBody.velocity * .5f;
@@ -165,8 +167,18 @@ public class RopeScript : MonoBehaviour
                 ropeNodeMiddleRigidBody.velocity = ballRigidBody.velocity * .2f;
                 status = Status.AfterTouchBall;
                 Remove();
+                ApplicationScript.instance.ShowMiss();
+                ApplicationScript.instance.resetPerfectCount();
                 return;
             }
+            if (Mathf.Abs(Vector3.Cross(vAC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude -
+                          vAB.magnitude / 2) < perfectRange)
+            {
+                isPerfect = true; 
+                ApplicationScript.instance.ShowPerfect();
+            }
+            else ApplicationScript.instance.resetPerfectCount();
+
             ballCircleCollider.enabled = false;
             status = Status.DuringTouchBall;
             isRemovable = false;
@@ -280,6 +292,7 @@ public class RopeScript : MonoBehaviour
         status = Status.BeforeTouchBall;
         ropeNodeMiddle.SetActive(false);
         gameObject.SetActive(false);
+        isPerfect = false;
         isRemoving = false;
     }
 }

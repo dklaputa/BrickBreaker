@@ -45,13 +45,11 @@ public class RopeGenerator : MonoBehaviour
             var d = Vector2.Distance(trail[trail.Count - 1], trail[trail.Count - 2]);
             if (d > maxLength)
                 trail[trail.Count - 1] = Vector2.Lerp(trail[trail.Count - 2], trail[trail.Count - 1], maxLength / d);
-            if (trail.Count == 2)
+            if (trail.Count != 2 || d < minLength) return;
+            lineRenderer.positionCount = 30;
+            for (var i = 0; i < 30; i++)
             {
-                lineRenderer.positionCount = 30;
-                for (var i = 0; i < 30; i++)
-                {
-                    lineRenderer.SetPosition(i, Vector3.Lerp(trail[0], trail[1], i / 29f));
-                }
+                lineRenderer.SetPosition(i, Vector3.Lerp(trail[0], trail[1], i / 29f));
             }
         }
         else if (Input.GetMouseButtonUp(0))

@@ -5,6 +5,7 @@ public class BallScript : MonoBehaviour
 {
     public static BallScript instance;
     public int speedLvl;
+    public int scoreTimes;
 
     private Rigidbody2D rigid2D;
     private SpriteRenderer spriteRenderer;
@@ -57,11 +58,15 @@ public class BallScript : MonoBehaviour
         RefreshBallSpeed();
     }
 
-    public void SpeedLevelToZero()
+    public void SetScoreTimes(int times)
     {
-        speedLvl = 0;
-        RefreshBallSpeed();
+        scoreTimes = times;
     }
+//    public void SpeedLevelToZero()
+//    {
+//        speedLvl = 0;
+//        RefreshBallSpeed();
+//    }
 
     private void RefreshBallSpeed()
     {
