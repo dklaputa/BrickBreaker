@@ -5,13 +5,13 @@ public class RopeGenerator : MonoBehaviour
 {
     public int initialPoolSize = 2;
     public float minLength = .5f;
-    public float maxLength = 4f;
+    public float maxLength = 3f;
     public GameObject ropePrefab;
 
     private List<GameObject> ropePool = new List<GameObject>();
     private List<Vector3> trail = new List<Vector3>();
     private GameObject firstRope;
- 
+
     private LineRenderer lineRenderer;
 
     private void Awake()
@@ -36,6 +36,8 @@ public class RopeGenerator : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
+                trail.Clear();
+                ApplicationScript.instance.hideStartIntroAnim();
                 trail.Add((Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition));
             }
             else if (Input.GetMouseButton(0))

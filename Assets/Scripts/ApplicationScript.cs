@@ -14,6 +14,7 @@ public class ApplicationScript : MonoBehaviour
     private Text subtitle;
     private Text subtitleTimes;
     private GameObject startTips;
+    private GameObject startIntro;
     private int prefectCount;
     private bool isGameStart;
     private static readonly Color Yellow = new Color(215f / 255, 165f / 255, 57f / 255);
@@ -27,6 +28,7 @@ public class ApplicationScript : MonoBehaviour
         subtitle = GameObject.Find("Subtitle").GetComponent<Text>();
         subtitleTimes = GameObject.Find("SubtitleTimes").GetComponent<Text>();
         startTips = GameObject.Find("StartTips");
+        startIntro = GameObject.Find("StartIntroAnim");
     }
 
     // Update is called once per frame
@@ -51,6 +53,12 @@ public class ApplicationScript : MonoBehaviour
     {
         isGameStart = true;
         startTips.SetActive(false);
+        startIntro.SetActive(false);
+    }
+
+    public void hideStartIntroAnim()
+    {
+        if (startIntro.activeInHierarchy) startIntro.SetActive(false);
     }
 
     public void ShowPerfect()
