@@ -17,15 +17,15 @@ public class BrickScript : MonoBehaviour
         GetComponent<SpriteRenderer>().color = colors[level];
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("Ball"))
-        {
-            if (BallScript.instance.speedLvl >= level)
-            {
-                BallScript.instance.SpeedLevelChange(-level - 1);
-                Destroy(gameObject);
-            }
-        }
-    }
+//    private void OnCollisionEnter2D(Collision2D other)
+//    {
+//        if (other.gameObject.CompareTag("Ball"))
+//        {
+//            if (BallScript.instance.speedLvl >= level)
+//            {
+//                BallScript.instance.SpeedLevelChange(-level - 1);
+//                Destroy(gameObject);
+//            }
+//        }
+//    }
 }

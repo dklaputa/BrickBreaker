@@ -32,39 +32,39 @@ public class RopeGenerator : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (!ApplicationScript.instance.IsGameStart())
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                trail.Clear();
-                ApplicationScript.instance.hideStartIntroAnim();
-                trail.Add((Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                if (trail.Count < 2) trail.Add(point);
-                else trail[1] = point;
-                var d = Vector2.Distance(trail[0], trail[1]);
-                if (d > maxLength)
-                    trail[1] = Vector2.Lerp(trail[0], trail[1], maxLength / d);
-                lineRenderer.positionCount = 30;
-                for (var i = 0; i < 30; i++)
-                {
-                    lineRenderer.SetPosition(i, Vector3.Lerp(trail[0], trail[1], i / 29f));
-                }
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                lineRenderer.positionCount = 0;
-                if (trail.Count < 2 || Vector2.Distance(trail[0], trail[1]) < minLength) return;
-
-                firstRope.GetComponent<FirstRopeScript>().Initialize(trail[0], trail[1]);
-                firstRope.SetActive(true);
-                ApplicationScript.instance.GameStart();
-            }
-            return;
-        }
+//        if (!ApplicationScript.instance.IsGameStart())
+//        {
+//            if (Input.GetMouseButtonDown(0))
+//            {
+//                trail.Clear();
+//                ApplicationScript.instance.hideStartIntroAnim();
+//                trail.Add((Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition));
+//            }
+//            else if (Input.GetMouseButton(0))
+//            {
+//                Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+//                if (trail.Count < 2) trail.Add(point);
+//                else trail[1] = point;
+//                var d = Vector2.Distance(trail[0], trail[1]);
+//                if (d > maxLength)
+//                    trail[1] = Vector2.Lerp(trail[0], trail[1], maxLength / d);
+//                lineRenderer.positionCount = 30;
+//                for (var i = 0; i < 30; i++)
+//                {
+//                    lineRenderer.SetPosition(i, Vector3.Lerp(trail[0], trail[1], i / 29f));
+//                }
+//            }
+//            else if (Input.GetMouseButtonUp(0))
+//            {
+//                lineRenderer.positionCount = 0;
+//                if (trail.Count < 2 || Vector2.Distance(trail[0], trail[1]) < minLength) return;
+//
+//                firstRope.GetComponent<FirstRopeScript>().Initialize(trail[0], trail[1]);
+//                firstRope.SetActive(true);
+//                ApplicationScript.instance.GameStart();
+//            }
+//            return;
+//        }
 
         if (Input.GetMouseButtonDown(0))
         {

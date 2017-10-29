@@ -9,38 +9,45 @@ public class RopeScript : MonoBehaviour
         AfterTouchBall
     }
 
-    protected enum BallEnterStatus
+    protected enum BallEnterDirection
     {
         UpDown,
-        DownUp,
-        NotEnter
+        DownUp
+    }
+
+    public enum BallTriggerResult
+    {
+        BallAttach,
+        BallDetach,
+        BallBounce,
+        NotTrigger
     }
 
     public float lengthStall1 = 1f;
     public float lengthStall2 = 2f;
 
     private const float ballRange = .175f;
+
     private const float perfectRange = .125f;
 //    private const float randomBias = .1f;
 
     protected Vector2[] endPointPositions;
     private int times;
     private LineRenderer lineRenderer;
-    protected Rigidbody2D ballRigidBody;
-    protected CircleCollider2D ballCircleCollider;
     private GameObject ropeNodeLeft;
     protected GameObject ropeNodeMiddle;
     private GameObject ropeNodeRight;
     protected Rigidbody2D ropeNodeMiddleRigidBody;
     private SpringJoint2D[] springJointsMiddle;
+    private EdgeCollider2D edgeCollider2D;
 
     protected Status status = Status.BeforeTouchBall;
     private bool isPerfect;
     private bool isRemovable = true;
     protected bool isRemoving;
-    protected Vector2 AccelerationDirection;
-    protected BallEnterStatus enterDirection;
+    protected BallEnterDirection enterDirection;
     private Vector3[] ropePath = new Vector3[30];
+    private BallScript ball;
 
     public void Initialize(Vector2 position1, Vector2 position2, int ropeTimes)
     {
@@ -58,6 +65,7 @@ public class RopeScript : MonoBehaviour
         ropeNodeRight = transform.GetChild(2).gameObject;
         ropeNodeMiddleRigidBody = ropeNodeMiddle.GetComponent<Rigidbody2D>();
         springJointsMiddle = ropeNodeMiddle.GetComponents<SpringJoint2D>();
+        edgeCollider2D = GetComponent<EdgeCollider2D>();
     }
 
     protected virtual void OnEnable()
@@ -68,8 +76,7 @@ public class RopeScript : MonoBehaviour
         var ropeLength = (endPointPositions[0] - endPointPositions[1]).magnitude;
         springJointsMiddle[0].distance = ropeLength * .4f;
         springJointsMiddle[1].distance = springJointsMiddle[0].distance;
-        ballRigidBody = BallScript.instance.GetComponent<Rigidbody2D>();
-        ballCircleCollider = BallScript.instance.GetComponent<CircleCollider2D>();
+        edgeCollider2D.points = endPointPositions;
     }
 
     // Update is called once per frame
@@ -82,7 +89,8 @@ public class RopeScript : MonoBehaviour
                 RopePathBeforeTouch(endPointPositions[0], endPointPositions[1], ropePath);
                 break;
             case Status.DuringTouchBall:
-                RopePathDuringTouch(endPointPositions[0], endPointPositions[1], ballRigidBody.position, ballRange,
+                RopePathDuringTouch(endPointPositions[0], endPointPositions[1], ball.transform.position,
+                    ballRange,
                     enterDirection, ropePath);
                 break;
             case Status.AfterTouchBall:
@@ -100,19 +108,115 @@ public class RopeScript : MonoBehaviour
         lineRenderer.endColor = color2;
     }
 
-    protected virtual void FixedUpdate()
+//    protected virtual void FixedUpdate()
+//    {
+//        if (isRemoving || status == Status.AfterTouchBall) return;
+//        if (status == Status.DuringTouchBall)
+//        {
+//            var acceleration = AccelerationDirection * (30 + 16 * BallScript.instance.speed.magnitude);
+//            var ballStatus = CheckTrigger(endPointPositions[0], endPointPositions[1],
+//                BallScript.instance.transform.position,
+//                (BallScript.instance.speed + acceleration * Time.deltaTime) * Time.deltaTime);
+//            if (ballStatus == BallEnterStatus.NotEnter)
+//                BallScript.instance.speed += acceleration * Time.deltaTime;
+//            else if (ballStatus != enterDirection)
+//            {
+//                var ropeLength = (endPointPositions[0] - endPointPositions[1]).magnitude;
+//                int speedUp;
+//                if (ropeLength < lengthStall1)
+//                {
+//                    speedUp = times < 2 ? 2 : times;
+//                }
+//                else if (ropeLength < lengthStall2)
+//                {
+//                    speedUp = times < 2 ? 1 : times / 2;
+//                }
+//                else
+//                {
+//                    speedUp = times / 3;
+//                }
+//                if (isPerfect) speedUp *= 2;
+//                BallScript.instance.SpeedLevelChange(speedUp);
+//                ropeNodeMiddle.transform.position = BallScript.instance.transform.position;
+//                ropeNodeMiddle.SetActive(true);
+//                ropeNodeMiddleRigidBody.velocity = BallScript.instance.speed * .5f;
+//                BallScript.instance.isAttachedToRope = false;
+//                status = Status.AfterTouchBall;
+//                isRemovable = true;
+//                Remove();
+//            }
+//        }
+//        else if (status == Status.BeforeTouchBall)
+//        {
+//            var ballStatus = CheckTrigger(endPointPositions[0], endPointPositions[1],
+//                BallScript.instance.transform.position,
+//                BallScript.instance.speed * Time.deltaTime);
+//            if (ballStatus == BallEnterStatus.NotEnter) return;
+//
+//            var vAB = endPointPositions[0] - endPointPositions[1];
+//
+//            if (ballStatus == BallEnterStatus.UpDown)
+//                AccelerationDirection = -new Vector2(vAB.y, -vAB.x).normalized;
+//            else
+//                AccelerationDirection = new Vector2(vAB.y, -vAB.x).normalized;
+//            enterDirection = ballStatus;
+//            BallScript.instance.speed = -AccelerationDirection * BallScript.instance.speed.magnitude;
+//
+//            var vAC = endPointPositions[0] - (Vector2) BallScript.instance.transform.position;
+//            var vBC = endPointPositions[1] - (Vector2) BallScript.instance.transform.position;
+//            if (Mathf.Abs(Vector3.Cross(vAC, BallScript.instance.speed).z / BallScript.instance.speed.magnitude) <
+//                ballRange ||
+//                Mathf.Abs(Vector3.Cross(vBC, BallScript.instance.speed).z / BallScript.instance.speed.magnitude) <
+//                ballRange)
+//            {
+//                BallScript.instance.speed = -BallScript.instance.speed;
+//                ropeNodeMiddle.SetActive(true);
+//                ropeNodeMiddleRigidBody.velocity = BallScript.instance.speed * .2f;
+//                status = Status.AfterTouchBall;
+//                Remove();
+//                ApplicationScript.instance.ShowMiss();
+//                ApplicationScript.instance.ResetPerfectCount();
+//                return;
+//            }
+//            if (Mathf.Abs(Vector3.Cross(vAC, BallScript.instance.speed).z / BallScript.instance.speed.magnitude -
+//                          vAB.magnitude / 2) < perfectRange)
+//            {
+//                isPerfect = true;
+//                ApplicationScript.instance.ShowPerfect();
+//            }
+//            else ApplicationScript.instance.ResetPerfectCount();
+//
+//            BallScript.instance.isAttachedToRope = true;
+//            status = Status.DuringTouchBall;
+//            isRemovable = false;
+//        }
+//    }
+//
+//    protected static BallEnterStatus CheckTrigger(Vector2 ropeNodeLeftPosition, Vector2 ropeNodeRightPosition,
+//        Vector2 ballPosition, Vector2 ballDisplacement)
+//    {
+//        var pointD = ballPosition + ballDisplacement;
+//        var vAB = ropeNodeRightPosition - ropeNodeLeftPosition;
+//        var vAC = ballPosition - ropeNodeLeftPosition;
+//        var vAD = pointD - ropeNodeLeftPosition;
+//        var vBC = ballPosition - ropeNodeRightPosition;
+//        var sinCAB = Vector3.Cross(vAC, vAB).z;
+//        if (!(sinCAB * Vector3.Cross(vAD, vAB).z < 0) ||
+//            !(Vector3.Cross(vAC, ballDisplacement).z * Vector3.Cross(vBC, ballDisplacement).z < 0))
+//            return BallEnterStatus.NotEnter;
+//        return sinCAB > 0 ? BallEnterStatus.UpDown : BallEnterStatus.DownUp;
+//    }
+
+    public BallTriggerResult OnBallTrigger(Vector2 position, Vector2 speed, BallScript callback)
     {
-        if (isRemoving || status == Status.AfterTouchBall) return;
         if (status == Status.DuringTouchBall)
         {
-            var acceleration = AccelerationDirection * (30 + 16 * ballRigidBody.velocity.magnitude);
-            var ballStatus = CheckTrigger(endPointPositions[0], endPointPositions[1], ballRigidBody.position,
-                (ballRigidBody.velocity + acceleration * Time.deltaTime) * Time.deltaTime);
-            if (ballStatus == BallEnterStatus.NotEnter)
-                ballRigidBody.velocity += acceleration * Time.deltaTime;
-            else if (ballStatus != enterDirection)
+            var vRope = endPointPositions[0] - endPointPositions[1];
+            var newEnterDirection =
+                Vector3.Cross(speed, vRope).z < 0 ? BallEnterDirection.DownUp : BallEnterDirection.UpDown;
+            if (newEnterDirection != enterDirection)
             {
-                var ropeLength = (endPointPositions[0] - endPointPositions[1]).magnitude;
+                var ropeLength = vRope.magnitude;
                 int speedUp;
                 if (ropeLength < lengthStall1)
                 {
@@ -127,73 +231,55 @@ public class RopeScript : MonoBehaviour
                     speedUp = times / 3;
                 }
                 if (isPerfect) speedUp *= 2;
-                BallScript.instance.SpeedLevelChange(speedUp);
-                ropeNodeMiddle.transform.position = ballRigidBody.position;
+                callback.SpeedLevelChange(speedUp);
+                ball = null;
+                ropeNodeMiddle.transform.position = position;
                 ropeNodeMiddle.SetActive(true);
-                ropeNodeMiddleRigidBody.velocity = ballRigidBody.velocity * .5f;
-                ballCircleCollider.enabled = true;
+                ropeNodeMiddleRigidBody.velocity = speed * .5f;
                 status = Status.AfterTouchBall;
                 isRemovable = true;
                 Remove();
+                return BallTriggerResult.BallDetach;
             }
+            return BallTriggerResult.NotTrigger;
         }
-        else if (status == Status.BeforeTouchBall)
+        if (status == Status.BeforeTouchBall)
         {
-            var ballStatus = CheckTrigger(endPointPositions[0], endPointPositions[1], ballRigidBody.position,
-                ballRigidBody.velocity * Time.deltaTime);
-            if (ballStatus == BallEnterStatus.NotEnter) return;
-
-            var vAB = endPointPositions[0] - endPointPositions[1];
-
-            if (ballStatus == BallEnterStatus.UpDown)
-                AccelerationDirection = -new Vector2(vAB.y, -vAB.x).normalized;
+            var vRope = endPointPositions[0] - endPointPositions[1];
+            enterDirection = Vector3.Cross(speed, vRope).z < 0 ? BallEnterDirection.DownUp : BallEnterDirection.UpDown;
+            Vector2 accelerationDirection;
+            if (enterDirection == BallEnterDirection.UpDown)
+                accelerationDirection = -new Vector2(vRope.y, -vRope.x).normalized;
             else
-                AccelerationDirection = new Vector2(vAB.y, -vAB.x).normalized;
-            enterDirection = ballStatus;
-            ballRigidBody.velocity = -AccelerationDirection * ballRigidBody.velocity.magnitude;
-
-            var vAC = endPointPositions[0] - ballRigidBody.position;
-            var vBC = endPointPositions[1] - ballRigidBody.position;
-            if (Mathf.Abs(Vector3.Cross(vAC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude) <
-                ballRange ||
-                Mathf.Abs(Vector3.Cross(vBC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude) < ballRange)
+                accelerationDirection = new Vector2(vRope.y, -vRope.x).normalized;
+            callback.SetAccelerationDirection(accelerationDirection);
+            var vLeft = endPointPositions[0] - position;
+            var vRight = endPointPositions[1] - position;
+            var lLeft = Vector3.Dot(vLeft, vRope) / vRope.magnitude;
+            var lRight = -Vector3.Dot(vRight, vRope) / vRope.magnitude;
+            if (lLeft < ballRange || lRight < ballRange)
             {
-                ballRigidBody.velocity = -ballRigidBody.velocity;
                 ropeNodeMiddle.SetActive(true);
-                ropeNodeMiddleRigidBody.velocity = ballRigidBody.velocity * .2f;
+                ropeNodeMiddleRigidBody.velocity = speed * .2f;
                 status = Status.AfterTouchBall;
                 Remove();
                 ApplicationScript.instance.ShowMiss();
                 ApplicationScript.instance.ResetPerfectCount();
-                return;
+                return BallTriggerResult.BallBounce;
             }
-            if (Mathf.Abs(Vector3.Cross(vAC, ballRigidBody.velocity).z / ballRigidBody.velocity.magnitude -
-                          vAB.magnitude / 2) < perfectRange)
+            if (Mathf.Abs(lLeft - vRope.magnitude / 2) < perfectRange)
             {
-                isPerfect = true; 
+                isPerfect = true;
                 ApplicationScript.instance.ShowPerfect();
             }
             else ApplicationScript.instance.ResetPerfectCount();
 
-            ballCircleCollider.enabled = false;
+            ball = callback;
             status = Status.DuringTouchBall;
             isRemovable = false;
+            return BallTriggerResult.BallAttach;
         }
-    }
-
-    protected static BallEnterStatus CheckTrigger(Vector2 ropeNodeLeftPosition, Vector2 ropeNodeRightPosition,
-        Vector2 ballPosition, Vector2 ballDisplacement)
-    {
-        var pointD = ballPosition + ballDisplacement;
-        var vAB = ropeNodeRightPosition - ropeNodeLeftPosition;
-        var vAC = ballPosition - ropeNodeLeftPosition;
-        var vAD = pointD - ropeNodeLeftPosition;
-        var vBC = ballPosition - ropeNodeRightPosition;
-        var sinCAB = Vector3.Cross(vAC, vAB).z;
-        if (!(sinCAB * Vector3.Cross(vAD, vAB).z < 0) ||
-            !(Vector3.Cross(vAC, ballDisplacement).z * Vector3.Cross(vBC, ballDisplacement).z < 0))
-            return BallEnterStatus.NotEnter;
-        return sinCAB > 0 ? BallEnterStatus.UpDown : BallEnterStatus.DownUp;
+        return BallTriggerResult.NotTrigger;
     }
 
     private static void RopePathBeforeTouch(Vector3 pointL, Vector3 pointR, Vector3[] ropePath)
@@ -205,7 +291,7 @@ public class RopeScript : MonoBehaviour
     }
 
     private static void RopePathDuringTouch(Vector3 pointL, Vector3 pointR, Vector3 circleCenter, float r,
-        BallEnterStatus direction, Vector3[] ropePath)
+        BallEnterDirection direction, Vector3[] ropePath)
     {
         var dL = (pointL - circleCenter).magnitude;
         var dR = (pointR - circleCenter).magnitude;
@@ -221,7 +307,7 @@ public class RopeScript : MonoBehaviour
         var normalizedR = (pointR - circleCenter).normalized;
 
         var rotated = new Vector3[2];
-        if (direction == BallEnterStatus.DownUp)
+        if (direction == BallEnterDirection.DownUp)
         {
             rotated[0] = r * RotateVector(normalizedL, fL);
             rotated[1] = r * RotateVector(normalizedR, -fR);

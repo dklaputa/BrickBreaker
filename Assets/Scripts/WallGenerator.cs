@@ -24,5 +24,8 @@ public class WallGenerator : MonoBehaviour
         var rightCol = Instantiate(wallPrefab, transform).GetComponent<BoxCollider2D>();
         rightCol.offset = right + new Vector3(0.3f, 0, 0);
         rightCol.size = new Vector3(0.6f, height, 0);
+        var bottomCol = Instantiate(wallPrefab, transform).GetComponent<BoxCollider2D>();
+        bottomCol.offset = bottom - new Vector3(0, 0.3f, 0);
+        bottomCol.size = new Vector3(width, 0.6f, 0);
     }
 }
