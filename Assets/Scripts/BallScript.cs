@@ -12,9 +12,15 @@ public class BallScript : MonoBehaviour
     private int scoreTimes;
     private bool isAttachedToRope;
     private Vector2 accelerationDirection;
+    private bool isBeforeStart = true;
 
     private static readonly Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
     private static readonly Color Yellow = new Color(215f / 255, 165f / 255, 57f / 255);
+
+    public void setInitialSpeedDirection(Vector2 direction)
+    {
+        speed = direction * speedArray[speedLvl];
+    }
 
     // Use this for initialization
     private void Awake()
@@ -22,10 +28,10 @@ public class BallScript : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void Start()
-    {
-        speed = Vector2.down * speedArray[speedLvl];
-    }
+//    private void Start() 
+//    {
+//        speed = Vector2.down * speedArray[speedLvl];
+//    }
 
 //    // Update is called once per frame
 //    private void Update()
@@ -58,6 +64,7 @@ public class BallScript : MonoBehaviour
                 {
                     speed = -accelerationDirection * speed.magnitude;
                     isAttachedToRope = true;
+                    if (isBeforeStart) isBeforeStart = false;
                 }
                 else if (result == RopeScript.BallTriggerResult.BallDetach)
                 {
@@ -65,7 +72,7 @@ public class BallScript : MonoBehaviour
                 }
                 break;
             }
-            if (isAttachedToRope) break;
+            if (isAttachedToRope || isBeforeStart) break;
             if (o.CompareTag("Wall"))
             {
                 remainTime -= hit.distance / speed.magnitude;
@@ -86,6 +93,11 @@ public class BallScript : MonoBehaviour
                 {
                     speed = Vector2.Reflect(speed, hit.normal);
                 }
+            }
+            else if (o.CompareTag("GameOverTrigger"))
+            {
+                SceneManager.LoadScene("Main");
+                break;
             }
             else break;
             hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * remainTime);

@@ -7,10 +7,12 @@ public class ApplicationScript : MonoBehaviour
 {
     public static ApplicationScript instance;
 
+    public GameObject ball;
+
     public string miss = "Oops!";
     public string[] perfect = {"Good", "Great", "Perfect"};
 
-    private Text ropeTimes;
+    private Text ropeGain;
     private Text subtitle;
     private Text subtitleTimes;
     private GameObject startTips;
@@ -24,7 +26,7 @@ public class ApplicationScript : MonoBehaviour
     {
         instance = this;
         Input.multiTouchEnabled = false;
-        ropeTimes = GameObject.Find("RopeTimes").GetComponent<Text>();
+        ropeGain = GameObject.Find("RopeGain").GetComponent<Text>();
         subtitle = GameObject.Find("Subtitle").GetComponent<Text>();
         subtitleTimes = GameObject.Find("SubtitleTimes").GetComponent<Text>();
         startTips = GameObject.Find("StartTips");
@@ -38,10 +40,10 @@ public class ApplicationScript : MonoBehaviour
             Application.Quit();
     }
 
-    public void SetRopeTimes(int times)
+    public void ShowRopeGain(int gain)
     {
-        ropeTimes.text = times == -1 ? "" : times.ToString();
-        ropeTimes.color = Color.Lerp(Color.white, Yellow, (times - 10) / 10f);
+        ropeGain.text = gain == -1 ? "" : gain.ToString();
+        ropeGain.color = Color.Lerp(Color.white, Yellow, (gain - 10) / 10f);
     }
 
     public bool IsGameStart()
@@ -49,14 +51,19 @@ public class ApplicationScript : MonoBehaviour
         return isGameStart;
     }
 
-    public void GameStart()
+    public void GameStart(Vector2 position1, Vector2 position2)
     {
         isGameStart = true;
         startTips.SetActive(false);
-        startIntro.SetActive(false);
+        var ropeVector = position1 - position2;
+        Vector2 up;
+        if (ropeVector.x < 0) up = new Vector2(ropeVector.y, -ropeVector.x).normalized;
+        else up = new Vector2(-ropeVector.y, ropeVector.x).normalized;
+        var o = Instantiate(ball, (position1 + position2) / 2 + up, Quaternion.identity);
+        o.GetComponent<BallScript>().setInitialSpeedDirection(-up);
     }
 
-    public void hideStartIntroAnim()
+    public void HideStartIntroAnim()
     {
         if (startIntro.activeInHierarchy) startIntro.SetActive(false);
     }

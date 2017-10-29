@@ -27,5 +27,6 @@ public class WallGenerator : MonoBehaviour
         var bottomCol = Instantiate(wallPrefab, transform).GetComponent<BoxCollider2D>();
         bottomCol.offset = bottom - new Vector3(0, 0.3f, 0);
         bottomCol.size = new Vector3(width, 0.6f, 0);
+        bottomCol.tag = "GameOverTrigger";
     }
 }
