@@ -23,8 +23,8 @@ public class RopeScript : MonoBehaviour
         NotTrigger
     }
 
-    public float lengthStall1 = 1f;
-    public float lengthStall2 = 2f;
+    public float lengthStall1 = 1.1f;
+    public float lengthStall2 = 1.8f;
 
     private const float ballRange = .175f;
     private const float perfectRange = .125f;
@@ -75,6 +75,7 @@ public class RopeScript : MonoBehaviour
         springJointsMiddle[0].distance = ropeLength * .4f;
         springJointsMiddle[1].distance = springJointsMiddle[0].distance;
         edgeCollider2D.points = endPointPositions;
+        edgeCollider2D.enabled = true;
     }
 
     // Update is called once per frame
@@ -260,6 +261,7 @@ public class RopeScript : MonoBehaviour
     {
         if (isRemoving) return;
         isRemoving = true;
+        edgeCollider2D.enabled = false;
         Invoke("Destroy", .25f);
     }
 

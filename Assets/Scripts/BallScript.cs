@@ -7,15 +7,18 @@ public class BallScript : MonoBehaviour
     public float[] speedArray = {8, 9, 10, 11, 12, 13, 14, 15, 16};
 
     private SpriteRenderer spriteRenderer;
+    private ParticleSystem.ColorOverLifetimeModule colorOverLifetimeModule;
     private Vector2 speed;
     private int speedLvl;
     private int scoreTimes;
     private bool isAttachedToRope;
     private Vector2 accelerationDirection;
     private bool isBeforeStart = true;
+    private bool isRestoreTimeScale;
 
-    private static readonly Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
-    private static readonly Color Yellow = new Color(215f / 255, 165f / 255, 57f / 255);
+    public Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
+    public Color Yellow = new Color(215f / 255, 165f / 255, 57f / 255);
+    public Color Red = new Color(215f / 255, 57f / 255, 80f / 255);
 
     public void setInitialSpeedDirection(Vector2 direction)
     {
@@ -26,6 +29,7 @@ public class BallScript : MonoBehaviour
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        colorOverLifetimeModule = GetComponent<ParticleSystem>().colorOverLifetime;
     }
 
 //    private void Start() 
@@ -42,6 +46,15 @@ public class BallScript : MonoBehaviour
 
     private void Update()
     {
+        if (isRestoreTimeScale)
+        {
+            Time.timeScale += 2 * Time.deltaTime;
+            if (Time.timeScale >= 1)
+            {
+                isRestoreTimeScale = false;
+                Time.timeScale = 1;
+            }
+        }
         if (isAttachedToRope)
         {
             speed += accelerationDirection * (20 + 10 * speed.magnitude) * Time.deltaTime;
@@ -49,7 +62,8 @@ public class BallScript : MonoBehaviour
         var remainTime = Time.deltaTime;
         var hit = Physics2D.CircleCast(transform.position, .125f, speed,
             speed.magnitude * remainTime);
-        while (hit.collider != null)
+        var count = 0;
+        while (hit.collider != null && count < 5)
         {
             var o = hit.collider.gameObject;
             if (o.CompareTag("Rope"))
@@ -86,8 +100,10 @@ public class BallScript : MonoBehaviour
                 var brick = o.GetComponent<BrickScript>();
                 if (speedLvl >= brick.level)
                 {
+                    if (speedLvl > 3) SlowDownTimeScale();
                     SpeedLevelChange(-brick.level - 1);
-                    Destroy(o);
+                    brick.Remove();
+                    BrickGenerator.instance.CheckIsBrickAllDead();
                 }
                 if (speedLvl <= brick.level)
                 {
@@ -101,6 +117,7 @@ public class BallScript : MonoBehaviour
             }
             else break;
             hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * remainTime);
+            count++;
         }
         transform.position += (Vector3) speed * remainTime;
     }
@@ -110,11 +127,25 @@ public class BallScript : MonoBehaviour
         accelerationDirection = direction;
     }
 
+    public void SlowDownTimeScale()
+    {
+        CancelInvoke();
+        isRestoreTimeScale = false;
+        Time.timeScale = .1f;
+        Invoke("RestoreTimeScale", .1f);
+    }
+
+    public void RestoreTimeScale()
+    {
+        isRestoreTimeScale = true;
+    }
+
     public void SpeedLevelChange(int lvlChange)
     {
         speedLvl = Mathf.Clamp(speedLvl + lvlChange, 0, speedArray.Length - 1);
         OnSpeedLevelChange();
     }
+
 
     public void SetScoreTimes(int times)
     {
@@ -129,6 +160,18 @@ public class BallScript : MonoBehaviour
     private void OnSpeedLevelChange()
     {
         speed = speed.normalized * speedArray[speedLvl];
-        spriteRenderer.color = Color.Lerp(Blue, Yellow, (float) speedLvl / (speedArray.Length - 1));
+        Color color;
+        var half = speedArray.Length / 2;
+        if (speedLvl < half)
+        {
+            color = Color.Lerp(Blue, Yellow, (float) speedLvl / half);
+        }
+        else
+        {
+            color = Color.Lerp(Yellow, Red,
+                (float) (speedLvl - half) / (speedArray.Length - half - 1));
+        }
+        spriteRenderer.color = color;
+        colorOverLifetimeModule.color = color;
     }
 }

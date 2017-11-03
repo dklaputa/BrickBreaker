@@ -61,6 +61,7 @@ public class ApplicationScript : MonoBehaviour
         else up = new Vector2(-ropeVector.y, ropeVector.x).normalized;
         var o = Instantiate(ball, (position1 + position2) / 2 + up, Quaternion.identity);
         o.GetComponent<BallScript>().setInitialSpeedDirection(-up);
+        BrickGenerator.instance.GameStart();
     }
 
     public void HideStartIntroAnim()

@@ -5,8 +5,8 @@ using UnityEngine;
 public class RopeGenerator : MonoBehaviour
 {
     public int initialPoolSize = 2;
-    public float minLength = .5f;
-    public float maxLength = 3f;
+    public float minLength = .4f;
+    public float maxLength = 2.5f;
     public GameObject ropePrefab;
 
     public static RopeGenerator instance;

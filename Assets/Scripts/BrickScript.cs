@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BrickScript : MonoBehaviour
 {
@@ -12,9 +13,20 @@ public class BrickScript : MonoBehaviour
         new Color(214f / 255, 135f / 255, 255f / 255)
     };
 
-    private void Start()
+    public void SetLevel(int lvl)
+    {
+        level = lvl;
+    }
+
+    private void OnEnable()
     {
         GetComponent<SpriteRenderer>().color = colors[level];
+        transform.GetChild(0).GetChild(0).gameObject.GetComponent<Text>().text = (level + 1).ToString();
+    }
+
+    public void Remove()
+    {
+        gameObject.SetActive(false);
     }
 
 //    private void OnCollisionEnter2D(Collision2D other)
