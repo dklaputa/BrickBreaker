@@ -10,7 +10,7 @@ public class ApplicationScript : MonoBehaviour
     public GameObject ball;
 
     public string miss = "Oops!";
-    public string[] perfect = {"Good", "Great", "Perfect"};
+    public string[] perfect = {"Good!", "Great!", "Perfect!!"};
 
     private Text ropeGain;
     private Text subtitle;

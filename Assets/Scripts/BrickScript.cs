@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class BrickScript : MonoBehaviour
 {
     public int level;
+    private Text textLvl;
+    private SpriteRenderer spriteRenderer;
 
     public Color[] colors =
     {
@@ -18,15 +20,22 @@ public class BrickScript : MonoBehaviour
         level = lvl;
     }
 
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        textLvl = transform.GetChild(0).GetChild(0).gameObject.GetComponent<Text>();
+    }
+
     private void OnEnable()
     {
-        GetComponent<SpriteRenderer>().color = colors[level];
-        transform.GetChild(0).GetChild(0).gameObject.GetComponent<Text>().text = (level + 1).ToString();
+        spriteRenderer.color = colors[level];
+        textLvl.text = (level + 1).ToString();
     }
 
     public void Remove()
     {
         gameObject.SetActive(false);
+        BrickParticleGenerator.instance.ShowParticle(transform.position, colors[level]);
     }
 
 //    private void OnCollisionEnter2D(Collision2D other)

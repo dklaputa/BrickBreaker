@@ -8,6 +8,7 @@ public class BallScript : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
     private ParticleSystem.ColorOverLifetimeModule colorOverLifetimeModule;
+    private ParticleSystem particle;
     private Vector2 speed;
     private int speedLvl;
     private int scoreTimes;
@@ -29,7 +30,8 @@ public class BallScript : MonoBehaviour
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        colorOverLifetimeModule = GetComponent<ParticleSystem>().colorOverLifetime;
+        particle = GetComponent<ParticleSystem>();
+        colorOverLifetimeModule = particle.colorOverLifetime;
     }
 
 //    private void Start() 
@@ -98,16 +100,16 @@ public class BallScript : MonoBehaviour
                 remainTime -= hit.distance / speed.magnitude;
                 transform.position = hit.point + hit.normal * .125f;
                 var brick = o.GetComponent<BrickScript>();
+                if (speedLvl <= brick.level)
+                {
+                    speed = Vector2.Reflect(speed, hit.normal);
+                }
                 if (speedLvl >= brick.level)
                 {
                     if (speedLvl > 3) SlowDownTimeScale();
                     SpeedLevelChange(-brick.level - 1);
                     brick.Remove();
                     BrickGenerator.instance.CheckIsBrickAllDead();
-                }
-                if (speedLvl <= brick.level)
-                {
-                    speed = Vector2.Reflect(speed, hit.normal);
                 }
             }
             else if (o.CompareTag("GameOverTrigger"))
@@ -172,6 +174,14 @@ public class BallScript : MonoBehaviour
                 (float) (speedLvl - half) / (speedArray.Length - half - 1));
         }
         spriteRenderer.color = color;
-        colorOverLifetimeModule.color = color;
+        if (speedLvl > 3)
+        {
+            if (!particle.isPlaying) particle.Play();
+            colorOverLifetimeModule.color = color;
+        }
+        else
+        {
+            if (!particle.isStopped) particle.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+        }
     }
 }

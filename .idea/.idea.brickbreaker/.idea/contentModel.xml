@@ -17,6 +17,8 @@
           <e p="ApplicationScript.cs" t="Include" />
           <e p="BallScript.cs" t="Include" />
           <e p="BrickGenerator.cs" t="Include" />
+          <e p="BrickParticleGenerator.cs" t="Include" />
+          <e p="BrickParticleScript.cs" t="Include" />
           <e p="BrickScript.cs" t="Include" />
           <e p="FpsScript.cs" t="Include" />
           <e p="RopeGenerator.cs" t="Include" />
