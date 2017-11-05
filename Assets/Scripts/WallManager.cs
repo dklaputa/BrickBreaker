@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class WallGenerator : MonoBehaviour
+public class WallManager : MonoBehaviour
 {
     public GameObject wallPrefab;
 

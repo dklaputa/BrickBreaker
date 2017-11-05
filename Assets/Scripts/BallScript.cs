@@ -11,7 +11,6 @@ public class BallScript : MonoBehaviour
     private ParticleSystem particle;
     private Vector2 speed;
     private int speedLvl;
-    private int scoreTimes;
     private bool isAttachedToRope;
     private Vector2 accelerationDirection;
     private bool isBeforeStart = true;
@@ -71,7 +70,7 @@ public class BallScript : MonoBehaviour
             if (o.CompareTag("Rope"))
             {
                 var rope = o.GetComponent<RopeScript>();
-                var result = rope.OnBallTrigger(transform.position, speed, this);
+                var result = rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
                 if (result == RopeScript.BallTriggerResult.BallBounce)
                 {
                     speed = -speed;
@@ -80,11 +79,11 @@ public class BallScript : MonoBehaviour
                 {
                     speed = -accelerationDirection * speed.magnitude;
                     isAttachedToRope = true;
-                    if (isBeforeStart) isBeforeStart = false;
                 }
                 else if (result == RopeScript.BallTriggerResult.BallDetach)
                 {
                     isAttachedToRope = false;
+                    if (isBeforeStart) isBeforeStart = false;
                 }
                 break;
             }
@@ -109,7 +108,7 @@ public class BallScript : MonoBehaviour
                     if (speedLvl > 3) SlowDownTimeScale();
                     SpeedLevelChange(-brick.level - 1);
                     brick.Remove();
-                    BrickGenerator.instance.CheckIsBrickAllDead();
+                    BrickManager.instance.CheckIsBrickAllDead();
                 }
             }
             else if (o.CompareTag("GameOverTrigger"))
@@ -129,7 +128,7 @@ public class BallScript : MonoBehaviour
         accelerationDirection = direction;
     }
 
-    public void SlowDownTimeScale()
+    private void SlowDownTimeScale()
     {
         CancelInvoke();
         isRestoreTimeScale = false;
@@ -137,7 +136,7 @@ public class BallScript : MonoBehaviour
         Invoke("RestoreTimeScale", .1f);
     }
 
-    public void RestoreTimeScale()
+    private void RestoreTimeScale()
     {
         isRestoreTimeScale = true;
     }
@@ -146,12 +145,6 @@ public class BallScript : MonoBehaviour
     {
         speedLvl = Mathf.Clamp(speedLvl + lvlChange, 0, speedArray.Length - 1);
         OnSpeedLevelChange();
-    }
-
-
-    public void SetScoreTimes(int times)
-    {
-        scoreTimes = times;
     }
 //    public void SpeedLevelToZero()
 //    {

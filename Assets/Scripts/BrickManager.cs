@@ -3,11 +3,11 @@ using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
-public class BrickGenerator : MonoBehaviour
+public class BrickManager : MonoBehaviour
 {
     public int initialPoolSize = 50;
     public GameObject brickPrefab;
-    public static BrickGenerator instance;
+    public static BrickManager instance;
     private Vector2 targetPosition;
     private bool startMove;
 

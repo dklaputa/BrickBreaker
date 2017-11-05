@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BrickParticleGenerator : MonoBehaviour
+public class BrickParticleManager : MonoBehaviour
 {
     public int initialPoolSize = 5;
     public GameObject brickParticlePrefab;
-    public static BrickParticleGenerator instance;
+    public static BrickParticleManager instance;
 
     private List<GameObject> particlePool = new List<GameObject>();
 

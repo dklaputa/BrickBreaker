@@ -35,7 +35,8 @@ public class BrickScript : MonoBehaviour
     public void Remove()
     {
         gameObject.SetActive(false);
-        BrickParticleGenerator.instance.ShowParticle(transform.position, colors[level]);
+        BrickParticleManager.instance.ShowParticle(transform.position, colors[level]);
+        PointsTextManager.instance.ShowPointsText(transform.position, (level + 1) * 100);
     }
 
 //    private void OnCollisionEnter2D(Collision2D other)

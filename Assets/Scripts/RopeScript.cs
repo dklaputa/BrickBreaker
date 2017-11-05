@@ -23,15 +23,12 @@ public class RopeScript : MonoBehaviour
         NotTrigger
     }
 
-    public float lengthStall1 = 1.1f;
-    public float lengthStall2 = 1.8f;
+    public float lengthStall = 1.2f;
 
     private const float ballRange = .175f;
     private const float perfectRange = .125f;
 
     private Vector2[] endPointPositions;
-    private int gain;
-    private bool isFirstTime;
 
     private LineRenderer lineRenderer;
     private GameObject ropeNodeMiddle;
@@ -43,16 +40,14 @@ public class RopeScript : MonoBehaviour
     private bool isPerfect;
     private bool isRemoving;
     private BallEnterDirection enterDirection;
-    private readonly Vector3[] ropePath = new Vector3[30];
+    private readonly Vector3[] ropePath = new Vector3[15];
     private BallScript ball;
     private Vector2 ropeVector;
     private float ropeLength;
 
-    public void Initialize(Vector2 position1, Vector2 position2, int ropeGain, bool firstTime)
+    public void Initialize(Vector2 position1, Vector2 position2)
     {
         endPointPositions = new[] {position1, position2};
-        gain = ropeGain;
-        isFirstTime = firstTime;
     }
 
     // Use this for initialization
@@ -76,12 +71,13 @@ public class RopeScript : MonoBehaviour
         springJointsMiddle[1].distance = springJointsMiddle[0].distance;
         edgeCollider2D.points = endPointPositions;
         edgeCollider2D.enabled = true;
+//        lineRenderer.material.mainTextureScale = new Vector2(ropeLength * 2.5f, 1);
     }
 
     // Update is called once per frame
     private void LateUpdate()
     {
-        lineRenderer.positionCount = 30;
+        lineRenderer.positionCount = 15;
         switch (status)
         {
             case Status.BeforeTouchBall:
@@ -107,7 +103,7 @@ public class RopeScript : MonoBehaviour
         lineRenderer.endColor = color2;
     }
 
-    public BallTriggerResult OnBallTrigger(Vector2 position, Vector2 speed, BallScript callback)
+    public BallTriggerResult OnBallTrigger(Vector2 position, Vector2 speed, BallScript callback, bool isNormalCase)
     {
         switch (status)
         {
@@ -115,21 +111,9 @@ public class RopeScript : MonoBehaviour
                 var newEnterDirection =
                     Vector3.Cross(speed, ropeVector).z < 0 ? BallEnterDirection.DownUp : BallEnterDirection.UpDown;
                 if (newEnterDirection == enterDirection) return BallTriggerResult.NotTrigger;
-                if (!isFirstTime)
-                {
-                    int speedUp;
-                    if (ropeLength < lengthStall1)
-                    {
-                        speedUp = gain < 2 ? 2 : gain;
-                    }
-                    else if (ropeLength < lengthStall2)
-                    {
-                        speedUp = gain < 2 ? 1 : gain / 2;
-                    }
-                    else
-                    {
-                        speedUp = gain / 3;
-                    }
+                if (isNormalCase)
+                { 
+                    var speedUp = ropeLength < lengthStall ? 2 : 1;
                     if (isPerfect) speedUp *= 2;
                     callback.SpeedLevelChange(speedUp);
                 }
@@ -139,7 +123,7 @@ public class RopeScript : MonoBehaviour
                 ropeNodeMiddle.SetActive(true);
                 ropeNodeMiddleRigidBody.velocity = speed * .5f;
                 status = Status.AfterTouchBall;
-                RopeGenerator.instance.PreventNewRope(false);
+                RopeManager.instance.PreventNewRope(false);
                 Remove();
                 return BallTriggerResult.BallDetach;
             case Status.BeforeTouchBall:
@@ -152,7 +136,7 @@ public class RopeScript : MonoBehaviour
                 else
                     accelerationDirection = new Vector2(ropeVector.y, -ropeVector.x).normalized;
                 callback.SetAccelerationDirection(accelerationDirection);
-                if (!isFirstTime)
+                if (isNormalCase)
                 {
                     var vLeft = endPointPositions[0] - position;
                     var vRight = endPointPositions[1] - position;
@@ -164,20 +148,19 @@ public class RopeScript : MonoBehaviour
                         ropeNodeMiddleRigidBody.velocity = speed * .2f;
                         status = Status.AfterTouchBall;
                         Remove();
-                        ApplicationScript.instance.ShowMiss();
-                        ApplicationScript.instance.ResetPerfectCount();
+                        GameController.instance.Miss();
                         return BallTriggerResult.BallBounce;
                     }
                     if (Mathf.Abs(lLeft - ropeLength / 2) < perfectRange)
                     {
                         isPerfect = true;
-                        ApplicationScript.instance.ShowPerfect();
+                        GameController.instance.PerfectShoot();
                     }
-                    else ApplicationScript.instance.ResetPerfectCount();
+                    else GameController.instance.ResetPerfectCount();
                 }
                 ball = callback;
                 status = Status.DuringTouchBall;
-                RopeGenerator.instance.PreventNewRope(true);
+                RopeManager.instance.PreventNewRope(true);
                 return BallTriggerResult.BallAttach;
             default:
                 return BallTriggerResult.NotTrigger;
@@ -186,9 +169,9 @@ public class RopeScript : MonoBehaviour
 
     private static void RopePathBeforeTouch(Vector3 pointL, Vector3 pointR, Vector3[] ropePath)
     {
-        for (var i = 0; i < 30; i++)
+        for (var i = 0; i < 15; i++)
         {
-            ropePath[i] = Vector3.Lerp(pointL, pointR, i / 29f);
+            ropePath[i] = Vector3.Lerp(pointL, pointR, i / 14f);
         }
     }
 
@@ -220,25 +203,25 @@ public class RopeScript : MonoBehaviour
             rotated[1] = r * RotateVector(normalizedR, fR);
         }
         Vector3[] tangents = {rotated[0] + circleCenter, rotated[1] + circleCenter};
-        for (var i = 0; i < 10; i++)
+        for (var i = 0; i < 5; i++)
         {
-            ropePath[i] = Vector3.Lerp(pointL, tangents[0], i / 9f);
+            ropePath[i] = Vector3.Lerp(pointL, tangents[0], i / 4f);
         }
-        for (var i = 10; i < 20; i++)
+        for (var i = 5; i < 10; i++)
         {
-            ropePath[i] = Vector3.Slerp(rotated[0], rotated[1], (i - 10) / 9f) + circleCenter;
+            ropePath[i] = Vector3.Slerp(rotated[0], rotated[1], (i - 5) / 4f) + circleCenter;
         }
-        for (var i = 20; i < 30; i++)
+        for (var i = 10; i < 15; i++)
         {
-            ropePath[i] = Vector3.Lerp(tangents[1], pointR, (i - 20) / 9f);
+            ropePath[i] = Vector3.Lerp(tangents[1], pointR, (i - 10) / 4f);
         }
     }
 
     private static void RopePathAfterTouch(Vector3 pointL, Vector3 pointM, Vector3 pointR, Vector3[] ropePath)
     {
-        for (var i = 0; i < 30; i++)
+        for (var i = 0; i < 15; i++)
         {
-            var t = i / 29f;
+            var t = i / 14f;
             Vector3[] points = {pointL, pointM, pointR};
             for (var m = 2; m > 0; m--)
             {
