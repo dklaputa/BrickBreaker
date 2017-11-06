@@ -8,7 +8,7 @@ public class FpsScript : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
-        text = GameObject.Find("FPS").GetComponent<Text>();
+        text = GetComponent<Text>();
     }
 
     // Update is called once per frame

@@ -40,7 +40,7 @@ public class RopeScript : MonoBehaviour
     private bool isPerfect;
     private bool isRemoving;
     private BallEnterDirection enterDirection;
-    private readonly Vector3[] ropePath = new Vector3[15];
+    private readonly Vector3[] ropePath = new Vector3[20];
     private BallScript ball;
     private Vector2 ropeVector;
     private float ropeLength;
@@ -77,7 +77,7 @@ public class RopeScript : MonoBehaviour
     // Update is called once per frame
     private void LateUpdate()
     {
-        lineRenderer.positionCount = 15;
+        lineRenderer.positionCount = 20;
         switch (status)
         {
             case Status.BeforeTouchBall:
@@ -169,9 +169,9 @@ public class RopeScript : MonoBehaviour
 
     private static void RopePathBeforeTouch(Vector3 pointL, Vector3 pointR, Vector3[] ropePath)
     {
-        for (var i = 0; i < 15; i++)
+        for (var i = 0; i < 20; i++)
         {
-            ropePath[i] = Vector3.Lerp(pointL, pointR, i / 14f);
+            ropePath[i] = Vector3.Lerp(pointL, pointR, i / 19f);
         }
     }
 
@@ -207,11 +207,11 @@ public class RopeScript : MonoBehaviour
         {
             ropePath[i] = Vector3.Lerp(pointL, tangents[0], i / 4f);
         }
-        for (var i = 5; i < 10; i++)
+        for (var i = 5; i < 15; i++)
         {
-            ropePath[i] = Vector3.Slerp(rotated[0], rotated[1], (i - 5) / 4f) + circleCenter;
+            ropePath[i] = Vector3.Slerp(rotated[0], rotated[1], (i - 5) / 9f) + circleCenter;
         }
-        for (var i = 10; i < 15; i++)
+        for (var i = 15; i < 20; i++)
         {
             ropePath[i] = Vector3.Lerp(tangents[1], pointR, (i - 10) / 4f);
         }
@@ -219,9 +219,9 @@ public class RopeScript : MonoBehaviour
 
     private static void RopePathAfterTouch(Vector3 pointL, Vector3 pointM, Vector3 pointR, Vector3[] ropePath)
     {
-        for (var i = 0; i < 15; i++)
+        for (var i = 0; i < 20; i++)
         {
-            var t = i / 14f;
+            var t = i / 19f;
             Vector3[] points = {pointL, pointM, pointR};
             for (var m = 2; m > 0; m--)
             {

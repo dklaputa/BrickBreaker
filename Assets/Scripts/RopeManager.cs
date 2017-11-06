@@ -42,18 +42,42 @@ public class RopeManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             positions[0] = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if (positions[0].y > 0) return;
+            if (positions[0].y > 0 || positions[0].y < -4.25f || positions[0].x > 2.5f ||
+                positions[0].x < -2.5f) return;
             drawStart = true;
             if (!GameController.instance.IsGameStart()) GameController.instance.HideIntroductionInfo();
         }
         else if (Input.GetMouseButton(0))
         {
-            if (!drawStart) return;
             positions[1] = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (!drawStart)
+            {
+                if (positions[1].y > 0 || positions[1].y < -4.25f || positions[1].x > 2.5f ||
+                    positions[1].x < -2.5f) return;
+                positions[0] = positions[1];
+                drawStart = true;
+                if (!GameController.instance.IsGameStart()) GameController.instance.HideIntroductionInfo();
+                return;
+            }
             if (positions[1].y > 0)
             {
                 positions[1] = Vector2.Lerp(positions[0], positions[1],
                     positions[0].y / (positions[0].y - positions[1].y));
+            }
+            else if (positions[1].y < -4.25f)
+            {
+                positions[1] = Vector2.Lerp(positions[0], positions[1],
+                    (positions[0].y + 4.25f) / (positions[0].y - positions[1].y));
+            }
+            if (positions[1].x > 2.5f)
+            {
+                positions[1] = Vector2.Lerp(positions[0], positions[1],
+                    (positions[0].x - 2.5f) / (positions[0].x - positions[1].x));
+            }
+            else if (positions[1].x < -2.5f)
+            {
+                positions[1] = Vector2.Lerp(positions[0], positions[1],
+                    (positions[0].x + 2.5f) / (positions[0].x - positions[1].x));
             }
             var d = Vector2.Distance(positions[0], positions[1]);
             if (d > maxLength)
@@ -62,11 +86,8 @@ public class RopeManager : MonoBehaviour
                 d = maxLength;
             }
             lineRenderer.material.mainTextureScale = new Vector2(d * 4, 1);
-            lineRenderer.positionCount = 15;
-            for (var i = 0; i < 15; i++)
-            {
-                lineRenderer.SetPosition(i, Vector3.Lerp(positions[0], positions[1], i / 14f));
-            }
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPositions(new Vector3[] {positions[0], positions[1]});
         }
         else if (Input.GetMouseButtonUp(0))
         {
@@ -79,6 +100,21 @@ public class RopeManager : MonoBehaviour
             {
                 positions[1] = Vector2.Lerp(positions[0], positions[1],
                     positions[0].y / (positions[0].y - positions[1].y));
+            }
+            else if (positions[1].y < -4.25f)
+            {
+                positions[1] = Vector2.Lerp(positions[0], positions[1],
+                    (positions[0].y + 4.25f) / (positions[0].y - positions[1].y));
+            }
+            if (positions[1].x > 2.5f)
+            {
+                positions[1] = Vector2.Lerp(positions[0], positions[1],
+                    (positions[0].x - 2.5f) / (positions[0].x - positions[1].x));
+            }
+            else if (positions[1].x < -2.5f)
+            {
+                positions[1] = Vector2.Lerp(positions[0], positions[1],
+                    (positions[0].x + 2.5f) / (positions[0].x - positions[1].x));
             }
             var d = Vector2.Distance(positions[0], positions[1]);
             if (d > maxLength)

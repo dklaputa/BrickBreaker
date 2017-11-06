@@ -14,9 +14,10 @@ public class GameController : MonoBehaviour
 
     private Text assessmentText;
     private Text assessmentCount;
+    private Text scoreText;
     private GameObject IntroductionInfo;
     private GameObject IntroductionAnimation;
-    private int prefectShootCount;
+    private int perfectShootCount;
     private int comboCount;
     private int totalPoints;
     private bool isGameStart;
@@ -28,6 +29,7 @@ public class GameController : MonoBehaviour
         Input.multiTouchEnabled = false;
         assessmentText = GameObject.Find("AssessmentText").GetComponent<Text>();
         assessmentCount = GameObject.Find("AssessmentCount").GetComponent<Text>();
+        scoreText = GameObject.Find("Score").GetComponent<Text>();
         IntroductionInfo = GameObject.Find("IntroInfo");
         IntroductionAnimation = GameObject.Find("IntroAnim");
     }
@@ -65,25 +67,25 @@ public class GameController : MonoBehaviour
     public void PerfectShoot()
     {
         CancelInvoke();
-        prefectShootCount++;
-        if (prefectShootCount <= perfect.Length) assessmentText.text = perfect[prefectShootCount - 1];
+        perfectShootCount++;
+        if (perfectShootCount <= perfect.Length) assessmentText.text = perfect[perfectShootCount - 1];
         else
         {
             assessmentText.text = perfect[perfect.Length - 1];
-            assessmentCount.text = "×" + (prefectShootCount - perfect.Length + 1);
+            assessmentCount.text = "×" + (perfectShootCount - perfect.Length + 1);
         }
         Invoke("HideAssessment", 0.4f);
     }
 
     public void ResetPerfectCount()
     {
-        prefectShootCount = 0;
+        perfectShootCount = 0;
     }
 
     public void Miss()
     {
         CancelInvoke();
-        prefectShootCount = 0;
+        perfectShootCount = 0;
         assessmentText.text = miss;
         Invoke("HideAssessment", 0.4f);
     }
@@ -97,8 +99,10 @@ public class GameController : MonoBehaviour
     public void GetPoints(Vector2 position, int points)
     {
         comboCount++;
-        totalPoints += points * comboCount;
-        PointsTextManager.instance.ShowPointsText(position, points * comboCount, comboCount);
+        var finalPoint = points * comboCount * (perfectShootCount + 1);
+        totalPoints += finalPoint;
+        PointsTextManager.instance.ShowPointsText(position, finalPoint);
+        scoreText.text = totalPoints.ToString();
     }
 
     public void ResetComboCount()

@@ -14,6 +14,7 @@
           </e>
         </e>
         <e p="Scripts" t="Include">
+          <e p="BackgroundScript.cs" t="Include" />
           <e p="BallScript.cs" t="Include" />
           <e p="BrickManager.cs" t="Include" />
           <e p="BrickParticleManager.cs" t="Include" />
@@ -25,7 +26,6 @@
           <e p="PointsTextScript.cs" t="Include" />
           <e p="RopeManager.cs" t="Include" />
           <e p="RopeScript.cs" t="Include" />
-          <e p="WallManager.cs" t="Include" />
         </e>
       </e>
       <e p="brickbreaker.sln" t="IncludeFlat" />
