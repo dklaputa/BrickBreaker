@@ -17,8 +17,8 @@ public class BallScript : MonoBehaviour
     private bool isRestoreTimeScale;
 
     public Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
-    public Color Yellow = new Color(215f / 255, 165f / 255, 57f / 255);
-    public Color Red = new Color(215f / 255, 57f / 255, 80f / 255);
+    public Color Yellow = new Color(255f / 255, 197f / 255, 71f / 255);
+    public Color Red = new Color(255f / 255, 73f / 255, 122f / 255);
 
     public void setInitialSpeedDirection(Vector2 direction)
     {
@@ -79,6 +79,7 @@ public class BallScript : MonoBehaviour
                 {
                     speed = -accelerationDirection * speed.magnitude;
                     isAttachedToRope = true;
+                    GameController.instance.ResetComboCount();
                 }
                 else if (result == RopeScript.BallTriggerResult.BallDetach)
                 {
@@ -108,6 +109,7 @@ public class BallScript : MonoBehaviour
                     if (speedLvl > 3) SlowDownTimeScale();
                     SpeedLevelChange(-brick.level - 1);
                     brick.Remove();
+                    GameController.instance.GetPoints(brick.transform.position, (brick.level + 1) * 100);
                     BrickManager.instance.CheckIsBrickAllDead();
                 }
             }

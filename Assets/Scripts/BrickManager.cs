@@ -167,7 +167,7 @@ public class BrickManager : MonoBehaviour
         }
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         if (!startMove) return;
         transform.position = Vector2.MoveTowards(transform.position, targetPosition, Time.deltaTime);

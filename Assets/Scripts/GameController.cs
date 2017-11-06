@@ -17,6 +17,8 @@ public class GameController : MonoBehaviour
     private GameObject IntroductionInfo;
     private GameObject IntroductionAnimation;
     private int prefectShootCount;
+    private int comboCount;
+    private int totalPoints;
     private bool isGameStart;
 
     // Use this for initialization
@@ -68,7 +70,7 @@ public class GameController : MonoBehaviour
         else
         {
             assessmentText.text = perfect[perfect.Length - 1];
-            assessmentCount.text = "+" + (prefectShootCount - perfect.Length);
+            assessmentCount.text = "×" + (prefectShootCount - perfect.Length + 1);
         }
         Invoke("HideAssessment", 0.4f);
     }
@@ -90,5 +92,17 @@ public class GameController : MonoBehaviour
     {
         assessmentText.text = "";
         assessmentCount.text = "";
+    }
+
+    public void GetPoints(Vector2 position, int points)
+    {
+        comboCount++;
+        totalPoints += points * comboCount;
+        PointsTextManager.instance.ShowPointsText(position, points * comboCount, comboCount);
+    }
+
+    public void ResetComboCount()
+    {
+        comboCount = 0;
     }
 }

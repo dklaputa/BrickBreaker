@@ -36,7 +36,6 @@ public class BrickScript : MonoBehaviour
     {
         gameObject.SetActive(false);
         BrickParticleManager.instance.ShowParticle(transform.position, colors[level]);
-        PointsTextManager.instance.ShowPointsText(transform.position, (level + 1) * 100);
     }
 
 //    private void OnCollisionEnter2D(Collision2D other)

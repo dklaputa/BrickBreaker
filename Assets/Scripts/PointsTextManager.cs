@@ -25,11 +25,11 @@ public class PointsTextManager : MonoBehaviour
         }
     }
 
-    public void ShowPointsText(Vector2 position, int points)
+    public void ShowPointsText(Vector2 position, int points, int combos)
     {
         var text = GetAvailablePointsText();
         text.transform.position = position;
-        text.GetComponent<Text>().text = "+" + points;
+        text.GetComponent<PointsTextScript>().SetText(points, combos);
         text.SetActive(true);
     }
 
