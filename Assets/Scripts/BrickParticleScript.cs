@@ -5,7 +5,7 @@ using UnityEngine;
 public class BrickParticleScript : MonoBehaviour
 {
     private Color color;
-    private ParticleSystem particleSystem;
+    private ParticleSystem particle;
     private ParticleSystem.ColorOverLifetimeModule colorOverLifetimeModule;
 
     public void SetColor(Color particleColor)
@@ -15,20 +15,20 @@ public class BrickParticleScript : MonoBehaviour
 
     private void Awake()
     {
-        particleSystem = GetComponent<ParticleSystem>();
-        colorOverLifetimeModule = particleSystem.colorOverLifetime;
+        particle = GetComponent<ParticleSystem>();
+        colorOverLifetimeModule = particle.colorOverLifetime;
     }
 
     private void OnEnable()
     {
         colorOverLifetimeModule.color = color;
-        particleSystem.Play();
+        particle.Play();
         Invoke("Destory", .3f);
     }
 
     private void Destory()
     {
-        if (!particleSystem.isStopped) particleSystem.Stop();
+        if (!particle.isStopped) particle.Stop();
         gameObject.SetActive(false);
     }
 }

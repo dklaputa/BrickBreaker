@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Globalization;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class FpsScript : MonoBehaviour
@@ -14,6 +15,7 @@ public class FpsScript : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        text.text = (1f / Time.deltaTime).ToString();
+        var fps = 1f / Time.deltaTime;
+        text.text = fps <= 59 ? fps.ToString() : "";
     }
 }

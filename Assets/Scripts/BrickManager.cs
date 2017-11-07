@@ -25,117 +25,117 @@ public class BrickManager : MonoBehaviour
         },
         new List<Vector3>
         {
-            new Vector3(-1.5f, 0.35f, 0),
-            new Vector3(-0.9f, 0.35f, 1),
-            new Vector3(-0.3f, 0.35f, 0),
-            new Vector3(0.3f, 0.35f, 0),
-            new Vector3(0.9f, 0.35f, 1),
-            new Vector3(1.5f, 0.35f, 0)
+            new Vector3(-1.5f, 0.34f, 0),
+            new Vector3(-0.9f, 0.34f, 1),
+            new Vector3(-0.3f, 0.34f, 0),
+            new Vector3(0.3f, 0.34f, 0),
+            new Vector3(0.9f, 0.34f, 1),
+            new Vector3(1.5f, 0.34f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.8f, 0.7f, 0),
-            new Vector3(-1.2f, 0.7f, 1),
-            new Vector3(-0.6f, 0.7f, 0),
-            new Vector3(0, 0.7f, 2),
-            new Vector3(0.6f, 0.7f, 0),
-            new Vector3(1.2f, 0.7f, 1),
-            new Vector3(1.8f, 0.7f, 0)
+            new Vector3(-1.8f, 0.68f, 0),
+            new Vector3(-1.2f, 0.68f, 1),
+            new Vector3(-0.6f, 0.68f, 0),
+            new Vector3(0, 0.68f, 2),
+            new Vector3(0.6f, 0.68f, 0),
+            new Vector3(1.2f, 0.68f, 1),
+            new Vector3(1.8f, 0.68f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.5f, 1.05f, 0),
-            new Vector3(-0.9f, 1.05f, 1),
-            new Vector3(-0.3f, 1.05f, 0),
-            new Vector3(0.3f, 1.05f, 0),
-            new Vector3(0.9f, 1.05f, 1),
-            new Vector3(1.5f, 1.05f, 0)
+            new Vector3(-1.5f, 1.02f, 0),
+            new Vector3(-0.9f, 1.02f, 1),
+            new Vector3(-0.3f, 1.02f, 0),
+            new Vector3(0.3f, 1.02f, 0),
+            new Vector3(0.9f, 1.02f, 1),
+            new Vector3(1.5f, 1.02f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.8f, 1.4f, 0),
-            new Vector3(-1.2f, 1.4f, 0),
-            new Vector3(-0.6f, 1.4f, 1),
-            new Vector3(0, 1.4f, 1),
-            new Vector3(0.6f, 1.4f, 1),
-            new Vector3(1.2f, 1.4f, 0),
-            new Vector3(1.8f, 1.4f, 0)
+            new Vector3(-1.8f, 1.36f, 0),
+            new Vector3(-1.2f, 1.36f, 0),
+            new Vector3(-0.6f, 1.36f, 1),
+            new Vector3(0, 1.36f, 1),
+            new Vector3(0.6f, 1.36f, 1),
+            new Vector3(1.2f, 1.36f, 0),
+            new Vector3(1.8f, 1.36f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.5f, 1.75f, 0),
-            new Vector3(-0.9f, 1.75f, 1),
-            new Vector3(-0.3f, 1.75f, 0),
-            new Vector3(0.3f, 1.75f, 0),
-            new Vector3(0.9f, 1.75f, 1),
-            new Vector3(1.5f, 1.75f, 0)
+            new Vector3(-1.5f, 1.7f, 0),
+            new Vector3(-0.9f, 1.7f, 1),
+            new Vector3(-0.3f, 1.7f, 0),
+            new Vector3(0.3f, 1.7f, 0),
+            new Vector3(0.9f, 1.7f, 1),
+            new Vector3(1.5f, 1.7f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.8f, 2.1f, 0),
-            new Vector3(-1.2f, 2.1f, 1),
-            new Vector3(-0.6f, 2.1f, 0),
-            new Vector3(0, 2.1f, 2),
-            new Vector3(0.6f, 2.1f, 0),
-            new Vector3(1.2f, 2.1f, 1),
-            new Vector3(1.8f, 2.1f, 0)
+            new Vector3(-1.8f, 2.04f, 0),
+            new Vector3(-1.2f, 2.04f, 1),
+            new Vector3(-0.6f, 2.04f, 0),
+            new Vector3(0, 2.04f, 2),
+            new Vector3(0.6f, 2.04f, 0),
+            new Vector3(1.2f, 2.04f, 1),
+            new Vector3(1.8f, 2.04f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.5f, 2.45f, 0),
-            new Vector3(-0.9f, 2.45f, 1),
-            new Vector3(-0.3f, 2.45f, 0),
-            new Vector3(0.3f, 2.45f, 0),
-            new Vector3(0.9f, 2.45f, 1),
-            new Vector3(1.5f, 2.45f, 0)
+            new Vector3(-1.5f, 2.38f, 0),
+            new Vector3(-0.9f, 2.38f, 1),
+            new Vector3(-0.3f, 2.38f, 0),
+            new Vector3(0.3f, 2.38f, 0),
+            new Vector3(0.9f, 2.38f, 1),
+            new Vector3(1.5f, 2.38f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.8f, 2.8f, 0),
-            new Vector3(-1.2f, 2.8f, 0),
-            new Vector3(-0.6f, 2.8f, 1),
-            new Vector3(0, 2.8f, 1),
-            new Vector3(0.6f, 2.8f, 1),
-            new Vector3(1.2f, 2.8f, 0),
-            new Vector3(1.8f, 2.8f, 0)
+            new Vector3(-1.8f, 2.72f, 0),
+            new Vector3(-1.2f, 2.72f, 0),
+            new Vector3(-0.6f, 2.72f, 1),
+            new Vector3(0, 2.72f, 1),
+            new Vector3(0.6f, 2.72f, 1),
+            new Vector3(1.2f, 2.72f, 0),
+            new Vector3(1.8f, 2.72f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.5f, 3.15f, 0),
-            new Vector3(-0.9f, 3.15f, 1),
-            new Vector3(-0.3f, 3.15f, 0),
-            new Vector3(0.3f, 3.15f, 0),
-            new Vector3(0.9f, 3.15f, 1),
-            new Vector3(1.5f, 3.15f, 0)
+            new Vector3(-1.5f, 3.06f, 0),
+            new Vector3(-0.9f, 3.06f, 1),
+            new Vector3(-0.3f, 3.06f, 0),
+            new Vector3(0.3f, 3.06f, 0),
+            new Vector3(0.9f, 3.06f, 1),
+            new Vector3(1.5f, 3.06f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.8f, 3.5f, 0),
-            new Vector3(-1.2f, 3.5f, 1),
-            new Vector3(-0.6f, 3.5f, 0),
-            new Vector3(0, 3.5f, 2),
-            new Vector3(0.6f, 3.5f, 0),
-            new Vector3(1.2f, 3.5f, 1),
-            new Vector3(1.8f, 3.5f, 0)
+            new Vector3(-1.8f, 3.4f, 0),
+            new Vector3(-1.2f, 3.4f, 1),
+            new Vector3(-0.6f, 3.4f, 0),
+            new Vector3(0, 3.4f, 2),
+            new Vector3(0.6f, 3.4f, 0),
+            new Vector3(1.2f, 3.4f, 1),
+            new Vector3(1.8f, 3.4f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.5f, 3.85f, 0),
-            new Vector3(-0.9f, 3.85f, 1),
-            new Vector3(-0.3f, 3.85f, 0),
-            new Vector3(0.3f, 3.85f, 0),
-            new Vector3(0.9f, 3.85f, 1),
-            new Vector3(1.5f, 3.85f, 0)
+            new Vector3(-1.5f, 3.74f, 0),
+            new Vector3(-0.9f, 3.74f, 1),
+            new Vector3(-0.3f, 3.74f, 0),
+            new Vector3(0.3f, 3.74f, 0),
+            new Vector3(0.9f, 3.74f, 1),
+            new Vector3(1.5f, 3.74f, 0)
         },
         new List<Vector3>
         {
-            new Vector3(-1.8f, 4.2f, 0),
-            new Vector3(-1.2f, 4.2f, 0),
-            new Vector3(-0.6f, 4.2f, 1),
-            new Vector3(0, 4.2f, 1),
-            new Vector3(0.6f, 4.2f, 1),
-            new Vector3(1.2f, 4.2f, 0),
-            new Vector3(1.8f, 4.2f, 0)
+            new Vector3(-1.8f, 4.08f, 0),
+            new Vector3(-1.2f, 4.08f, 0),
+            new Vector3(-0.6f, 4.08f, 1),
+            new Vector3(0, 4.08f, 1),
+            new Vector3(0.6f, 4.08f, 1),
+            new Vector3(1.2f, 4.08f, 0),
+            new Vector3(1.8f, 4.08f, 0)
         },
     };
 
@@ -190,7 +190,7 @@ public class BrickManager : MonoBehaviour
 
     private void NewBricksRow()
     {
-        targetPosition = new Vector2(transform.position.x, transform.position.y - .35f);
+        targetPosition = new Vector2(transform.position.x, transform.position.y - .34f);
         startMove = true;
         if (nextRow < bricks.Length)
         {
@@ -230,7 +230,7 @@ public class BrickManager : MonoBehaviour
                 }
                 rows++;
             }
-            targetPosition = new Vector2(transform.position.x, transform.position.y - .35f * rows);
+            targetPosition = new Vector2(transform.position.x, transform.position.y - .34f * rows);
             startMove = true;
             Invoke("NewBricksRow", 15);
         }
