@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
@@ -9,8 +7,8 @@ public class GameController : MonoBehaviour
 
     public GameObject ballPrefab;
 
-    public string miss = "Oops!";
-    public string[] perfect = {"Good!", "Great!", "Perfect!!"};
+    public string miss;
+    public string[] perfect;
 
     private Text assessmentText;
     private Text assessmentCount;
@@ -96,7 +94,7 @@ public class GameController : MonoBehaviour
         assessmentCount.text = "";
     }
 
-    public void GetPoints(Vector2 position, int points)
+    public void HitBrick(Vector2 position, int points)
     {
         comboCount++;
         var finalPoint = points * comboCount * (perfectShootCount + 1);

@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
 public class BrickManager : MonoBehaviour
 {
-    public int initialPoolSize = 50;
+    public int initialPoolSize;
     public GameObject brickPrefab;
     public static BrickManager instance;
     private Vector2 targetPosition;
     private bool startMove;
 
-    private readonly List<Vector3>[] bricks =
+    private static readonly List<Vector3>[] Bricks =
     {
         new List<Vector3>
         {
@@ -139,7 +138,7 @@ public class BrickManager : MonoBehaviour
         },
     };
 
-    private List<GameObject> brickPool = new List<GameObject>();
+    private List<GameObject> brickPool;
     private int nextRow;
 
     private void Awake()
@@ -150,13 +149,14 @@ public class BrickManager : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        brickPool = new List<GameObject>();
         for (var i = 0; i < initialPoolSize; i++)
         {
             brickPool.Add(Instantiate(brickPrefab, transform));
         }
         for (; nextRow < 7; nextRow++)
         {
-            var row = bricks[nextRow];
+            var row = Bricks[nextRow];
             foreach (var vector in row)
             {
                 var brick = GetAvailableBrick();
@@ -192,9 +192,9 @@ public class BrickManager : MonoBehaviour
     {
         targetPosition = new Vector2(transform.position.x, transform.position.y - .34f);
         startMove = true;
-        if (nextRow < bricks.Length)
+        if (nextRow < Bricks.Length)
         {
-            var row = bricks[nextRow++];
+            var row = Bricks[nextRow++];
             foreach (var vector in row)
             {
                 var brick = GetAvailableBrick();
@@ -209,18 +209,19 @@ public class BrickManager : MonoBehaviour
     public void GameStart()
     {
         Invoke("NewBricksRow", 15);
+        Invoke("RandomItem", 20);
     }
 
     public void CheckIsBrickAllDead()
     {
         if (brickPool.Any(brick => brick.activeInHierarchy)) return;
-        if (nextRow < bricks.Length)
+        if (nextRow < Bricks.Length)
         {
             CancelInvoke();
             var rows = 0;
-            while (rows < 4 && nextRow < bricks.Length)
+            while (rows < 4 && nextRow < Bricks.Length)
             {
-                var row = bricks[nextRow++];
+                var row = Bricks[nextRow++];
                 foreach (var vector in row)
                 {
                     var brick = GetAvailableBrick();
@@ -238,5 +239,12 @@ public class BrickManager : MonoBehaviour
         {
             //You Won!
         }
+    }
+
+    private void RandomItem()
+    {
+        var bricks = brickPool.FindAll(brick => brick.activeInHierarchy);
+        bricks[Random.Range(0, bricks.Count)].GetComponent<BrickScript>().AddItem();
+        Invoke("RandomItem", 20);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class FpsScript : MonoBehaviour
@@ -7,7 +6,7 @@ public class FpsScript : MonoBehaviour
     private Text text;
 
     // Use this for initialization
-    private void Start()
+    private void Awake()
     {
         text = GetComponent<Text>();
     }

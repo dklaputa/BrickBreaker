@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class RopeManager : MonoBehaviour
 {
-    public int initialPoolSize = 2;
-    public float minLength = .4f;
-    public float maxLength = 2f;
+    public int initialPoolSize;
+    public float minLength;
+    public float maxLength;
     public GameObject ropePrefab;
 
     public static RopeManager instance;
-    private List<GameObject> ropePool = new List<GameObject>();
-    private Vector2[] positions = new Vector2[2];
+    private List<GameObject> ropePool;
+    private Vector2[] positions;
     private bool isPreventNewRope;
     private bool drawStart;
 
@@ -25,6 +25,8 @@ public class RopeManager : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        positions = new Vector2[2];
+        ropePool = new List<GameObject>();
         for (var i = 0; i < initialPoolSize; i++)
         {
             ropePool.Add(Instantiate(ropePrefab, transform));

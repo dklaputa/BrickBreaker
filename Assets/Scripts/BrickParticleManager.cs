@@ -1,14 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class BrickParticleManager : MonoBehaviour
 {
-    public int initialPoolSize = 5;
+    public int initialPoolSize;
     public GameObject brickParticlePrefab;
     public static BrickParticleManager instance;
 
-    private List<GameObject> particlePool = new List<GameObject>();
+    private List<GameObject> particlePool;
 
     private void Awake()
     {
@@ -18,6 +17,7 @@ public class BrickParticleManager : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        particlePool = new List<GameObject>();
         for (var i = 0; i < initialPoolSize; i++)
         {
             particlePool.Add(Instantiate(brickParticlePrefab, transform));

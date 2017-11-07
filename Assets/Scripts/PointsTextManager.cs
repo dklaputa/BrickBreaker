@@ -1,15 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PointsTextManager : MonoBehaviour
 {
-    public int initialPoolSize = 5;
+    public int initialPoolSize;
     public GameObject pointsTextPrefab;
     public static PointsTextManager instance;
 
-    private List<GameObject> pointsTextPool = new List<GameObject>();
+    private List<GameObject> pointsTextPool;
 
     private void Awake()
     {
@@ -19,6 +18,7 @@ public class PointsTextManager : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        pointsTextPool = new List<GameObject>();
         for (var i = 0; i < initialPoolSize; i++)
         {
             pointsTextPool.Add(Instantiate(pointsTextPrefab, transform));

@@ -22,6 +22,7 @@
           <e p="BrickScript.cs" t="Include" />
           <e p="FpsScript.cs" t="Include" />
           <e p="GameController.cs" t="Include" />
+          <e p="ItemsManager.cs" t="Include" />
           <e p="PointsTextManager.cs" t="Include" />
           <e p="PointsTextScript.cs" t="Include" />
           <e p="RopeManager.cs" t="Include" />

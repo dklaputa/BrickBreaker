@@ -1,23 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class BrickScript : MonoBehaviour
 {
     public int level;
+    private int points;
+
     private Text textLvl;
     private SpriteRenderer spriteRenderer;
+    private bool isContainItem;
 
-    public Color[] colors =
+    private static readonly Color[] Colors =
     {
         new Color(255f / 255, 207f / 255, 135f / 255), new Color(255f / 255, 152f / 255, 135f / 255),
         new Color(214f / 255, 135f / 255, 255f / 255)
     };
 
+    public void AddItem()
+    {
+        isContainItem = true;
+        spriteRenderer.color = Color.white;
+        Invoke("RemoveItem", 10);
+    }
+
+    public void RemoveItem()
+    {
+        isContainItem = false;
+        spriteRenderer.color = Colors[level];
+    }
+
     public void SetLevel(int lvl)
     {
         level = lvl;
+        points = (lvl + 1) * 100;
     }
 
     private void Awake()
@@ -28,25 +43,20 @@ public class BrickScript : MonoBehaviour
 
     private void OnEnable()
     {
-        spriteRenderer.color = colors[level];
+        spriteRenderer.color = Colors[level];
         textLvl.text = (level + 1).ToString();
     }
 
-    public void Remove()
+    private void Remove()
     {
         gameObject.SetActive(false);
-        BrickParticleManager.instance.ShowParticle(transform.position, colors[level]);
+        BrickParticleManager.instance.ShowParticle(transform.position, Colors[level]);
     }
 
-//    private void OnCollisionEnter2D(Collision2D other)
-//    {
-//        if (other.gameObject.CompareTag("Ball"))
-//        {
-//            if (BallScript.instance.speedLvl >= level)
-//            {
-//                BallScript.instance.SpeedLevelChange(-level - 1);
-//                Destroy(gameObject);
-//            }
-//        }
-//    }
+    public void Break()
+    {
+        GameController.instance.HitBrick(transform.position, points);
+        BrickManager.instance.CheckIsBrickAllDead();
+        Remove();
+    }
 }

@@ -1,10 +1,12 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class BallScript : MonoBehaviour
 {
-    public float[] speedArray = {8, 9, 10, 11, 12, 13, 14, 15, 16};
+    private static readonly float[] SpeedArray = {8, 9, 10, 11, 12, 13, 14, 15, 16};
+    private static readonly Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
+    private static readonly Color Yellow = new Color(255f / 255, 197f / 255, 71f / 255);
+    private static readonly Color Red = new Color(255f / 255, 73f / 255, 122f / 255);
 
     private SpriteRenderer spriteRenderer;
     private ParticleSystem.ColorOverLifetimeModule colorOverLifetimeModule;
@@ -16,13 +18,9 @@ public class BallScript : MonoBehaviour
     private bool isBeforeStart = true;
     private bool isRestoreTimeScale;
 
-    public Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
-    public Color Yellow = new Color(255f / 255, 197f / 255, 71f / 255);
-    public Color Red = new Color(255f / 255, 73f / 255, 122f / 255);
-
     public void setInitialSpeedDirection(Vector2 direction)
     {
-        speed = direction * speedArray[speedLvl];
+        speed = direction * SpeedArray[speedLvl];
     }
 
     // Use this for initialization
@@ -36,14 +34,7 @@ public class BallScript : MonoBehaviour
 //    private void Start() 
 //    {
 //        speed = Vector2.down * speedArray[speedLvl];
-//    }
-
-//    // Update is called once per frame
-//    private void Update()
-//    {
-//        if (Mathf.Abs(transform.position.x) > 4 || Mathf.Abs(transform.position.y) > 6)
-//            SceneManager.LoadScene("Main");
-//    }
+//    } 
 
     private void Update()
     {
@@ -108,9 +99,7 @@ public class BallScript : MonoBehaviour
                 {
                     if (speedLvl > 3) SlowDownTimeScale();
                     SpeedLevelChange(-brick.level - 1);
-                    brick.Remove();
-                    GameController.instance.GetPoints(brick.transform.position, (brick.level + 1) * 100);
-                    BrickManager.instance.CheckIsBrickAllDead();
+                    brick.Break();
                 }
             }
             else if (o.CompareTag("GameOverTrigger"))
@@ -145,7 +134,7 @@ public class BallScript : MonoBehaviour
 
     public void SpeedLevelChange(int lvlChange)
     {
-        speedLvl = Mathf.Clamp(speedLvl + lvlChange, 0, speedArray.Length - 1);
+        speedLvl = Mathf.Clamp(speedLvl + lvlChange, 0, SpeedArray.Length - 1);
         OnSpeedLevelChange();
     }
 //    public void SpeedLevelToZero()
@@ -156,9 +145,9 @@ public class BallScript : MonoBehaviour
 
     private void OnSpeedLevelChange()
     {
-        speed = speed.normalized * speedArray[speedLvl];
+        speed = speed.normalized * SpeedArray[speedLvl];
         Color color;
-        var half = speedArray.Length / 2;
+        var half = SpeedArray.Length / 2;
         if (speedLvl < half)
         {
             color = Color.Lerp(Blue, Yellow, (float) speedLvl / half);
@@ -166,7 +155,7 @@ public class BallScript : MonoBehaviour
         else
         {
             color = Color.Lerp(Yellow, Red,
-                (float) (speedLvl - half) / (speedArray.Length - half - 1));
+                (float) (speedLvl - half) / (SpeedArray.Length - half - 1));
         }
         spriteRenderer.color = color;
         if (speedLvl > 3)

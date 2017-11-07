@@ -23,10 +23,10 @@ public class RopeScript : MonoBehaviour
         NotTrigger
     }
 
-    public float lengthStall = 1.2f;
+    public float lengthStall;
 
-    private const float ballRange = .175f;
-    private const float perfectRange = .125f;
+    private const float BallRange = .175f;
+    private const float PerfectRange = .125f;
 
     private Vector2[] endPointPositions;
 
@@ -40,7 +40,7 @@ public class RopeScript : MonoBehaviour
     private bool isPerfect;
     private bool isRemoving;
     private BallEnterDirection enterDirection;
-    private readonly Vector3[] ropePath = new Vector3[20];
+    private Vector3[] ropePath;
     private BallScript ball;
     private Vector2 ropeVector;
     private float ropeLength;
@@ -58,6 +58,11 @@ public class RopeScript : MonoBehaviour
         ropeNodeMiddleRigidBody = ropeNodeMiddle.GetComponent<Rigidbody2D>();
         springJointsMiddle = ropeNodeMiddle.GetComponents<SpringJoint2D>();
         edgeCollider2D = GetComponent<EdgeCollider2D>();
+    }
+
+    private void Start()
+    {
+        ropePath = new Vector3[20];
     }
 
     private void OnEnable()
@@ -85,7 +90,7 @@ public class RopeScript : MonoBehaviour
                 break;
             case Status.DuringTouchBall:
                 RopePathDuringTouch(endPointPositions[0], endPointPositions[1], ball.transform.position,
-                    ballRange,
+                    BallRange,
                     enterDirection, ropePath);
                 break;
             case Status.AfterTouchBall:
@@ -112,7 +117,7 @@ public class RopeScript : MonoBehaviour
                     Vector3.Cross(speed, ropeVector).z < 0 ? BallEnterDirection.DownUp : BallEnterDirection.UpDown;
                 if (newEnterDirection == enterDirection) return BallTriggerResult.NotTrigger;
                 if (isNormalCase)
-                { 
+                {
                     var speedUp = ropeLength < lengthStall ? 2 : 1;
                     if (isPerfect) speedUp *= 2;
                     callback.SpeedLevelChange(speedUp);
@@ -142,7 +147,7 @@ public class RopeScript : MonoBehaviour
                     var vRight = endPointPositions[1] - position;
                     var lLeft = Vector3.Dot(vLeft, ropeVector) / ropeLength;
                     var lRight = -Vector3.Dot(vRight, ropeVector) / ropeLength;
-                    if (lLeft < ballRange || lRight < ballRange)
+                    if (lLeft < BallRange || lRight < BallRange)
                     {
                         ropeNodeMiddle.SetActive(true);
                         ropeNodeMiddleRigidBody.velocity = speed * .2f;
@@ -151,7 +156,7 @@ public class RopeScript : MonoBehaviour
                         GameController.instance.Miss();
                         return BallTriggerResult.BallBounce;
                     }
-                    if (Mathf.Abs(lLeft - ropeLength / 2) < perfectRange)
+                    if (Mathf.Abs(lLeft - ropeLength / 2) < PerfectRange)
                     {
                         isPerfect = true;
                         GameController.instance.PerfectShoot();
