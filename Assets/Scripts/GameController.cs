@@ -6,12 +6,6 @@ public class GameController : MonoBehaviour
 {
     public static GameController instance;
 
-    public enum Item
-    {
-        None,
-        Division
-    }
-
     public GameObject ballPrefab;
 
     public string miss;
@@ -33,6 +27,7 @@ public class GameController : MonoBehaviour
     private int comboCount;
     private int totalPoints;
     private bool isGameStart;
+    private bool needRefreshScore;
 
     // Use this for initialization
     private void Awake()
@@ -57,6 +52,30 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
+
+        if (needRefreshScore)
+        {
+            scoreText.text = totalPoints.ToString();
+            var percent = totalPoints / 100000f;
+            scoreBar.fillAmount = percent;
+            if (percent >= 1)
+            {
+                if (!star[2].activeInHierarchy) star[2].SetActive(true);
+                if (!star[1].activeInHierarchy) star[1].SetActive(true);
+                if (!star[0].activeInHierarchy) star[0].SetActive(true);
+            }
+            else if (percent >= .75f)
+            {
+                if (!star[1].activeInHierarchy) star[1].SetActive(true);
+                if (!star[0].activeInHierarchy) star[0].SetActive(true);
+            }
+            else if (percent >= .5f)
+            {
+                if (!star[0].activeInHierarchy && percent >= .5f) star[0].SetActive(true);
+            }
+            needRefreshScore = false;
+        }
+
         if (!isChangeEnergyFillAmount) return;
         var diff = Mathf.Abs(energyFillAmount - energyFill.fillAmount);
         if (diff < .02f)
@@ -126,30 +145,14 @@ public class GameController : MonoBehaviour
         assessmentCount.text = "";
     }
 
-    public void BreakBrick(Vector2 position, int points)
+    public int BreakBrick(int points)
     {
         comboCount++;
         var finalPoint = points * comboCount * (perfectShootCount + 1);
         totalPoints += finalPoint;
-        PointsTextManager.instance.ShowPointsText(position, finalPoint);
-        scoreText.text = totalPoints.ToString();
-        var percent = totalPoints / 100000f;
-        scoreBar.fillAmount = percent;
-        if (percent >= 1)
-        {
-            if (!star[2].activeInHierarchy) star[2].SetActive(true);
-            if (!star[1].activeInHierarchy) star[1].SetActive(true);
-            if (!star[0].activeInHierarchy) star[0].SetActive(true);
-        }
-        else if (percent >= .75f)
-        {
-            if (!star[1].activeInHierarchy) star[1].SetActive(true);
-            if (!star[0].activeInHierarchy) star[0].SetActive(true);
-        }
-        else if (percent >= .5f)
-        {
-            if (!star[0].activeInHierarchy && percent >= .5f) star[0].SetActive(true);
-        }
+//        PointsTextManager.instance.ShowPointsText(position, finalPoint);
+        needRefreshScore = true;
+        return finalPoint;
     }
 
     public void ResetComboCount()

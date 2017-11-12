@@ -19,8 +19,6 @@ public class BallScript : MonoBehaviour
     private bool isBeforeStart = true;
     private bool isRestoreTimeScale;
 
-    private GameController.Item currentItem;
-
     public void setInitialSpeedDirection(Vector2 direction)
     {
         speed = direction * SpeedArray[speedLvl];
@@ -90,6 +88,8 @@ public class BallScript : MonoBehaviour
                 remainTime -= hit.distance / speed.magnitude;
                 transform.position = hit.point + hit.normal * .125f;
                 speed = Vector2.Reflect(speed, hit.normal);
+                //                    if (currentItem == GameController.Item.BlackHole)
+                BlackHoleManager.instance.ShowBlackHole(transform.position);
             }
             else if (o.CompareTag("Brick"))
             {
@@ -99,12 +99,14 @@ public class BallScript : MonoBehaviour
                 if (speedLvl <= brick.level)
                 {
                     speed = Vector2.Reflect(speed, hit.normal);
+//                    if (currentItem == GameController.Item.BlackHole)
+                    BlackHoleManager.instance.ShowBlackHole(transform.position);
                 }
                 if (speedLvl >= brick.level)
                 {
                     if (speedLvl > 3) SlowDownTimeScale();
                     SpeedLevelChange(-brick.level - 1);
-                    brick.Break(this);
+                    PointsTextManager.instance.ShowPointsText(brick.transform.position, brick.Break());
                 }
             }
             else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
@@ -122,11 +124,6 @@ public class BallScript : MonoBehaviour
     public void SetAccelerationDirection(Vector2 direction)
     {
         accelerationDirection = direction;
-    }
-
-    public void SetCurrentItem(GameController.Item item)
-    {
-        currentItem = item;
     }
 
     private void SlowDownTimeScale()

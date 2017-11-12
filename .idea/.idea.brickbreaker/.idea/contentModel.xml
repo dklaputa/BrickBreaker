@@ -16,6 +16,8 @@
         <e p="Scripts" t="Include">
           <e p="BackgroundScript.cs" t="Include" />
           <e p="BallScript.cs" t="Include" />
+          <e p="BlackHoleManager.cs" t="Include" />
+          <e p="BlackHoleScript.cs" t="Include" />
           <e p="BrickManager.cs" t="Include" />
           <e p="BrickParticleManager.cs" t="Include" />
           <e p="BrickParticleScript.cs" t="Include" />
@@ -24,6 +26,7 @@
           <e p="CloneBallScript.cs" t="Include" />
           <e p="FpsScript.cs" t="Include" />
           <e p="GameController.cs" t="Include" />
+          <e p="ItemManager.cs" t="Include" />
           <e p="ObjectPoolBehavior.cs" t="Include" />
           <e p="PointsTextManager.cs" t="Include" />
           <e p="PointsTextScript.cs" t="Include" />

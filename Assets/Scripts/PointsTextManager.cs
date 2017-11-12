@@ -15,7 +15,7 @@ public class PointsTextManager : ObjectPoolBehavior
     {
         var text = GetAvailableObject();
         text.transform.position = position;
-        text.GetComponent<Text>().text = "+" + points;
+        text.GetComponent<PointsTextScript>().SetPoints(points);
         text.SetActive(true);
     } 
 }

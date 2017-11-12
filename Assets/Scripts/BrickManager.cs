@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 public class BrickManager : ObjectPoolBehavior
-{ 
+{
     public static BrickManager instance;
     private Vector2 targetPosition;
     private bool startMove;
@@ -135,8 +135,9 @@ public class BrickManager : ObjectPoolBehavior
             new Vector3(1.8f, 4.08f, 0)
         },
     };
- 
+
     private int nextRow;
+    private bool needCheckAllDead;
 
     private void Awake()
     {
@@ -162,10 +163,41 @@ public class BrickManager : ObjectPoolBehavior
 
     private void Update()
     {
+        if (needCheckAllDead)
+        {
+            needCheckAllDead = false;
+            if (!pool.Any(brick => brick.activeInHierarchy))
+            {
+                if (nextRow < Bricks.Length)
+                {
+                    CancelInvoke();
+                    var rows = 0;
+                    while (rows < 4 && nextRow < Bricks.Length)
+                    {
+                        var row = Bricks[nextRow++];
+                        foreach (var vector in row)
+                        {
+                            var brick = GetAvailableObject();
+                            brick.transform.position = (Vector2) (transform.position + vector);
+                            brick.GetComponent<BrickScript>().SetLevel((int) vector.z);
+                            brick.SetActive(true);
+                        }
+                        rows++;
+                    }
+                    targetPosition = new Vector2(transform.position.x, transform.position.y - .34f * rows);
+                    startMove = true;
+                    Invoke("NewBricksRow", 15);
+                }
+                else
+                {
+                    //You Won!
+                }
+            }
+        }
         if (!startMove) return;
         transform.position = Vector2.MoveTowards(transform.position, targetPosition, Time.deltaTime);
         if ((Vector2) transform.position == targetPosition) startMove = false;
-    } 
+    }
 
     private void NewBricksRow()
     {
@@ -193,31 +225,7 @@ public class BrickManager : ObjectPoolBehavior
 
     public void CheckIsBrickAllDead()
     {
-        if (pool.Any(brick => brick.activeInHierarchy)) return;
-        if (nextRow < Bricks.Length)
-        {
-            CancelInvoke();
-            var rows = 0;
-            while (rows < 4 && nextRow < Bricks.Length)
-            {
-                var row = Bricks[nextRow++];
-                foreach (var vector in row)
-                {
-                    var brick = GetAvailableObject();
-                    brick.transform.position = (Vector2) (transform.position + vector);
-                    brick.GetComponent<BrickScript>().SetLevel((int) vector.z);
-                    brick.SetActive(true);
-                }
-                rows++;
-            }
-            targetPosition = new Vector2(transform.position.x, transform.position.y - .34f * rows);
-            startMove = true;
-            Invoke("NewBricksRow", 15);
-        }
-        else
-        {
-            //You Won!
-        }
+        needCheckAllDead = true;
     }
 
     private void RandomItem()
