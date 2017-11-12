@@ -23,7 +23,8 @@ public class RopeScript : MonoBehaviour
         NotTrigger
     }
 
-    public float lengthStall;
+    public float lengthStall1;
+    public float lengthStall2;
 
     private const float BallRange = .175f;
     private const float PerfectRange = .125f;
@@ -118,8 +119,10 @@ public class RopeScript : MonoBehaviour
                 if (newEnterDirection == enterDirection) return BallTriggerResult.NotTrigger;
                 if (isNormalCase)
                 {
-                    var speedUp = ropeLength < lengthStall ? 2 : 1;
-                    if (isPerfect) speedUp *= 2;
+                    int speedUp = 0;
+                    if (ropeLength < lengthStall1) speedUp = 2;
+                    else if (ropeLength < lengthStall2) speedUp = 1;
+                    if (isPerfect) speedUp += 2;
                     callback.SpeedLevelChange(speedUp);
                 }
                 else callback.SpeedLevelChange(0);

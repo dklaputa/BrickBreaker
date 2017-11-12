@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Video;
 
 public class BallScript : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class BallScript : MonoBehaviour
     private static readonly Color Red = new Color(255f / 255, 73f / 255, 122f / 255);
 
     private SpriteRenderer spriteRenderer;
-    private ParticleSystem.ColorOverLifetimeModule colorOverLifetimeModule;
+    private ParticleSystem.MainModule mainModule;
     private ParticleSystem particle;
     private Vector2 speed;
     private int speedLvl;
@@ -17,6 +18,8 @@ public class BallScript : MonoBehaviour
     private Vector2 accelerationDirection;
     private bool isBeforeStart = true;
     private bool isRestoreTimeScale;
+
+    private GameController.Item currentItem;
 
     public void setInitialSpeedDirection(Vector2 direction)
     {
@@ -28,7 +31,7 @@ public class BallScript : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         particle = GetComponent<ParticleSystem>();
-        colorOverLifetimeModule = particle.colorOverLifetime;
+        mainModule = particle.main;
     }
 
 //    private void Start() 
@@ -76,6 +79,8 @@ public class BallScript : MonoBehaviour
                 {
                     isAttachedToRope = false;
                     if (isBeforeStart) isBeforeStart = false;
+//                    if (currentItem == GameController.Item.Division)
+                    CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl);
                 }
                 break;
             }
@@ -99,10 +104,10 @@ public class BallScript : MonoBehaviour
                 {
                     if (speedLvl > 3) SlowDownTimeScale();
                     SpeedLevelChange(-brick.level - 1);
-                    brick.Break();
+                    brick.Break(this);
                 }
             }
-            else if (o.CompareTag("GameOverTrigger"))
+            else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
             {
                 SceneManager.LoadScene("Main");
                 break;
@@ -117,6 +122,11 @@ public class BallScript : MonoBehaviour
     public void SetAccelerationDirection(Vector2 direction)
     {
         accelerationDirection = direction;
+    }
+
+    public void SetCurrentItem(GameController.Item item)
+    {
+        currentItem = item;
     }
 
     private void SlowDownTimeScale()
@@ -137,11 +147,6 @@ public class BallScript : MonoBehaviour
         speedLvl = Mathf.Clamp(speedLvl + lvlChange, 0, SpeedArray.Length - 1);
         OnSpeedLevelChange();
     }
-//    public void SpeedLevelToZero()
-//    {
-//        speedLvl = 0;
-//        RefreshBallSpeed();
-//    }
 
     private void OnSpeedLevelChange()
     {
@@ -160,12 +165,13 @@ public class BallScript : MonoBehaviour
         spriteRenderer.color = color;
         if (speedLvl > 3)
         {
+            mainModule.startColor = color;
             if (!particle.isPlaying) particle.Play();
-            colorOverLifetimeModule.color = color;
         }
         else
         {
             if (!particle.isStopped) particle.Stop(false, ParticleSystemStopBehavior.StopEmitting);
         }
+        GameController.instance.SetBallLevel(speedLvl, SpeedArray.Length, color);
     }
 }

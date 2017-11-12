@@ -4,16 +4,17 @@ using UnityEngine.UI;
 public class BrickScript : MonoBehaviour
 {
     public int level;
+    public Sprite[] numbers;
     private int points;
 
-    private Text textLvl;
+    private SpriteRenderer textLvl;
     private SpriteRenderer spriteRenderer;
     private bool isContainItem;
 
     private static readonly Color[] Colors =
     {
-        new Color(255f / 255, 207f / 255, 135f / 255), new Color(255f / 255, 152f / 255, 135f / 255),
-        new Color(214f / 255, 135f / 255, 255f / 255)
+        new Color(255f / 255, 207f / 255, 135f / 255), new Color(255f / 255, 135f / 255, 135f / 255),
+        new Color(139f / 255, 135f / 255, 255f / 255)
     };
 
     public void AddItem()
@@ -38,13 +39,13 @@ public class BrickScript : MonoBehaviour
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        textLvl = transform.GetChild(0).GetChild(0).gameObject.GetComponent<Text>();
+        textLvl = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
     }
 
     private void OnEnable()
     {
         spriteRenderer.color = Colors[level];
-        textLvl.text = (level + 1).ToString();
+        textLvl.sprite = numbers[level];
     }
 
     private void Remove()
@@ -53,10 +54,14 @@ public class BrickScript : MonoBehaviour
         BrickParticleManager.instance.ShowParticle(transform.position, Colors[level]);
     }
 
-    public void Break()
+    public void Break(BallScript callback)
     {
-        GameController.instance.HitBrick(transform.position, points);
-        BrickManager.instance.CheckIsBrickAllDead();
+        if (isContainItem && callback != null)
+        {
+            callback.SetCurrentItem(GameController.Item.Division);
+        }
+        GameController.instance.BreakBrick(transform.position, points);
         Remove();
+        BrickManager.instance.CheckIsBrickAllDead();
     }
 }

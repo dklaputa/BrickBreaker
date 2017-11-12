@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class RopeManager : MonoBehaviour
+public class RopeManager : ObjectPoolBehavior
 {
-    public int initialPoolSize;
     public float minLength;
     public float maxLength;
-    public GameObject ropePrefab;
 
     public static RopeManager instance;
-    private List<GameObject> ropePool;
     private Vector2[] positions;
     private bool isPreventNewRope;
     private bool drawStart;
@@ -20,17 +17,7 @@ public class RopeManager : MonoBehaviour
     {
         instance = this;
         lineRenderer = GetComponent<LineRenderer>();
-    }
-
-    // Use this for initialization
-    private void Start()
-    {
         positions = new Vector2[2];
-        ropePool = new List<GameObject>();
-        for (var i = 0; i < initialPoolSize; i++)
-        {
-            ropePool.Add(Instantiate(ropePrefab, transform));
-        }
     }
 
     public void PreventNewRope(bool preventNewRope)
@@ -123,27 +110,10 @@ public class RopeManager : MonoBehaviour
                 positions[1] = Vector2.Lerp(positions[0], positions[1], maxLength / d);
             else if (d < minLength) return;
 
-            var done = false;
-            foreach (var rope in ropePool)
-            {
-                if (rope.activeInHierarchy)
-                {
-                    rope.GetComponent<RopeScript>().Remove();
-                }
-                else if (!done)
-                {
-                    rope.GetComponent<RopeScript>().Initialize(positions[0], positions[1]);
-                    rope.SetActive(true);
-                    done = true;
-                }
-            }
-            if (!done)
-            {
-                var newRope = Instantiate(ropePrefab, transform);
-                newRope.GetComponent<RopeScript>().Initialize(positions[0], positions[1]);
-                newRope.SetActive(true);
-                ropePool.Add(newRope);
-            }
+            pool.FindAll(go => go.activeInHierarchy).ForEach(go => go.GetComponent<RopeScript>().Remove());
+            var rope = GetAvailableObject();
+            rope.GetComponent<RopeScript>().Initialize(positions[0], positions[1]);
+            rope.SetActive(true);
             if (!GameController.instance.IsGameStart()) GameController.instance.GameStart(positions[0], positions[1]);
         }
     }

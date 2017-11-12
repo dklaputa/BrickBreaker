@@ -4,7 +4,7 @@ public class BrickParticleScript : MonoBehaviour
 {
     private Color color;
     private ParticleSystem particle;
-    private ParticleSystem.ColorOverLifetimeModule colorOverLifetimeModule;
+    private ParticleSystem.MainModule mainModule;
 
     public void SetColor(Color particleColor)
     {
@@ -14,12 +14,12 @@ public class BrickParticleScript : MonoBehaviour
     private void Awake()
     {
         particle = GetComponent<ParticleSystem>();
-        colorOverLifetimeModule = particle.colorOverLifetime;
+        mainModule = particle.main;
     }
 
     private void OnEnable()
     {
-        colorOverLifetimeModule.color = color;
+        mainModule.startColor = color;
         particle.Play();
         Invoke("Destory", .3f);
     }
