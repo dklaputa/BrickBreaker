@@ -23,13 +23,13 @@ public class PointsTextScript : MonoBehaviour
         else if (p > 1000) text.fontSize = 40;
         else text.fontSize = 32;
         text.color = Color.white;
-        Invoke("Destory", 1);
+        Invoke("Destory", .5f);
     }
 
     private void Update()
     {
         var color = text.color;
-        color.a -= Time.deltaTime;
+        color.a -= 2 * Time.deltaTime;
         text.color = color;
         transform.position = transform.position + Vector3.up * .1f * Time.deltaTime;
     }
