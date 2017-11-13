@@ -133,7 +133,7 @@ public class BrickManager : ObjectPoolBehavior
             new Vector3(0.6f, 4.08f, 1),
             new Vector3(1.2f, 4.08f, 0),
             new Vector3(1.8f, 4.08f, 0)
-        },
+        }
     };
 
     private int nextRow;
