@@ -9,10 +9,11 @@ public class BlackHoleManager : ObjectPoolBehavior
         instance = this;
     }
 
-    public void ShowBlackHole(Vector2 position)
+    public void ShowBlackHole(Vector2 position, float size)
     {
         var hole = GetAvailableObject();
-        hole.transform.position = position; 
+        hole.transform.position = position;
+        hole.GetComponent<BlackHoleScript>().SetRange(size);
         hole.SetActive(true);
     }
 }

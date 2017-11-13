@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class RopeScript : MonoBehaviour
 {
@@ -100,6 +101,10 @@ public class RopeScript : MonoBehaviour
                 break;
         }
         lineRenderer.SetPositions(ropePath);
+    }
+
+    private void Update()
+    {
         if (!isRemoving) return;
         var color1 = lineRenderer.startColor;
         var color2 = lineRenderer.endColor;
@@ -253,11 +258,12 @@ public class RopeScript : MonoBehaviour
         if (isRemoving) return;
         isRemoving = true;
         edgeCollider2D.enabled = false;
-        Invoke("Destroy", .25f);
+        StartCoroutine("Destroy");
     }
 
-    private void Destroy()
+    private IEnumerator Destroy()
     {
+        yield return new WaitForSeconds(.25f);
         lineRenderer.positionCount = 0;
         var color1 = lineRenderer.startColor;
         var color2 = lineRenderer.endColor;

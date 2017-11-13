@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 
@@ -39,15 +40,6 @@ public class BallScript : MonoBehaviour
 
     private void Update()
     {
-        if (isRestoreTimeScale)
-        {
-            Time.timeScale += 2 * Time.deltaTime;
-            if (Time.timeScale >= 1)
-            {
-                isRestoreTimeScale = false;
-                Time.timeScale = 1;
-            }
-        }
         if (isAttachedToRope)
         {
             speed += accelerationDirection * (20 + 10 * speed.magnitude) * Time.deltaTime;
@@ -77,8 +69,8 @@ public class BallScript : MonoBehaviour
                 {
                     isAttachedToRope = false;
                     if (isBeforeStart) isBeforeStart = false;
-//                    if (currentItem == GameController.Item.Division)
-                    CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl);
+                    var divisionItem = ItemManager.instance.checkItem(ItemManager.Division);
+                    CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionItem);
                 }
                 break;
             }
@@ -88,8 +80,9 @@ public class BallScript : MonoBehaviour
                 remainTime -= hit.distance / speed.magnitude;
                 transform.position = hit.point + hit.normal * .125f;
                 speed = Vector2.Reflect(speed, hit.normal);
-                //                    if (currentItem == GameController.Item.BlackHole)
-                BlackHoleManager.instance.ShowBlackHole(transform.position);
+                var blackHoleItem = ItemManager.instance.checkItem(ItemManager.BlackHole);
+                if (blackHoleItem > 0)
+                    BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
             }
             else if (o.CompareTag("Brick"))
             {
@@ -99,8 +92,9 @@ public class BallScript : MonoBehaviour
                 if (speedLvl <= brick.level)
                 {
                     speed = Vector2.Reflect(speed, hit.normal);
-//                    if (currentItem == GameController.Item.BlackHole)
-                    BlackHoleManager.instance.ShowBlackHole(transform.position);
+                    var blackHoleItem = ItemManager.instance.checkItem(ItemManager.BlackHole);
+                    if (blackHoleItem > 0)
+                        BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
                 }
                 if (speedLvl >= brick.level)
                 {
@@ -121,6 +115,15 @@ public class BallScript : MonoBehaviour
         transform.position += (Vector3) speed * remainTime;
     }
 
+    private void LateUpdate()
+    {
+        if (!isRestoreTimeScale) return;
+        Time.timeScale += 2 * Time.deltaTime;
+        if (Time.timeScale < 1) return;
+        isRestoreTimeScale = false;
+        Time.timeScale = 1;
+    }
+
     public void SetAccelerationDirection(Vector2 direction)
     {
         accelerationDirection = direction;
@@ -128,14 +131,15 @@ public class BallScript : MonoBehaviour
 
     private void SlowDownTimeScale()
     {
-        CancelInvoke();
+        StopCoroutine("RestoreTimeScale");
         isRestoreTimeScale = false;
         Time.timeScale = .1f;
-        Invoke("RestoreTimeScale", .1f);
+        StartCoroutine("RestoreTimeScale");
     }
 
-    private void RestoreTimeScale()
+    private IEnumerator RestoreTimeScale()
     {
+        yield return new WaitForSecondsRealtime(1);
         isRestoreTimeScale = true;
     }
 

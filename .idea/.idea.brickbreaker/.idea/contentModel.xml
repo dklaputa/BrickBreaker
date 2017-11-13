@@ -26,7 +26,6 @@
           <e p="CloneBallScript.cs" t="Include" />
           <e p="FpsScript.cs" t="Include" />
           <e p="GameController.cs" t="Include" />
-          <e p="ItemDurationManager.cs" t="Include" />
           <e p="ItemDurationScript.cs" t="Include" />
           <e p="ItemManager.cs" t="Include" />
           <e p="ObjectPoolBehavior.cs" t="Include" />

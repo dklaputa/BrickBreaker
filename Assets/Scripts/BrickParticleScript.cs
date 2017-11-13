@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class BrickParticleScript : MonoBehaviour
 {
@@ -21,11 +22,12 @@ public class BrickParticleScript : MonoBehaviour
     {
         mainModule.startColor = color;
         particle.Play();
-        Invoke("Destory", .3f);
+        StartCoroutine("Destory");
     }
 
-    private void Destory()
+    private IEnumerator Destory()
     {
+        yield return new WaitForSeconds(.3f);
         if (!particle.isStopped) particle.Stop();
         gameObject.SetActive(false);
     }

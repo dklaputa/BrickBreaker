@@ -21,6 +21,11 @@ public class ItemDurationScript : MonoBehaviour
         num.text = stack.ToString();
     }
 
+    public int GetStack()
+    {
+        return stack;
+    }
+
     // Use this for initialization
     private void Awake()
     {
@@ -45,7 +50,7 @@ public class ItemDurationScript : MonoBehaviour
 
     private void Destory()
     {
-        ItemDurationManager.instance.Remove(itemIndex);
+        ItemManager.instance.OnItemInvalid(itemIndex);
         gameObject.SetActive(false);
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class BrickScript : MonoBehaviour
@@ -21,11 +22,12 @@ public class BrickScript : MonoBehaviour
     {
         isContainItem = true;
         brickBackground.color = Color.white;
-        Invoke("RemoveItem", 10);
+        StartCoroutine("RemoveItem");
     }
 
-    public void RemoveItem()
+    private IEnumerator RemoveItem()
     {
+        yield return new WaitForSeconds(10);
         isContainItem = false;
         brickBackground.color = Colors[level];
     }

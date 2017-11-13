@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -159,52 +160,63 @@ public class BrickManager : ObjectPoolBehavior
                 brick.SetActive(true);
             }
         }
+        targetPosition = transform.position;
     }
 
     private void Update()
     {
-        if (needCheckAllDead)
-        {
-            needCheckAllDead = false;
-            if (!pool.Any(brick => brick.activeInHierarchy))
-            {
-                if (nextRow < Bricks.Length)
-                {
-                    CancelInvoke();
-                    var rows = 0;
-                    while (rows < 4 && nextRow < Bricks.Length)
-                    {
-                        var row = Bricks[nextRow++];
-                        foreach (var vector in row)
-                        {
-                            var brick = GetAvailableObject();
-                            brick.transform.position = (Vector2) (transform.position + vector);
-                            brick.GetComponent<BrickScript>().SetLevel((int) vector.z);
-                            brick.SetActive(true);
-                        }
-                        rows++;
-                    }
-                    targetPosition = new Vector2(transform.position.x, transform.position.y - .34f * rows);
-                    startMove = true;
-                    Invoke("NewBricksRow", 15);
-                }
-                else
-                {
-                    //You Won!
-                }
-            }
-        }
         if (!startMove) return;
         transform.position = Vector2.MoveTowards(transform.position, targetPosition, Time.deltaTime);
         if ((Vector2) transform.position == targetPosition) startMove = false;
     }
 
-    private void NewBricksRow()
+    private IEnumerator CheckBricks()
     {
-        targetPosition = new Vector2(transform.position.x, transform.position.y - .34f);
-        startMove = true;
-        if (nextRow < Bricks.Length)
+        for (;;)
         {
+            if (needCheckAllDead)
+            {
+                needCheckAllDead = false;
+                if (!pool.Any(brick => brick.activeInHierarchy))
+                {
+                    if (nextRow < Bricks.Length)
+                    {
+                        StopCoroutine("NewBricksRow");
+                        var rows = 0;
+                        while (rows < 4 && nextRow < Bricks.Length)
+                        {
+                            var row = Bricks[nextRow++];
+                            foreach (var vector in row)
+                            {
+                                var brick = GetAvailableObject();
+                                brick.transform.position = (Vector2) (transform.position + vector);
+                                brick.GetComponent<BrickScript>().SetLevel((int) vector.z);
+                                brick.SetActive(true);
+                            }
+                            rows++;
+                        }
+                        targetPosition += Vector2.down * .34f * rows;
+                        startMove = true;
+                        StartCoroutine("NewBricksRow");
+                    }
+                    else
+                    {
+                        //You Won!
+                    }
+                }
+            }
+            yield return new WaitForSeconds(.1f);
+        }
+    }
+
+    private IEnumerator NewBricksRow()
+    {
+        for (;;)
+        {
+            yield return new WaitForSeconds(15);
+            targetPosition += Vector2.down * .34f;
+            startMove = true;
+            if (nextRow >= Bricks.Length) continue;
             var row = Bricks[nextRow++];
             foreach (var vector in row)
             {
@@ -214,13 +226,13 @@ public class BrickManager : ObjectPoolBehavior
                 brick.SetActive(true);
             }
         }
-        Invoke("NewBricksRow", 15);
     }
 
     public void GameStart()
     {
-        Invoke("NewBricksRow", 15);
-        Invoke("RandomItem", 20);
+        StartCoroutine("CheckBricks");
+        StartCoroutine("NewBricksRow");
+        StartCoroutine("RandomItem");
     }
 
     public void CheckIsBrickAllDead()
@@ -228,10 +240,14 @@ public class BrickManager : ObjectPoolBehavior
         needCheckAllDead = true;
     }
 
-    private void RandomItem()
+    private IEnumerator RandomItem()
     {
-        var bricks = pool.FindAll(brick => brick.activeInHierarchy);
-        bricks[Random.Range(0, bricks.Count)].GetComponent<BrickScript>().AddItem();
-        Invoke("RandomItem", 20);
+        for (;;)
+        {
+            yield return new WaitForSeconds(20);
+            var bricks = pool.FindAll(brick => brick.activeInHierarchy);
+            if (bricks.Count < 1) continue;
+            bricks[Random.Range(0, bricks.Count)].GetComponent<BrickScript>().AddItem();
+        }
     }
 }

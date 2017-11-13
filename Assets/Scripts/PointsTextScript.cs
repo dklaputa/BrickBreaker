@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class PointsTextScript : MonoBehaviour
@@ -23,7 +24,7 @@ public class PointsTextScript : MonoBehaviour
         else if (p > 1000) text.fontSize = 40;
         else text.fontSize = 32;
         text.color = Color.white;
-        Invoke("Destory", .5f);
+        StartCoroutine("Destory");
     }
 
     private void Update()
@@ -34,8 +35,9 @@ public class PointsTextScript : MonoBehaviour
         transform.position = transform.position + Vector3.up * .1f * Time.deltaTime;
     }
 
-    private void Destory()
+    private IEnumerator Destory()
     {
+        yield return new WaitForSeconds(.5f);
         gameObject.SetActive(false);
     }
 }

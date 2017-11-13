@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking.NetworkSystem;
 using UnityEngine.UI;
 
@@ -52,11 +53,14 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
+    }
 
+    private void LateUpdate()
+    {
         if (needRefreshScore)
         {
             scoreText.text = totalPoints.ToString();
-            var percent = totalPoints / 100000f;
+            var percent = totalPoints / 80000f;
             scoreBar.fillAmount = percent;
             if (percent >= 1)
             {
@@ -115,7 +119,7 @@ public class GameController : MonoBehaviour
 
     public void PerfectShoot()
     {
-        CancelInvoke();
+        StopCoroutine("HideAssessment");
         perfectShootCount++;
         if (perfectShootCount <= perfect.Length) assessmentText.text = perfect[perfectShootCount - 1];
         else
@@ -123,7 +127,7 @@ public class GameController : MonoBehaviour
             assessmentText.text = perfect[perfect.Length - 1];
             assessmentCount.text = "×" + (perfectShootCount - perfect.Length + 1);
         }
-        Invoke("HideAssessment", 0.4f);
+        StartCoroutine("HideAssessment");
     }
 
     public void ResetPerfectCount()
@@ -133,14 +137,15 @@ public class GameController : MonoBehaviour
 
     public void Miss()
     {
-        CancelInvoke();
+        StopCoroutine("HideAssessment");
         perfectShootCount = 0;
         assessmentText.text = miss;
-        Invoke("HideAssessment", 0.4f);
+        StartCoroutine("HideAssessment");
     }
 
-    private void HideAssessment()
+    private IEnumerator HideAssessment()
     {
+        yield return new WaitForSeconds(.4f);
         assessmentText.text = "";
         assessmentCount.text = "";
     }
