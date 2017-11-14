@@ -15,6 +15,6 @@ public class FpsScript : MonoBehaviour
     private void Update()
     {
         var fps = Time.timeScale / Time.deltaTime;
-        text.text = fps <= 55 ? fps.ToString() : "";
+        text.text = fps <= 59 ? fps.ToString() : "";
     }
 }

@@ -18,7 +18,6 @@ public class BallScript : MonoBehaviour
     private bool isAttachedToRope;
     private Vector2 accelerationDirection;
     private bool isBeforeStart = true;
-    private bool isRestoreTimeScale;
 
     public void setInitialSpeedDirection(Vector2 direction)
     {
@@ -69,7 +68,7 @@ public class BallScript : MonoBehaviour
                 {
                     isAttachedToRope = false;
                     if (isBeforeStart) isBeforeStart = false;
-                    var divisionItem = ItemManager.instance.checkItem(ItemManager.Division);
+                    var divisionItem = ItemManager.instance.CheckItem(ItemManager.Division);
                     CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionItem);
                 }
                 break;
@@ -80,7 +79,7 @@ public class BallScript : MonoBehaviour
                 remainTime -= hit.distance / speed.magnitude;
                 transform.position = hit.point + hit.normal * .125f;
                 speed = Vector2.Reflect(speed, hit.normal);
-                var blackHoleItem = ItemManager.instance.checkItem(ItemManager.BlackHole);
+                var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
                 if (blackHoleItem > 0)
                     BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
             }
@@ -92,7 +91,7 @@ public class BallScript : MonoBehaviour
                 if (speedLvl <= brick.level)
                 {
                     speed = Vector2.Reflect(speed, hit.normal);
-                    var blackHoleItem = ItemManager.instance.checkItem(ItemManager.BlackHole);
+                    var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
                     if (blackHoleItem > 0)
                         BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
                 }
@@ -115,15 +114,6 @@ public class BallScript : MonoBehaviour
         transform.position += (Vector3) speed * remainTime;
     }
 
-    private void LateUpdate()
-    {
-        if (!isRestoreTimeScale) return;
-        Time.timeScale += 2 * Time.deltaTime;
-        if (Time.timeScale < 1) return;
-        isRestoreTimeScale = false;
-        Time.timeScale = 1;
-    }
-
     public void SetAccelerationDirection(Vector2 direction)
     {
         accelerationDirection = direction;
@@ -132,7 +122,6 @@ public class BallScript : MonoBehaviour
     private void SlowDownTimeScale()
     {
         StopCoroutine("RestoreTimeScale");
-        isRestoreTimeScale = false;
         Time.timeScale = .1f;
         StartCoroutine("RestoreTimeScale");
     }
@@ -140,7 +129,16 @@ public class BallScript : MonoBehaviour
     private IEnumerator RestoreTimeScale()
     {
         yield return new WaitForSecondsRealtime(1);
-        isRestoreTimeScale = true;
+        for (;;)
+        {
+            Time.timeScale += 2 * Time.deltaTime;
+            if (Time.timeScale < 1) yield return null;
+            else
+            {
+                Time.timeScale = 1;
+                break;
+            }
+        }
     }
 
     public void SpeedLevelChange(int lvlChange)

@@ -103,15 +103,18 @@ public class RopeScript : MonoBehaviour
         lineRenderer.SetPositions(ropePath);
     }
 
-    private void Update()
+    private IEnumerator Fade()
     {
-        if (!isRemoving) return;
-        var color1 = lineRenderer.startColor;
-        var color2 = lineRenderer.endColor;
-        color1.a -= Time.deltaTime * 4;
-        color2.a -= Time.deltaTime * 4;
-        lineRenderer.startColor = color1;
-        lineRenderer.endColor = color2;
+        for (;;)
+        {
+            var color1 = lineRenderer.startColor;
+            var color2 = lineRenderer.endColor;
+            color1.a -= .12f;
+            color2.a -= .12f;
+            lineRenderer.startColor = color1;
+            lineRenderer.endColor = color2;
+            yield return new WaitForSeconds(.03f);
+        }
     }
 
     public BallTriggerResult OnBallTrigger(Vector2 position, Vector2 speed, BallScript callback, bool isNormalCase)
@@ -258,12 +261,14 @@ public class RopeScript : MonoBehaviour
         if (isRemoving) return;
         isRemoving = true;
         edgeCollider2D.enabled = false;
+        StartCoroutine("Fade");
         StartCoroutine("Destroy");
     }
 
     private IEnumerator Destroy()
     {
         yield return new WaitForSeconds(.25f);
+        StopCoroutine("Fade");
         lineRenderer.positionCount = 0;
         var color1 = lineRenderer.startColor;
         var color2 = lineRenderer.endColor;

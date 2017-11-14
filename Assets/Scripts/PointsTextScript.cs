@@ -25,19 +25,25 @@ public class PointsTextScript : MonoBehaviour
         else text.fontSize = 32;
         text.color = Color.white;
         StartCoroutine("Destory");
+        StartCoroutine("Animation");
     }
 
-    private void Update()
+    private IEnumerator Animation()
     {
-        var color = text.color;
-        color.a -= 2 * Time.deltaTime;
-        text.color = color;
-        transform.position = transform.position + Vector3.up * .1f * Time.deltaTime;
+        for (;;)
+        {
+            var color = text.color;
+            color.a -= .06f;
+            text.color = color;
+            transform.position = transform.position + Vector3.up * .003f;
+            yield return new WaitForSeconds(.03f);
+        }
     }
 
     private IEnumerator Destory()
     {
         yield return new WaitForSeconds(.5f);
+        StopCoroutine("Animation");
         gameObject.SetActive(false);
     }
 }

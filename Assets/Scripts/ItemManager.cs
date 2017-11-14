@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,32 +35,39 @@ public class ItemManager : MonoBehaviour
         itemScripts[1] = Instantiate(prefab, transform).GetComponent<ItemDurationScript>();
         itemScripts[1].GetComponent<Image>().sprite = sprites[1];
         itemScripts[1].GetComponent<ItemDurationScript>().Initialize(1, 10);
+        StartCoroutine("Move");
     }
 
     // Update is called once per frame
-    private void Update()
+    private IEnumerator Move()
     {
-        if (needMove.Count < 1) return;
-        var l = needMove.ToList();
-        foreach (var i in l)
+        for (;;)
         {
-            if (!list.Contains(i))
+            if (needMove.Count > 0)
             {
-                needMove.Remove(i);
-                continue;
+                var l = needMove.ToList();
+                foreach (var i in l)
+                {
+                    if (!list.Contains(i))
+                    {
+                        needMove.Remove(i);
+                        continue;
+                    }
+                    var position = transform.position + Vector3.right * distance * list.IndexOf(i);
+                    if (itemScripts[i].transform.position != position)
+                        itemScripts[i].transform.position = Vector2.MoveTowards(itemScripts[i].transform.position,
+                            position, .06f * distance);
+                    else
+                    {
+                        needMove.Remove(i);
+                    }
+                }
             }
-            var position = transform.position + Vector3.right * distance * list.IndexOf(i);
-            if (itemScripts[i].transform.position != position)
-                itemScripts[i].transform.position = Vector2.MoveTowards(itemScripts[i].transform.position,
-                    position, Time.deltaTime * 2 * distance);
-            else
-            {
-                needMove.Remove(i);
-            }
+            yield return new WaitForSeconds(.03f);
         }
     }
 
-    public int checkItem(int item)
+    public int CheckItem(int item)
     {
         return !itemScripts[item].gameObject.activeInHierarchy ? 0 : itemScripts[item].GetStack();
     }

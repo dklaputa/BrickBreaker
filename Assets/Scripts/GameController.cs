@@ -19,7 +19,7 @@ public class GameController : MonoBehaviour
     private Image energyFill;
     private Image scoreBar;
     private float energyFillAmount;
-    private bool isChangeEnergyFillAmount;
+    private bool isChangingEnergyFillAmount;
     private GameObject introductionInfo;
     private GameObject introductionAnimation;
     private GameObject[] star;
@@ -78,18 +78,6 @@ public class GameController : MonoBehaviour
                 if (!star[0].activeInHierarchy && percent >= .5f) star[0].SetActive(true);
             }
             needRefreshScore = false;
-        }
-
-        if (!isChangeEnergyFillAmount) return;
-        var diff = Mathf.Abs(energyFillAmount - energyFill.fillAmount);
-        if (diff < .02f)
-        {
-            energyFill.fillAmount = energyFillAmount;
-            isChangeEnergyFillAmount = false;
-        }
-        else
-        {
-            energyFill.fillAmount += .02f * diff / (energyFillAmount - energyFill.fillAmount);
         }
     }
 
@@ -171,6 +159,23 @@ public class GameController : MonoBehaviour
         ballColor.a = .4f;
         energyFill.color = ballColor;
         energyFillAmount = (float) level / (maxLevel - 1);
-        isChangeEnergyFillAmount = true;
+        if (!isChangingEnergyFillAmount) StartCoroutine("ChangeEnergyFillAmount");
+    }
+
+    private IEnumerator ChangeEnergyFillAmount()
+    {
+        isChangingEnergyFillAmount = true;
+        for (;;)
+        {
+            var diff = Mathf.Abs(energyFillAmount - energyFill.fillAmount);
+            if (diff < .03f)
+            {
+                energyFill.fillAmount = energyFillAmount;
+                break;
+            }
+            energyFill.fillAmount += .03f * diff / (energyFillAmount - energyFill.fillAmount);
+            yield return new WaitForSeconds(.03f);
+        }
+        isChangingEnergyFillAmount = false;
     }
 }

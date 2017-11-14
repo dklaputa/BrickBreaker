@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ItemDurationScript : MonoBehaviour
@@ -34,18 +35,33 @@ public class ItemDurationScript : MonoBehaviour
         stack = 1;
     }
 
-    // Update is called once per frame
-    private void Update()
+    private void OnEnable()
     {
-        cover.fillAmount += Time.deltaTime / duration;
-        if (cover.fillAmount < 1) return;
-        cover.fillAmount = 0;
-        if (stack > 1)
+        StartCoroutine("Refresh");
+    }
+
+    // Update is called once per frame
+    private IEnumerator Refresh()
+    {
+        for (;;)
         {
-            stack--;
-            num.text = stack > 1 ? stack.ToString() : "";
+            cover.fillAmount += .1f / duration;
+            if (cover.fillAmount >= 1)
+            {
+                cover.fillAmount = 0;
+                if (stack > 1)
+                {
+                    stack--;
+                    num.text = stack > 1 ? stack.ToString() : "";
+                }
+                else
+                {
+                    Destory();
+                    break;
+                }
+            }
+            yield return new WaitForSeconds(.1f);
         }
-        else Destory();
     }
 
     private void Destory()

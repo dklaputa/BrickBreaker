@@ -7,7 +7,6 @@ public class BrickManager : ObjectPoolBehavior
 {
     public static BrickManager instance;
     private Vector2 targetPosition;
-    private bool startMove;
 
     private static readonly List<Vector3>[] Bricks =
     {
@@ -139,6 +138,7 @@ public class BrickManager : ObjectPoolBehavior
 
     private int nextRow;
     private bool needCheckAllDead;
+    private bool isMoving;
 
     private void Awake()
     {
@@ -163,11 +163,16 @@ public class BrickManager : ObjectPoolBehavior
         targetPosition = transform.position;
     }
 
-    private void Update()
+    private IEnumerator StartMove()
     {
-        if (!startMove) return;
-        transform.position = Vector2.MoveTowards(transform.position, targetPosition, Time.deltaTime);
-        if ((Vector2) transform.position == targetPosition) startMove = false;
+        isMoving = true;
+        for (;;)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, targetPosition, Time.deltaTime);
+            if ((Vector2) transform.position != targetPosition) yield return null;
+            else break;
+        }
+        isMoving = false;
     }
 
     private IEnumerator CheckBricks()
@@ -196,7 +201,7 @@ public class BrickManager : ObjectPoolBehavior
                             rows++;
                         }
                         targetPosition += Vector2.down * .34f * rows;
-                        startMove = true;
+                        if (!isMoving) StartCoroutine("StartMove");
                         StartCoroutine("NewBricksRow");
                     }
                     else
@@ -215,7 +220,7 @@ public class BrickManager : ObjectPoolBehavior
         {
             yield return new WaitForSeconds(15);
             targetPosition += Vector2.down * .34f;
-            startMove = true;
+            if (!isMoving) StartCoroutine("StartMove");
             if (nextRow >= Bricks.Length) continue;
             var row = Bricks[nextRow++];
             foreach (var vector in row)
