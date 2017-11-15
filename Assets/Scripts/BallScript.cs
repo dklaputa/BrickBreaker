@@ -14,6 +14,7 @@ public class BallScript : MonoBehaviour
     private ParticleSystem.MainModule mainModule;
     private ParticleSystem particle;
     private Vector2 speed;
+    private Animator animator;
     private int speedLvl;
     private bool isAttachedToRope;
     private Vector2 accelerationDirection;
@@ -30,6 +31,7 @@ public class BallScript : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         particle = GetComponent<ParticleSystem>();
         mainModule = particle.main;
+        animator = GetComponent<Animator>();
     }
 
 //    private void Start() 
@@ -39,77 +41,99 @@ public class BallScript : MonoBehaviour
 
     private void Update()
     {
+        var remainTime = Time.deltaTime;
         if (isAttachedToRope)
         {
             speed += accelerationDirection * (20 + 10 * speed.magnitude) * Time.deltaTime;
-        }
-        var remainTime = Time.deltaTime;
-        var hit = Physics2D.CircleCast(transform.position, .125f, speed,
-            speed.magnitude * remainTime);
-        var count = 0;
-        while (hit.collider != null && count < 5)
-        {
-            var o = hit.collider.gameObject;
-            if (o.CompareTag("Rope"))
+            var hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * Time.deltaTime,
+                LayerMask.GetMask("Rope"));
+            if (hit.collider != null)
             {
-                var rope = o.GetComponent<RopeScript>();
+                var rope = hit.collider.gameObject.GetComponent<RopeScript>();
                 var result = rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
-                if (result == RopeScript.BallTriggerResult.BallBounce)
-                {
-                    speed = -speed;
-                }
-                else if (result == RopeScript.BallTriggerResult.BallAttach)
-                {
-                    speed = -accelerationDirection * speed.magnitude;
-                    isAttachedToRope = true;
-                    GameController.instance.ResetComboCount();
-                }
-                else if (result == RopeScript.BallTriggerResult.BallDetach)
+                if (result == RopeScript.BallTriggerResult.BallDetach)
                 {
                     isAttachedToRope = false;
                     if (isBeforeStart) isBeforeStart = false;
                     var divisionItem = ItemManager.instance.CheckItem(ItemManager.Division);
                     CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionItem);
                 }
-                break;
             }
-            if (isAttachedToRope || isBeforeStart) break;
-            if (o.CompareTag("Wall"))
+        }
+        else if (isBeforeStart)
+        {
+            var hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * Time.deltaTime,
+                LayerMask.GetMask("Rope"));
+            if (hit.collider != null)
             {
-                remainTime -= hit.distance / speed.magnitude;
-                transform.position = hit.point + hit.normal * .125f;
-                speed = Vector2.Reflect(speed, hit.normal);
-                var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
-                if (blackHoleItem > 0)
-                    BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
+                var rope = hit.collider.gameObject.GetComponent<RopeScript>();
+                rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
+                isAttachedToRope = true;
             }
-            else if (o.CompareTag("Brick"))
+        }
+        else
+        {
+            var hit = Physics2D.CircleCast(transform.position, .125f, speed,
+                speed.magnitude * remainTime);
+            var count = 0;
+            while (hit.collider != null && count < 5)
             {
-                remainTime -= hit.distance / speed.magnitude;
-                transform.position = hit.point + hit.normal * .125f;
-                var brick = o.GetComponent<BrickScript>();
-                if (speedLvl <= brick.level)
+                var o = hit.collider.gameObject;
+                if (o.CompareTag("Rope"))
                 {
+                    var rope = o.GetComponent<RopeScript>();
+                    var result = rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
+                    if (result == RopeScript.BallTriggerResult.BallBounce)
+                    {
+                        speed = -speed;
+                    }
+                    else if (result == RopeScript.BallTriggerResult.BallAttach)
+                    {
+                        speed = -accelerationDirection * speed.magnitude;
+                        isAttachedToRope = true;
+                        GameController.instance.ResetComboCount();
+                    }
+                    break;
+                }
+                if (o.CompareTag("Wall"))
+                {
+                    remainTime -= hit.distance / speed.magnitude;
+                    transform.position = hit.point + hit.normal * .125f;
                     speed = Vector2.Reflect(speed, hit.normal);
                     var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
                     if (blackHoleItem > 0)
                         BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
                 }
-                if (speedLvl >= brick.level)
+                else if (o.CompareTag("Brick"))
                 {
-                    if (speedLvl > 3) SlowDownTimeScale();
-                    SpeedLevelChange(-brick.level - 1);
-                    PointsTextManager.instance.ShowPointsText(brick.transform.position, brick.Break());
+                    remainTime -= hit.distance / speed.magnitude;
+                    transform.position = hit.point + hit.normal * .125f;
+                    var brick = o.GetComponent<BrickScript>();
+                    if (speedLvl <= brick.level)
+                    {
+                        speed = Vector2.Reflect(speed, hit.normal);
+                        var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
+                        if (blackHoleItem > 0)
+                            BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
+                    }
+                    if (speedLvl >= brick.level)
+                    {
+                        if (speedLvl > 3) GameController.instance.SlowDownTimeScale();
+                        SpeedLevelChange(-brick.level - 1);
+                        PointsTextManager.instance.ShowPointsText(brick.transform.position, brick.Break());
+                    }
                 }
+                else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
+                {
+                    if (!GameController.instance.IsGameOver())
+                        GameController.instance.GameOver(false);
+                    animator.SetTrigger("Die");
+                    StartCoroutine("Destroy");
+                    break;
+                }
+                hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * remainTime);
+                count++;
             }
-            else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
-            {
-                SceneManager.LoadScene("Main");
-                break;
-            }
-            else break;
-            hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * remainTime);
-            count++;
         }
         transform.position += (Vector3) speed * remainTime;
     }
@@ -117,28 +141,6 @@ public class BallScript : MonoBehaviour
     public void SetAccelerationDirection(Vector2 direction)
     {
         accelerationDirection = direction;
-    }
-
-    private void SlowDownTimeScale()
-    {
-        StopCoroutine("RestoreTimeScale");
-        Time.timeScale = .1f;
-        StartCoroutine("RestoreTimeScale");
-    }
-
-    private IEnumerator RestoreTimeScale()
-    {
-        yield return new WaitForSecondsRealtime(1);
-        for (;;)
-        {
-            Time.timeScale += 2 * Time.deltaTime;
-            if (Time.timeScale < 1) yield return null;
-            else
-            {
-                Time.timeScale = 1;
-                break;
-            }
-        }
     }
 
     public void SpeedLevelChange(int lvlChange)
@@ -172,5 +174,11 @@ public class BallScript : MonoBehaviour
             if (!particle.isStopped) particle.Stop(false, ParticleSystemStopBehavior.StopEmitting);
         }
         GameController.instance.SetBallLevel(speedLvl, SpeedArray.Length, color);
+    }
+
+    private IEnumerator Destroy()
+    {
+        yield return new WaitForSeconds(.1f);
+        Destroy(this);
     }
 }

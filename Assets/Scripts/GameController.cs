@@ -1,16 +1,20 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking.NetworkSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
 
-    public GameObject ballPrefab;
+    public GameObject ball;
+    public GameObject gameOverMenu;
 
     public string miss;
     public string[] perfect;
+    public string win;
+    public string loss;
 
     private Text assessmentText;
     private Text assessmentCount;
@@ -20,14 +24,20 @@ public class GameController : MonoBehaviour
     private Image scoreBar;
     private float energyFillAmount;
     private bool isChangingEnergyFillAmount;
+
+    private GameObject[] gameOverStar;
+    private Text gameOverMessage;
+    private Text gameOverScore;
+
     private GameObject introductionInfo;
     private GameObject introductionAnimation;
     private GameObject[] star;
-    private BallScript ball;
+    private int starNum;
     private int perfectShootCount;
     private int comboCount;
     private int totalPoints;
     private bool isGameStart;
+    private bool isGameOver;
     private bool needRefreshScore;
 
     // Use this for initialization
@@ -35,6 +45,7 @@ public class GameController : MonoBehaviour
     {
         instance = this;
         Input.multiTouchEnabled = false;
+
         assessmentText = GameObject.Find("AssessmentText").GetComponent<Text>();
         assessmentCount = GameObject.Find("AssessmentCount").GetComponent<Text>();
         scoreText = GameObject.Find("Score").GetComponent<Text>();
@@ -46,6 +57,15 @@ public class GameController : MonoBehaviour
         var bar = GameObject.Find("ScoreBar").transform;
         scoreBar = bar.GetChild(0).gameObject.GetComponent<Image>();
         star = new[] {bar.GetChild(1).gameObject, bar.GetChild(2).gameObject, bar.GetChild(3).gameObject};
+
+        var gameOverTransform = gameOverMenu.transform;
+        gameOverStar = new[]
+        {
+            gameOverTransform.GetChild(0).GetChild(0).gameObject, gameOverTransform.GetChild(1).GetChild(0).gameObject,
+            gameOverTransform.GetChild(2).GetChild(0).gameObject
+        };
+        gameOverMessage = gameOverTransform.GetChild(3).gameObject.GetComponent<Text>();
+        gameOverScore = gameOverTransform.GetChild(4).gameObject.GetComponent<Text>();
     }
 
     // Update is called once per frame
@@ -62,20 +82,23 @@ public class GameController : MonoBehaviour
             scoreText.text = totalPoints.ToString();
             var percent = totalPoints / 80000f;
             scoreBar.fillAmount = percent;
-            if (percent >= 1)
+            if (percent >= 1 && starNum < 3)
             {
                 if (!star[2].activeInHierarchy) star[2].SetActive(true);
                 if (!star[1].activeInHierarchy) star[1].SetActive(true);
                 if (!star[0].activeInHierarchy) star[0].SetActive(true);
+                starNum = 3;
             }
-            else if (percent >= .75f)
+            else if (percent >= .75f && starNum < 2)
             {
                 if (!star[1].activeInHierarchy) star[1].SetActive(true);
                 if (!star[0].activeInHierarchy) star[0].SetActive(true);
+                starNum = 2;
             }
-            else if (percent >= .5f)
+            else if (percent >= .5f && starNum < 1)
             {
                 if (!star[0].activeInHierarchy && percent >= .5f) star[0].SetActive(true);
+                starNum = 1;
             }
             needRefreshScore = false;
         }
@@ -86,6 +109,11 @@ public class GameController : MonoBehaviour
         return isGameStart;
     }
 
+    public bool IsGameOver()
+    {
+        return isGameOver;
+    }
+
     public void GameStart(Vector2 position1, Vector2 position2)
     {
         isGameStart = true;
@@ -93,10 +121,31 @@ public class GameController : MonoBehaviour
         Vector2 up;
         if (ropeVector.x < 0) up = new Vector2(ropeVector.y, -ropeVector.x).normalized;
         else up = new Vector2(-ropeVector.y, ropeVector.x).normalized;
-        var o = Instantiate(ballPrefab, (position1 + position2) / 2 + up, Quaternion.identity);
-        ball = o.GetComponent<BallScript>();
-        ball.setInitialSpeedDirection(-up);
+        ball.transform.position = (position1 + position2) / 2 + up;
+        ball.GetComponent<BallScript>().setInitialSpeedDirection(-up);
+        ball.SetActive(true);
         BrickManager.instance.GameStart();
+    }
+
+    public void GameOver(bool isWin)
+    {
+        isGameOver = true;
+        gameOverMessage.text = isWin ? win : loss;
+        gameOverScore.text = "score: " + totalPoints;
+        if (isWin)
+        {
+            for (var i = 0; i < starNum; i++)
+            {
+                gameOverStar[i].SetActive(true);
+            }
+        }
+        gameOverMenu.SetActive(true);
+        BrickManager.instance.GameOver();
+    }
+
+    public void GameRestart()
+    {
+        SceneManager.LoadScene("Main");
     }
 
     public void HideIntroductionInfo()
@@ -177,5 +226,27 @@ public class GameController : MonoBehaviour
             yield return new WaitForSeconds(.03f);
         }
         isChangingEnergyFillAmount = false;
+    }
+    
+    public void SlowDownTimeScale()
+    {
+        StopCoroutine("RestoreTimeScale");
+        Time.timeScale = .1f;
+        StartCoroutine("RestoreTimeScale");
+    }
+
+    private IEnumerator RestoreTimeScale()
+    {
+        yield return new WaitForSecondsRealtime(1);
+        for (;;)
+        {
+            Time.timeScale += 2 * Time.deltaTime;
+            if (Time.timeScale < 1) yield return null;
+            else
+            {
+                Time.timeScale = 1;
+                break;
+            }
+        }
     }
 }

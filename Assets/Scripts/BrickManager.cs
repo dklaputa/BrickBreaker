@@ -206,7 +206,7 @@ public class BrickManager : ObjectPoolBehavior
                     }
                     else
                     {
-                        //You Won!
+                        if (!GameController.instance.IsGameOver()) GameController.instance.GameOver(true);
                     }
                 }
             }
@@ -238,6 +238,11 @@ public class BrickManager : ObjectPoolBehavior
         StartCoroutine("CheckBricks");
         StartCoroutine("NewBricksRow");
         StartCoroutine("RandomItem");
+    }
+    
+    public void GameOver()
+    {
+        StopAllCoroutines();
     }
 
     public void CheckIsBrickAllDead()
