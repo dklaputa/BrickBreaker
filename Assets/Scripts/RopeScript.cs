@@ -78,7 +78,7 @@ public class RopeScript : MonoBehaviour
         springJointsMiddle[1].distance = springJointsMiddle[0].distance;
         edgeCollider2D.points = endPointPositions;
         edgeCollider2D.enabled = true;
-//        lineRenderer.material.mainTextureScale = new Vector2(ropeLength * 2.5f, 1);
+        lineRenderer.material.mainTextureScale = new Vector2((int) (ropeLength * 4), 1);
     }
 
     // Update is called once per frame

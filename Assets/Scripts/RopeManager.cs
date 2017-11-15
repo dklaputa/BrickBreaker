@@ -73,7 +73,7 @@ public class RopeManager : ObjectPoolBehavior
                 positions[1] = Vector2.Lerp(positions[0], positions[1], maxLength / d);
                 d = maxLength;
             }
-            lineRenderer.material.mainTextureScale = new Vector2(d * 4, 1);
+            lineRenderer.material.mainTextureScale = new Vector2(d * 5.2f, 1);
             lineRenderer.positionCount = 2;
             lineRenderer.SetPositions(new Vector3[] {positions[0], positions[1]});
         }

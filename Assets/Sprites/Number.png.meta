@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: d2cafcc71bbfc194dbf77785d5c69b18
-timeCreated: 1510484992
+timeCreated: 1510672819
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -108,10 +108,10 @@ TextureImporter:
       name: Number_0
       rect:
         serializedVersion: 2
-        x: 9
-        y: 120
-        width: 44
-        height: 66
+        x: 11
+        y: 112
+        width: 47
+        height: 72
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -122,10 +122,10 @@ TextureImporter:
       name: Number_1
       rect:
         serializedVersion: 2
-        x: 60
-        y: 121
-        width: 26
-        height: 64
+        x: 66
+        y: 113
+        width: 28
+        height: 69
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -136,10 +136,10 @@ TextureImporter:
       name: Number_2
       rect:
         serializedVersion: 2
-        x: 102
-        y: 121
-        width: 44
-        height: 65
+        x: 111
+        y: 114
+        width: 48
+        height: 69
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -150,10 +150,10 @@ TextureImporter:
       name: Number_3
       rect:
         serializedVersion: 2
-        x: 152
-        y: 120
-        width: 45
-        height: 66
+        x: 165
+        y: 113
+        width: 48
+        height: 70
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -164,10 +164,10 @@ TextureImporter:
       name: Number_4
       rect:
         serializedVersion: 2
-        x: 203
-        y: 121
-        width: 48
-        height: 64
+        x: 220
+        y: 114
+        width: 51
+        height: 69
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,10 +178,10 @@ TextureImporter:
       name: Number_5
       rect:
         serializedVersion: 2
-        x: 3
-        y: 26
-        width: 45
-        height: 65
+        x: 4
+        y: 12
+        width: 48
+        height: 69
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -192,10 +192,10 @@ TextureImporter:
       name: Number_6
       rect:
         serializedVersion: 2
-        x: 56
-        y: 26
-        width: 44
-        height: 66
+        x: 61
+        y: 12
+        width: 48
+        height: 70
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -206,10 +206,10 @@ TextureImporter:
       name: Number_7
       rect:
         serializedVersion: 2
-        x: 107
-        y: 27
-        width: 44
-        height: 64
+        x: 116
+        y: 12
+        width: 47
+        height: 69
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -220,10 +220,10 @@ TextureImporter:
       name: Number_8
       rect:
         serializedVersion: 2
-        x: 157
-        y: 26
-        width: 45
-        height: 66
+        x: 172
+        y: 12
+        width: 47
+        height: 70
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -234,10 +234,10 @@ TextureImporter:
       name: Number_9
       rect:
         serializedVersion: 2
-        x: 208
-        y: 26
-        width: 44
-        height: 66
+        x: 226
+        y: 12
+        width: 48
+        height: 70
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

@@ -33,7 +33,7 @@ public class PointsTextScript : MonoBehaviour
         for (;;)
         {
             var color = text.color;
-            color.a -= .06f;
+            color.a -= .03f;
             text.color = color;
             transform.position = transform.position + Vector3.up * .003f;
             yield return new WaitForSeconds(.03f);
@@ -42,7 +42,7 @@ public class PointsTextScript : MonoBehaviour
 
     private IEnumerator Destory()
     {
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(1);
         StopCoroutine("Animation");
         gameObject.SetActive(false);
     }
