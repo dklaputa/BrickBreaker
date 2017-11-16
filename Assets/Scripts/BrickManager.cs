@@ -254,7 +254,7 @@ public class BrickManager : ObjectPoolBehavior
     {
         for (;;)
         {
-            yield return new WaitForSeconds(20);
+            yield return new WaitForSeconds(5);
             var bricks = pool.FindAll(brick => brick.activeInHierarchy);
             if (bricks.Count < 1) continue;
             bricks[Random.Range(0, bricks.Count)].GetComponent<BrickScript>().AddItem();

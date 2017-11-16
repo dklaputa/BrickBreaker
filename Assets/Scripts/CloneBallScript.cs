@@ -29,7 +29,7 @@ public class CloneBallScript : MonoBehaviour
                 remainTime -= hit.distance / speed.magnitude;
                 transform.position = hit.point + hit.normal * .125f;
                 speed = Vector2.Reflect(speed, hit.normal);
-                var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
+                var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
                 if (blackHoleItem > 0)
                     BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
             }
@@ -41,7 +41,7 @@ public class CloneBallScript : MonoBehaviour
                 if (speedLvl <= brick.level)
                 {
                     speed = Vector2.Reflect(speed, hit.normal);
-                    var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
+                    var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
                     if (blackHoleItem > 0)
                         BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
                 }

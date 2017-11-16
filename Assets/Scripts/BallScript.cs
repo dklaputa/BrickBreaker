@@ -55,7 +55,7 @@ public class BallScript : MonoBehaviour
                 {
                     isAttachedToRope = false;
                     if (isBeforeStart) isBeforeStart = false;
-                    var divisionItem = ItemManager.instance.CheckItem(ItemManager.Division);
+                    var divisionItem = ItemManager.instance.CheckItemLevel(ItemManager.Division);
                     CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionItem);
                 }
             }
@@ -100,7 +100,7 @@ public class BallScript : MonoBehaviour
                     remainTime -= hit.distance / speed.magnitude;
                     transform.position = hit.point + hit.normal * .125f;
                     speed = Vector2.Reflect(speed, hit.normal);
-                    var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
+                    var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
                     if (blackHoleItem > 0)
                         BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
                 }
@@ -112,7 +112,7 @@ public class BallScript : MonoBehaviour
                     if (speedLvl <= brick.level)
                     {
                         speed = Vector2.Reflect(speed, hit.normal);
-                        var blackHoleItem = ItemManager.instance.CheckItem(ItemManager.BlackHole);
+                        var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
                         if (blackHoleItem > 0)
                             BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
                     }

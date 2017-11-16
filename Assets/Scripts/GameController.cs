@@ -131,7 +131,7 @@ public class GameController : MonoBehaviour
     {
         isGameOver = true;
         gameOverMessage.text = isWin ? win : loss;
-        gameOverScore.text = "score: " + totalPoints;
+        gameOverScore.text = "Score: " + totalPoints;
         if (isWin)
         {
             for (var i = 0; i < starNum; i++)

@@ -8,7 +8,7 @@ public class ItemDurationScript : MonoBehaviour
     private int itemIndex;
     private Text num;
     private float duration;
-    private int stack;
+    private int level;
 
     public void Initialize(int item, float time)
     {
@@ -16,15 +16,15 @@ public class ItemDurationScript : MonoBehaviour
         duration = time;
     }
 
-    public void AddStack()
+    public void LevelUp()
     {
-        stack++;
-        num.text = stack.ToString();
+        level++;
+        num.text = level.ToString();
     }
 
-    public int GetStack()
+    public int GetLevel()
     {
-        return stack;
+        return level;
     }
 
     // Use this for initialization
@@ -32,7 +32,7 @@ public class ItemDurationScript : MonoBehaviour
     {
         cover = transform.GetChild(0).gameObject.GetComponent<Image>();
         num = transform.GetChild(1).gameObject.GetComponent<Text>();
-        stack = 1;
+        level = 1;
     }
 
     private void OnEnable()
@@ -49,10 +49,10 @@ public class ItemDurationScript : MonoBehaviour
             if (cover.fillAmount >= 1)
             {
                 cover.fillAmount = 0;
-                if (stack > 1)
+                if (level > 1)
                 {
-                    stack--;
-                    num.text = stack > 1 ? stack.ToString() : "";
+                    level--;
+                    num.text = level > 1 ? level.ToString() : "";
                 }
                 else
                 {
@@ -66,7 +66,7 @@ public class ItemDurationScript : MonoBehaviour
 
     private void Destory()
     {
-        ItemManager.instance.OnItemInvalid(itemIndex);
+        ItemManager.instance.OnItemDurationEnd(itemIndex);
         gameObject.SetActive(false);
     }
 }

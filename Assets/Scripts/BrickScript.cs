@@ -27,7 +27,7 @@ public class BrickScript : MonoBehaviour
 
     private IEnumerator RemoveItem()
     {
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(5);
         isContainItem = false;
         brickBackground.color = Colors[level];
     }
@@ -60,7 +60,7 @@ public class BrickScript : MonoBehaviour
     {
         if (isContainItem)
         {
-            //item
+            ItemManager.instance.ObtainItem();
         }
         Remove();
         BrickManager.instance.CheckIsBrickAllDead();
