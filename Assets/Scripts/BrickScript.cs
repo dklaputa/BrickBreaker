@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BrickScript : MonoBehaviour
 {
@@ -11,11 +10,13 @@ public class BrickScript : MonoBehaviour
     private SpriteRenderer textLvl;
     private SpriteRenderer brickBackground;
     private bool isContainItem;
+    private bool dead;
 
     private static readonly Color[] Colors =
     {
         new Color(255f / 255, 207f / 255, 135f / 255), new Color(255f / 255, 135f / 255, 135f / 255),
-        new Color(139f / 255, 135f / 255, 255f / 255)
+        new Color(135f / 255, 195f / 255, 255f / 255), new Color(139f / 255, 135f / 255, 255f / 255),
+        new Color(180f / 255, 135f / 255, 255f / 255)
     };
 
     public void AddItem()
@@ -27,7 +28,7 @@ public class BrickScript : MonoBehaviour
 
     private IEnumerator RemoveItem()
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(20);
         isContainItem = false;
         brickBackground.color = Colors[level];
     }
@@ -48,6 +49,7 @@ public class BrickScript : MonoBehaviour
     {
         brickBackground.color = Colors[level];
         textLvl.sprite = numbers[level];
+        dead = false;
     }
 
     private void Remove()
@@ -58,9 +60,12 @@ public class BrickScript : MonoBehaviour
 
     public int Break()
     {
+        if (dead) return 0;
+        dead = true;
         if (isContainItem)
         {
             ItemManager.instance.ObtainItem();
+            isContainItem = false;
         }
         Remove();
         BrickManager.instance.CheckIsBrickAllDead();

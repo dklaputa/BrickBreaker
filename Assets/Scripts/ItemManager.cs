@@ -113,7 +113,7 @@ public class ItemManager : MonoBehaviour
 
     public void OnItemClick(int item)
     {
-        if (itemNum[item] < 1) return;
+        if (itemNum[item] < 1 || !GameController.instance.IsGameStart()) return;
         itemNum[item]--;
         itemNumTexts[item].text = itemNum[item].ToString();
         if (itemDurationList.Contains(item)) itemDurationScripts[item].LevelUp();

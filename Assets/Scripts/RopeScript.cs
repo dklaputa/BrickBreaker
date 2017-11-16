@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class RopeScript : MonoBehaviour
@@ -183,7 +184,7 @@ public class RopeScript : MonoBehaviour
         }
     }
 
-    private static void RopePathBeforeTouch(Vector3 pointL, Vector3 pointR, Vector3[] ropePath)
+    private static void RopePathBeforeTouch(Vector3 pointL, Vector3 pointR, IList<Vector3> ropePath)
     {
         for (var i = 0; i < 20; i++)
         {
@@ -192,7 +193,7 @@ public class RopeScript : MonoBehaviour
     }
 
     private static void RopePathDuringTouch(Vector3 pointL, Vector3 pointR, Vector3 circleCenter, float r,
-        BallEnterDirection direction, Vector3[] ropePath)
+        BallEnterDirection direction, IList<Vector3> ropePath)
     {
         var dL = (pointL - circleCenter).magnitude;
         var dR = (pointR - circleCenter).magnitude;
@@ -233,7 +234,7 @@ public class RopeScript : MonoBehaviour
         }
     }
 
-    private static void RopePathAfterTouch(Vector3 pointL, Vector3 pointM, Vector3 pointR, Vector3[] ropePath)
+    private static void RopePathAfterTouch(Vector3 pointL, Vector3 pointM, Vector3 pointR, IList<Vector3> ropePath)
     {
         for (var i = 0; i < 20; i++)
         {

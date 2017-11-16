@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Networking.NetworkSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -13,9 +12,10 @@ public class GameController : MonoBehaviour
 
     public string miss;
     public string[] perfect;
-    public string win;
-    public string loss;
+//    public string win;
+//    public string loss;
 
+    private Text stageText;
     private Text assessmentText;
     private Text assessmentCount;
     private Text scoreText;
@@ -25,8 +25,8 @@ public class GameController : MonoBehaviour
     private float energyFillAmount;
     private bool isChangingEnergyFillAmount;
 
-    private GameObject[] gameOverStar;
-    private Text gameOverMessage;
+//    private GameObject[] gameOverStar;
+//    private Text gameOverMessage;
     private Text gameOverScore;
 
     private GameObject introductionInfo;
@@ -36,6 +36,7 @@ public class GameController : MonoBehaviour
     private int perfectShootCount;
     private int comboCount;
     private int totalPoints;
+
     private bool isGameStart;
     private bool isGameOver;
     private bool needRefreshScore;
@@ -49,6 +50,7 @@ public class GameController : MonoBehaviour
         assessmentText = GameObject.Find("AssessmentText").GetComponent<Text>();
         assessmentCount = GameObject.Find("AssessmentCount").GetComponent<Text>();
         scoreText = GameObject.Find("Score").GetComponent<Text>();
+        stageText = GameObject.Find("StageNum").GetComponent<Text>();
         introductionInfo = GameObject.Find("IntroInfo");
         introductionAnimation = GameObject.Find("IntroAnim");
         energyText = GameObject.Find("EnergyLvl").GetComponent<Text>();
@@ -59,12 +61,12 @@ public class GameController : MonoBehaviour
         star = new[] {bar.GetChild(1).gameObject, bar.GetChild(2).gameObject, bar.GetChild(3).gameObject};
 
         var gameOverTransform = gameOverMenu.transform;
-        gameOverStar = new[]
-        {
-            gameOverTransform.GetChild(0).GetChild(0).gameObject, gameOverTransform.GetChild(1).GetChild(0).gameObject,
-            gameOverTransform.GetChild(2).GetChild(0).gameObject
-        };
-        gameOverMessage = gameOverTransform.GetChild(3).gameObject.GetComponent<Text>();
+//        gameOverStar = new[]
+//        {
+//            gameOverTransform.GetChild(0).GetChild(0).gameObject, gameOverTransform.GetChild(1).GetChild(0).gameObject,
+//            gameOverTransform.GetChild(2).GetChild(0).gameObject
+//        };
+//        gameOverMessage = gameOverTransform.GetChild(3).gameObject.GetComponent<Text>();
         gameOverScore = gameOverTransform.GetChild(4).gameObject.GetComponent<Text>();
     }
 
@@ -77,31 +79,31 @@ public class GameController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (needRefreshScore)
+        if (!needRefreshScore) return;
+        scoreText.text = totalPoints.ToString();
+        var percent = totalPoints / 80000f;
+        scoreBar.fillAmount = percent;
+        if (percent >= 1 && starNum < 3)
         {
-            scoreText.text = totalPoints.ToString();
-            var percent = totalPoints / 80000f;
-            scoreBar.fillAmount = percent;
-            if (percent >= 1 && starNum < 3)
-            {
-                if (!star[2].activeInHierarchy) star[2].SetActive(true);
-                if (!star[1].activeInHierarchy) star[1].SetActive(true);
-                if (!star[0].activeInHierarchy) star[0].SetActive(true);
-                starNum = 3;
-            }
-            else if (percent >= .75f && starNum < 2)
-            {
-                if (!star[1].activeInHierarchy) star[1].SetActive(true);
-                if (!star[0].activeInHierarchy) star[0].SetActive(true);
-                starNum = 2;
-            }
-            else if (percent >= .5f && starNum < 1)
-            {
-                if (!star[0].activeInHierarchy && percent >= .5f) star[0].SetActive(true);
-                starNum = 1;
-            }
-            needRefreshScore = false;
+            if (!star[2].activeInHierarchy) star[2].SetActive(true);
+            if (!star[1].activeInHierarchy) star[1].SetActive(true);
+            if (!star[0].activeInHierarchy) star[0].SetActive(true);
+            starNum = 3;
         }
+        else if (percent >= .75f && starNum < 2)
+        {
+            if (!star[1].activeInHierarchy) star[1].SetActive(true);
+            if (!star[0].activeInHierarchy) star[0].SetActive(true);
+            starNum = 2;
+        }
+        else if (percent >= .5f && starNum < 1)
+        {
+            if (!star[0].activeInHierarchy && percent >= .5f) star[0].SetActive(true);
+            starNum = 1;
+        }
+        int s;
+        if ((s = BrickManager.instance.CheckStage(totalPoints)) > 0) stageText.text = (s + 1).ToString();
+        needRefreshScore = false;
     }
 
     public bool IsGameStart()
@@ -119,26 +121,27 @@ public class GameController : MonoBehaviour
         isGameStart = true;
         var ropeVector = position1 - position2;
         Vector2 up;
-        if (ropeVector.x < 0) up = new Vector2(ropeVector.y, -ropeVector.x).normalized;
-        else up = new Vector2(-ropeVector.y, ropeVector.x).normalized;
+        up = ropeVector.x < 0
+            ? new Vector2(ropeVector.y, -ropeVector.x).normalized
+            : new Vector2(-ropeVector.y, ropeVector.x).normalized;
         ball.transform.position = (position1 + position2) / 2 + up;
-        ball.GetComponent<BallScript>().setInitialSpeedDirection(-up);
+        ball.GetComponent<BallScript>().SetInitialSpeedDirection(-up);
         ball.SetActive(true);
         BrickManager.instance.GameStart();
     }
 
-    public void GameOver(bool isWin)
+    public void GameOver()
     {
         isGameOver = true;
-        gameOverMessage.text = isWin ? win : loss;
+//        gameOverMessage.text = isWin ? win : loss;
         gameOverScore.text = "Score: " + totalPoints;
-        if (isWin)
-        {
-            for (var i = 0; i < starNum; i++)
-            {
-                gameOverStar[i].SetActive(true);
-            }
-        }
+//        if (isWin)
+//        {
+//            for (var i = 0; i < starNum; i++)
+//            {
+//                gameOverStar[i].SetActive(true);
+//            }
+//        }
         gameOverMenu.SetActive(true);
         BrickManager.instance.GameOver();
     }
@@ -227,7 +230,7 @@ public class GameController : MonoBehaviour
         }
         isChangingEnergyFillAmount = false;
     }
-    
+
     public void SlowDownTimeScale()
     {
         StopCoroutine("RestoreTimeScale");

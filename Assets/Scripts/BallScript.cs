@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Video;
 
 public class BallScript : MonoBehaviour
 {
@@ -20,7 +18,7 @@ public class BallScript : MonoBehaviour
     private Vector2 accelerationDirection;
     private bool isBeforeStart = true;
 
-    public void setInitialSpeedDirection(Vector2 direction)
+    public void SetInitialSpeedDirection(Vector2 direction)
     {
         speed = direction * SpeedArray[speedLvl];
     }
@@ -120,13 +118,14 @@ public class BallScript : MonoBehaviour
                     {
                         if (speedLvl > 3) GameController.instance.SlowDownTimeScale();
                         SpeedLevelChange(-brick.level - 1);
-                        PointsTextManager.instance.ShowPointsText(brick.transform.position, brick.Break());
+                        var score = brick.Break();
+                        if (score > 0) PointsTextManager.instance.ShowPointsText(brick.transform.position, score);
                     }
                 }
                 else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
                 {
                     if (!GameController.instance.IsGameOver())
-                        GameController.instance.GameOver(false);
+                        GameController.instance.GameOver();
                     animator.SetTrigger("Die");
                     StartCoroutine("Destroy");
                     break;

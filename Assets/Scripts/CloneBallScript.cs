@@ -48,7 +48,8 @@ public class CloneBallScript : MonoBehaviour
                 if (speedLvl >= brick.level)
                 {
                     SpeedLevelChange(-brick.level - 1);
-                    PointsTextManager.instance.ShowPointsText(brick.transform.position, brick.Break());
+                    var score = brick.Break();
+                    if (score > 0) PointsTextManager.instance.ShowPointsText(brick.transform.position, score);
                 }
             }
             else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
