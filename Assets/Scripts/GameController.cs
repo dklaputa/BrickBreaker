@@ -12,8 +12,6 @@ public class GameController : MonoBehaviour
 
     public string miss;
     public string[] perfect;
-//    public string win;
-//    public string loss;
 
     private Text stageText;
     private Text assessmentText;
@@ -21,18 +19,16 @@ public class GameController : MonoBehaviour
     private Text scoreText;
     private Text energyText;
     private Image energyFill;
-    private Image scoreBar;
     private float energyFillAmount;
     private bool isChangingEnergyFillAmount;
 
-//    private GameObject[] gameOverStar;
-//    private Text gameOverMessage;
     private Text gameOverScore;
+    private Text gameOverStarNum;
+    private Text gameOverHighestScore;
+    private Text gameOverTotalStarNum;
 
     private GameObject introductionInfo;
     private GameObject introductionAnimation;
-    private GameObject[] star;
-    private int starNum;
     private int perfectShootCount;
     private int comboCount;
     private int totalPoints;
@@ -56,18 +52,11 @@ public class GameController : MonoBehaviour
         energyText = GameObject.Find("EnergyLvl").GetComponent<Text>();
         energyFill = GameObject.Find("EnergyFill").GetComponent<Image>();
 
-        var bar = GameObject.Find("ScoreBar").transform;
-        scoreBar = bar.GetChild(0).gameObject.GetComponent<Image>();
-        star = new[] {bar.GetChild(1).gameObject, bar.GetChild(2).gameObject, bar.GetChild(3).gameObject};
-
         var gameOverTransform = gameOverMenu.transform;
-//        gameOverStar = new[]
-//        {
-//            gameOverTransform.GetChild(0).GetChild(0).gameObject, gameOverTransform.GetChild(1).GetChild(0).gameObject,
-//            gameOverTransform.GetChild(2).GetChild(0).gameObject
-//        };
-//        gameOverMessage = gameOverTransform.GetChild(3).gameObject.GetComponent<Text>();
+        gameOverStarNum = gameOverTransform.GetChild(2).gameObject.GetComponent<Text>();
         gameOverScore = gameOverTransform.GetChild(4).gameObject.GetComponent<Text>();
+        gameOverHighestScore = gameOverTransform.GetChild(5).gameObject.GetComponent<Text>();
+        gameOverTotalStarNum = gameOverTransform.GetChild(8).gameObject.GetComponent<Text>();
     }
 
     // Update is called once per frame
@@ -81,26 +70,7 @@ public class GameController : MonoBehaviour
     {
         if (!needRefreshScore) return;
         scoreText.text = totalPoints.ToString();
-        var percent = totalPoints / 80000f;
-        scoreBar.fillAmount = percent;
-        if (percent >= 1 && starNum < 3)
-        {
-            if (!star[2].activeInHierarchy) star[2].SetActive(true);
-            if (!star[1].activeInHierarchy) star[1].SetActive(true);
-            if (!star[0].activeInHierarchy) star[0].SetActive(true);
-            starNum = 3;
-        }
-        else if (percent >= .75f && starNum < 2)
-        {
-            if (!star[1].activeInHierarchy) star[1].SetActive(true);
-            if (!star[0].activeInHierarchy) star[0].SetActive(true);
-            starNum = 2;
-        }
-        else if (percent >= .5f && starNum < 1)
-        {
-            if (!star[0].activeInHierarchy && percent >= .5f) star[0].SetActive(true);
-            starNum = 1;
-        }
+
         int s;
         if ((s = BrickManager.instance.CheckStage(totalPoints)) > 0) stageText.text = (s + 1).ToString();
         needRefreshScore = false;
@@ -133,15 +103,27 @@ public class GameController : MonoBehaviour
     public void GameOver()
     {
         isGameOver = true;
-//        gameOverMessage.text = isWin ? win : loss;
+
+        var starNumber = totalPoints / 20000;
+        gameOverStarNum.text = starNumber.ToString();
+
+        var totalStar = PlayerPrefs.GetInt("StarNumber");
+        gameOverTotalStarNum.text = totalStar.ToString();
+        if (starNumber > 0)
+        {
+            PlayerPrefs.SetInt("StarNumber", totalStar + starNumber);
+            StartCoroutine(TotalStarNumberAnimation(totalStar, starNumber));
+        }
+
         gameOverScore.text = "Score: " + totalPoints;
-//        if (isWin)
-//        {
-//            for (var i = 0; i < starNum; i++)
-//            {
-//                gameOverStar[i].SetActive(true);
-//            }
-//        }
+        var highest = PlayerPrefs.GetInt("HighestScore");
+        if (totalPoints > highest)
+        {
+            highest = totalPoints;
+            PlayerPrefs.SetInt("HighestScore", highest);
+        }
+        gameOverHighestScore.text = "Highest: " + highest;
+
         gameOverMenu.SetActive(true);
         BrickManager.instance.GameOver();
     }
@@ -149,6 +131,16 @@ public class GameController : MonoBehaviour
     public void GameRestart()
     {
         SceneManager.LoadScene("Main");
+    }
+
+    private IEnumerator TotalStarNumberAnimation(int old, int diff)
+    {
+        yield return new WaitForSeconds(1.1f);
+        for (var i = 1; i <= diff; i++)
+        {
+            gameOverTotalStarNum.text = (old + i).ToString();
+            yield return new WaitForSeconds(.01f);
+        }
     }
 
     public void HideIntroductionInfo()
@@ -195,7 +187,6 @@ public class GameController : MonoBehaviour
         comboCount++;
         var finalPoint = points * comboCount * (perfectShootCount + 1);
         totalPoints += finalPoint;
-//        PointsTextManager.instance.ShowPointsText(position, finalPoint);
         needRefreshScore = true;
         return finalPoint;
     }
