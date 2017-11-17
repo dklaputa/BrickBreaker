@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: c280ca18a01d9ae49bdbdc3285dfb881
+timeCreated: 1510911356
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Rounded-X M+ 1c
+  fontNames:
+  - Rounded-X M+ 1c
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

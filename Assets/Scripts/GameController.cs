@@ -74,7 +74,7 @@ public class GameController : MonoBehaviour
 
     private IEnumerator ShowTutorial()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(.1f);
         tutorial1.SetActive(true);
         sampleBrick.SetActive(true);
         isShowingTutorial = true;
