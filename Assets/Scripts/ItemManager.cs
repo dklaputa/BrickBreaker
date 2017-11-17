@@ -10,12 +10,11 @@ public class ItemManager : MonoBehaviour
     public const int BlackHole = 1;
 
     public static ItemManager instance;
-    public GameObject itemDurationPrefab;
-    public Sprite[] itemSprites;
+    public GameObject[] itemDuration;
     public GameObject[] itemButtons;
 
     private ItemDurationScript[] itemDurationScripts;
-    private const int itemDurationDistance = 90;
+    private const float itemDurationDistance = 90 / 192f;
     private List<int> itemDurationList;
     private HashSet<int> needMove;
     private bool isMoving;
@@ -23,6 +22,7 @@ public class ItemManager : MonoBehaviour
     private Text[] itemNumTexts;
     private Animator[] itemNumAnimators;
     private int[] itemNum;
+    private Vector3 itemDurationOriginPosition;
 
     // Use this for initialization
     private void Awake()
@@ -35,12 +35,11 @@ public class ItemManager : MonoBehaviour
         itemDurationList = new List<int>();
         needMove = new HashSet<int>();
         itemDurationScripts = new ItemDurationScript[2];
-        itemDurationScripts[0] = Instantiate(itemDurationPrefab, transform).GetComponent<ItemDurationScript>();
-        itemDurationScripts[0].GetComponent<Image>().sprite = itemSprites[0];
+        itemDurationScripts[0] = itemDuration[0].GetComponent<ItemDurationScript>();
         itemDurationScripts[0].GetComponent<ItemDurationScript>().Initialize(0, 10);
-        itemDurationScripts[1] = Instantiate(itemDurationPrefab, transform).GetComponent<ItemDurationScript>();
-        itemDurationScripts[1].GetComponent<Image>().sprite = itemSprites[1];
+        itemDurationScripts[1] = itemDuration[1].GetComponent<ItemDurationScript>();
         itemDurationScripts[1].GetComponent<ItemDurationScript>().Initialize(1, 10);
+        itemDurationOriginPosition = itemDuration[0].transform.position;
 
         itemNum = new[] {1, 1};
         itemNumTexts = new[]
@@ -71,7 +70,7 @@ public class ItemManager : MonoBehaviour
                         needMove.Remove(i);
                         continue;
                     }
-                    var position = transform.position +
+                    var position = itemDurationOriginPosition +
                                    Vector3.right * itemDurationDistance * itemDurationList.IndexOf(i);
                     if (itemDurationScripts[i].transform.position != position)
                         itemDurationScripts[i].transform.position = Vector2.MoveTowards(
@@ -123,7 +122,8 @@ public class ItemManager : MonoBehaviour
                 itemDurationScripts[item].transform.position =
                     itemDurationScripts[itemDurationList[itemDurationList.Count - 1]].transform.position +
                     Vector3.right * itemDurationDistance;
-            else itemDurationScripts[item].transform.position = transform.position;
+            else itemDurationScripts[item].transform.position = itemDurationOriginPosition;
+
             itemDurationScripts[item].gameObject.SetActive(true);
             itemDurationList.Add(item);
             needMove.Add(item);

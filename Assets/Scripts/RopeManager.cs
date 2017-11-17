@@ -27,7 +27,7 @@ public class RopeManager : ObjectPoolBehavior
     // Update is called once per frame
     private void Update()
     {
-        if (GameController.instance.IsGameOver()) return;
+        if (GameController.instance.IsGameOver()||GameController.instance.IsShowingTutorial()) return;
         if (Input.GetMouseButtonDown(0))
         {
             positions[0] = Camera.main.ScreenToWorldPoint(Input.mousePosition);

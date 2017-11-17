@@ -9,6 +9,9 @@ public class GameController : MonoBehaviour
 
     public GameObject ball;
     public GameObject gameOverMenu;
+    public GameObject tutorial1;
+    public GameObject tutorial2;
+    public GameObject sampleBrick;
 
     public string miss;
     public string[] perfect;
@@ -29,13 +32,16 @@ public class GameController : MonoBehaviour
 
     private GameObject introductionInfo;
     private GameObject introductionAnimation;
+
     private int perfectShootCount;
     private int comboCount;
     private int totalPoints;
 
     private bool isGameStart;
     private bool isGameOver;
+    private bool isShowingTutorial;
     private bool needRefreshScore;
+    private static bool showTutorial = true;
 
     // Use this for initialization
     private void Awake()
@@ -49,6 +55,7 @@ public class GameController : MonoBehaviour
         stageText = GameObject.Find("StageNum").GetComponent<Text>();
         introductionInfo = GameObject.Find("IntroInfo");
         introductionAnimation = GameObject.Find("IntroAnim");
+
         energyText = GameObject.Find("EnergyLvl").GetComponent<Text>();
         energyFill = GameObject.Find("EnergyFill").GetComponent<Image>();
 
@@ -57,6 +64,41 @@ public class GameController : MonoBehaviour
         gameOverScore = gameOverTransform.GetChild(4).gameObject.GetComponent<Text>();
         gameOverHighestScore = gameOverTransform.GetChild(5).gameObject.GetComponent<Text>();
         gameOverTotalStarNum = gameOverTransform.GetChild(8).gameObject.GetComponent<Text>();
+    }
+
+    private void Start()
+    {
+        if (!showTutorial) return;
+        StartCoroutine("ShowTutorial");
+    }
+
+    private IEnumerator ShowTutorial()
+    {
+        yield return new WaitForSeconds(1);
+        tutorial1.SetActive(true);
+        sampleBrick.SetActive(true);
+        isShowingTutorial = true;
+    }
+
+    public void OnTutorialClick(int number)
+    {
+        if (number == 0)
+        {
+            Destroy(tutorial1);
+            Destroy(sampleBrick);
+            tutorial2.SetActive(true);
+        }
+        else
+        {
+            Destroy(tutorial2);
+            isShowingTutorial = false;
+            showTutorial = false;
+        }
+    }
+
+    public bool IsShowingTutorial()
+    {
+        return isShowingTutorial;
     }
 
     // Update is called once per frame
