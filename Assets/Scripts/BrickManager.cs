@@ -17,9 +17,11 @@ public class BrickManager : ObjectPoolBehavior
 
     private int stage;
     private float nextRowPosition;
+
     private int nextRow;
-    private bool needCheckAllDead;
-    private bool needCheckTouchLine;
+
+    private bool isCheckinigAllDead;
+    private bool isCheckingTouchLine;
     private bool isMoving;
 
     private void Awake()
@@ -78,7 +80,7 @@ public class BrickManager : ObjectPoolBehavior
         for (;;)
         {
             transform.position = Vector2.MoveTowards(transform.position, targetPosition, Time.deltaTime);
-            needCheckTouchLine = true;
+            if (!isCheckingTouchLine) StartCoroutine("CheckTouchLine");
             if ((Vector2) transform.position != targetPosition) yield return null;
             else break;
         }
@@ -87,52 +89,42 @@ public class BrickManager : ObjectPoolBehavior
 
     private IEnumerator CheckAllDead()
     {
-        for (;;)
+        isCheckinigAllDead = true;
+        yield return new WaitForSeconds(.2f);
+        if (!pool.Any(brick => brick.activeInHierarchy))
         {
-            if (needCheckAllDead)
+            StopCoroutine("NewBricksRow");
+            var rows = 0;
+            while (rows < 4)
             {
-                needCheckAllDead = false;
-                if (!pool.Any(brick => brick.activeInHierarchy))
+                var row = RandomRow(stage, nextRow++ % 2 == 0, nextRowPosition);
+                nextRowPosition += .34f;
+                foreach (var vector in row)
                 {
-                    StopCoroutine("NewBricksRow");
-                    var rows = 0;
-                    while (rows < 4)
-                    {
-                        var row = RandomRow(stage, nextRow++ % 2 == 0, nextRowPosition);
-                        nextRowPosition += .34f;
-                        foreach (var vector in row)
-                        {
-                            var brick = GetAvailableObject();
-                            brick.transform.position = (Vector2) (transform.position + vector);
-                            brick.GetComponent<BrickScript>().SetLevel((int) vector.z);
-                            brick.SetActive(true);
-                        }
-                        rows++;
-                    }
-                    targetPosition += Vector2.down * .34f * rows;
-                    if (!isMoving) StartCoroutine("StartMove");
-                    StartCoroutine("NewBricksRow");
+                    var brick = GetAvailableObject();
+                    brick.transform.position = (Vector2) (transform.position + vector);
+                    brick.GetComponent<BrickScript>().SetLevel((int) vector.z);
+                    brick.SetActive(true);
                 }
+                rows++;
             }
-            yield return new WaitForSeconds(.2f);
+            targetPosition += Vector2.down * .34f * rows;
+            if (!isMoving) StartCoroutine("StartMove");
+            StartCoroutine("NewBricksRow");
         }
+        isCheckinigAllDead = false;
     }
 
     private IEnumerator CheckTouchLine()
     {
-        for (;;)
+        isCheckingTouchLine = true;
+        yield return new WaitForSeconds(.2f);
+        if (pool.Any(brick => brick.activeInHierarchy && brick.transform.position.y < 0))
         {
-            if (needCheckTouchLine)
-            {
-                needCheckTouchLine = false;
-                if (pool.Any(brick => brick.activeInHierarchy && brick.transform.position.y < 0))
-                {
-                    if (!GameController.instance.IsGameOver())
-                        GameController.instance.GameOver();
-                }
-            }
-            yield return new WaitForSeconds(.2f);
+            if (!GameController.instance.IsGameOver())
+                GameController.instance.GameOver();
         }
+        isCheckingTouchLine = false;
     }
 
     private IEnumerator NewBricksRow()
@@ -156,8 +148,6 @@ public class BrickManager : ObjectPoolBehavior
 
     public void GameStart()
     {
-        StartCoroutine("CheckAllDead");
-        StartCoroutine("CheckTouchLine");
         StartCoroutine("NewBricksRow");
         StartCoroutine("AddItem");
     }
@@ -176,7 +166,7 @@ public class BrickManager : ObjectPoolBehavior
 
     public void CheckIsBrickAllDead()
     {
-        needCheckAllDead = true;
+        if (!isCheckinigAllDead) StartCoroutine("CheckAllDead");
     }
 
     private IEnumerator AddItem()

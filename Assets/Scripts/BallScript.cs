@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BallScript : MonoBehaviour
 {
-    private static readonly float[] SpeedArray = {8, 9, 10, 11, 12, 13, 14, 15, 16};
+    private static readonly float[] SpeedArray = {8, 9, 10, 11, 12, 12.5f, 13, 13.5f, 14};
     private static readonly Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
     private static readonly Color Yellow = new Color(255f / 255, 197f / 255, 71f / 255);
     private static readonly Color Red = new Color(255f / 255, 73f / 255, 122f / 255);
@@ -178,6 +178,6 @@ public class BallScript : MonoBehaviour
     private IEnumerator Destroy()
     {
         yield return new WaitForSeconds(.1f);
-        Destroy(this);
+        Destroy(gameObject);
     }
 }

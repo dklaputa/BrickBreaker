@@ -40,7 +40,7 @@ public class GameController : MonoBehaviour
     private bool isGameStart;
     private bool isGameOver;
     private bool isShowingTutorial;
-    private bool needRefreshScore;
+    private bool isRefreshingScore;
     private static bool showTutorial = true;
 
     // Use this for initialization
@@ -108,14 +108,14 @@ public class GameController : MonoBehaviour
             Application.Quit();
     }
 
-    private void LateUpdate()
+    private IEnumerator RefreshScore()
     {
-        if (!needRefreshScore) return;
+        isRefreshingScore = true;
+        yield return new WaitForEndOfFrame();
         scoreText.text = totalPoints.ToString();
-
         int s;
         if ((s = BrickManager.instance.CheckStage(totalPoints)) > 0) stageText.text = (s + 1).ToString();
-        needRefreshScore = false;
+        isRefreshingScore = false;
     }
 
     public bool IsGameStart()
@@ -229,7 +229,7 @@ public class GameController : MonoBehaviour
         comboCount++;
         var finalPoint = points * comboCount * (perfectShootCount + 1);
         totalPoints += finalPoint;
-        needRefreshScore = true;
+        if (!isRefreshingScore) StartCoroutine("RefreshScore");
         return finalPoint;
     }
 
@@ -240,7 +240,7 @@ public class GameController : MonoBehaviour
 
     public void SetBallLevel(int level, int maxLevel, Color ballColor)
     {
-        energyText.text = level == maxLevel - 1 ? "Max" : (level + 1).ToString();
+        energyText.text = level == maxLevel - 1 ? "MAX" : (level + 1).ToString();
         ballColor.a = .4f;
         energyFill.color = ballColor;
         energyFillAmount = (float) level / (maxLevel - 1);
