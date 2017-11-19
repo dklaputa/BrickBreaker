@@ -2,7 +2,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+/// <inheritdoc />
+/// <summary>
+/// Game conductor.
+/// </summary>
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
@@ -101,13 +104,14 @@ public class GameController : MonoBehaviour
         return isShowingTutorial;
     }
 
-    // Update is called once per frame
+    // Game end on esc pressed.
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
     }
 
+    // Refresh score at the end of the frame.
     private IEnumerator RefreshScore()
     {
         isRefreshingScore = true;
@@ -132,10 +136,10 @@ public class GameController : MonoBehaviour
     {
         isGameStart = true;
         var ropeVector = position1 - position2;
-        Vector2 up;
-        up = ropeVector.x < 0
+        var up = ropeVector.x < 0
             ? new Vector2(ropeVector.y, -ropeVector.x).normalized
             : new Vector2(-ropeVector.y, ropeVector.x).normalized;
+        // Let the ball appear above the rope.
         ball.transform.position = (position1 + position2) / 2 + up;
         ball.GetComponent<BallScript>().SetInitialSpeedDirection(-up);
         ball.SetActive(true);
@@ -191,6 +195,9 @@ public class GameController : MonoBehaviour
         if (introductionInfo.activeInHierarchy) introductionInfo.SetActive(false);
     }
 
+    /// <summary>
+    /// The ball hits the middle of the rope. Show UI and perfect count plus 1.
+    /// </summary>
     public void PerfectShoot()
     {
         StopCoroutine("HideAssessment");
@@ -204,11 +211,17 @@ public class GameController : MonoBehaviour
         StartCoroutine("HideAssessment");
     }
 
+    /// <summary>
+    /// Reset perfect count.
+    /// </summary>
     public void ResetPerfectCount()
     {
         perfectShootCount = 0;
     }
 
+    /// <summary>
+    /// The ball hits the side of the rope and gets reflected. Show UI and perfect count reset.
+    /// </summary>
     public void Miss()
     {
         StopCoroutine("HideAssessment");
@@ -224,6 +237,12 @@ public class GameController : MonoBehaviour
         assessmentCount.text = "";
     }
 
+    /// <summary>
+    /// A brick is broken. We calculate the points that the player should get.
+    /// Final points = brick points * combo count * (perfect count + 1)
+    /// </summary>
+    /// <param name="points">Points that brick has.</param>
+    /// <returns>Final points that the player should get by breaking the brick.</returns>
     public int BreakBrick(int points)
     {
         comboCount++;
@@ -238,6 +257,7 @@ public class GameController : MonoBehaviour
         comboCount = 0;
     }
 
+    // Show ball level use UI.
     public void SetBallLevel(int level, int maxLevel, Color ballColor)
     {
         energyText.text = level == maxLevel - 1 ? "MAX" : (level + 1).ToString();

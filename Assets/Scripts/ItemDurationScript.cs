@@ -2,6 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <inheritdoc />
+/// <summary>
+/// Manage item's duration and level.
+/// </summary>
 public class ItemDurationScript : MonoBehaviour
 {
     private Image cover;

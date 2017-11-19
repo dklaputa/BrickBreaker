@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
-
+/// <inheritdoc />
+/// <summary>
+/// Division balls generator.
+/// </summary>
 public class CloneBallManager : ObjectPoolBehavior
 {
     public static CloneBallManager instance;

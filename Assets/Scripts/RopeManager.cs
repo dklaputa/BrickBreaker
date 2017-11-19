@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
-
+/// <inheritdoc />
+/// <summary>
+/// Rope generator.
+/// </summary>
 public class RopeManager : ObjectPoolBehavior
 {
     public float minLength;
@@ -19,6 +22,7 @@ public class RopeManager : ObjectPoolBehavior
         positions = new Vector2[2];
     }
 
+    // If the ball attaches to a rope, we should not generate a new rope. Otherwise the ball may interact with multiple ropes at the same time.
     public void PreventNewRope(bool preventNewRope)
     {
         isPreventNewRope = preventNewRope;
@@ -31,6 +35,7 @@ public class RopeManager : ObjectPoolBehavior
         if (Input.GetMouseButtonDown(0))
         {
             positions[0] = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            // We respond only if the touch point is within the draw area. 
             if (positions[0].y > 0 || positions[0].y < -4.25f || positions[0].x > 2.5f ||
                 positions[0].x < -2.5f) return;
             drawStart = true;
@@ -43,11 +48,13 @@ public class RopeManager : ObjectPoolBehavior
             {
                 if (positions[1].y > 0 || positions[1].y < -4.25f || positions[1].x > 2.5f ||
                     positions[1].x < -2.5f) return;
+                // The player moves his finger into the draw area so we start the draw mode.
                 positions[0] = positions[1];
                 drawStart = true;
                 if (!GameController.instance.IsGameStart()) GameController.instance.HideIntroductionInfo();
                 return;
             }
+            // The touch point is out of the draw area in the vertical direction. We restrict the rope not to cross the border.
             if (positions[1].y > 0)
             {
                 positions[1] = Vector2.Lerp(positions[0], positions[1],
@@ -58,6 +65,7 @@ public class RopeManager : ObjectPoolBehavior
                 positions[1] = Vector2.Lerp(positions[0], positions[1],
                     (positions[0].y + 4.25f) / (positions[0].y - positions[1].y));
             }
+            // The touch point is out of the draw area in the horizontal direction. We restrict the rope not to cross the border.
             if (positions[1].x > 2.5f)
             {
                 positions[1] = Vector2.Lerp(positions[0], positions[1],
@@ -68,6 +76,7 @@ public class RopeManager : ObjectPoolBehavior
                 positions[1] = Vector2.Lerp(positions[0], positions[1],
                     (positions[0].x + 2.5f) / (positions[0].x - positions[1].x));
             }
+            // We also need to restrict the max length of the rope.
             var d = Vector2.Distance(positions[0], positions[1]);
             if (d > maxLength)
             {

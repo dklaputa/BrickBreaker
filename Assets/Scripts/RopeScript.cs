@@ -82,7 +82,7 @@ public class RopeScript : MonoBehaviour
         lineRenderer.material.mainTextureScale = new Vector2((int) (ropeLength * 4), 1);
     }
 
-    // Update is called once per frame
+    // Should update after ball updates, so that we can get the accurate ball position.
     private void LateUpdate()
     {
         lineRenderer.positionCount = 20;
@@ -104,6 +104,7 @@ public class RopeScript : MonoBehaviour
         lineRenderer.SetPositions(ropePath);
     }
 
+    // Rope fade out animation.
     private IEnumerator Fade()
     {
         for (;;)
@@ -118,6 +119,14 @@ public class RopeScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Ball crosses the rope edge.
+    /// </summary>
+    /// <param name="position">Ball position</param>
+    /// <param name="speed">Ball speed</param>
+    /// <param name="callback">A callback for the rope</param>
+    /// <param name="isNormalCase">Whether we should detect perfect hit and change ball speed level after ball gets detached?</param>
+    /// <returns></returns>
     public BallTriggerResult OnBallTrigger(Vector2 position, Vector2 speed, BallScript callback, bool isNormalCase)
     {
         switch (status)
@@ -125,6 +134,7 @@ public class RopeScript : MonoBehaviour
             case Status.DuringTouchBall:
                 var newEnterDirection =
                     Vector3.Cross(speed, ropeVector).z < 0 ? BallEnterDirection.DownUp : BallEnterDirection.UpDown;
+                // Ball speed direction is same as the one when the ball attaches to the rope, so we ignore the trigger.
                 if (newEnterDirection == enterDirection) return BallTriggerResult.NotTrigger;
                 if (isNormalCase)
                 {
@@ -136,6 +146,7 @@ public class RopeScript : MonoBehaviour
                 }
                 else callback.SpeedLevelChange(0);
                 ball = null;
+                // Start simple harmonic motion.
                 ropeNodeMiddle.transform.position = position;
                 ropeNodeMiddle.SetActive(true);
                 ropeNodeMiddleRigidBody.velocity = speed * .5f;
@@ -166,6 +177,7 @@ public class RopeScript : MonoBehaviour
                         status = Status.AfterTouchBall;
                         Remove();
                         GameController.instance.Miss();
+                        // If the ball closes to one side of the rope, it should not be attached, otherwise problem may occur.
                         return BallTriggerResult.BallBounce;
                     }
                     if (Mathf.Abs(lLeft - ropeLength / 2) < PerfectRange)
@@ -199,7 +211,9 @@ public class RopeScript : MonoBehaviour
         var dR = (pointR - circleCenter).magnitude;
         if (r > dL || r > dR)
         {
-            Debug.Log("illegal parameter.");
+            Debug.Log("Illegal parameter.");
+            // We should avoid this case by detecting the distance of the ball and the rope sides when a ball enters. 
+            // If the distance is smaller than r, the ball should be bounced back, rather than attaching to the rope.
             return;
         }
         var fL = Mathf.Acos(r / dL);
@@ -236,6 +250,7 @@ public class RopeScript : MonoBehaviour
 
     private static void RopePathAfterTouch(Vector3 pointL, Vector3 pointM, Vector3 pointR, IList<Vector3> ropePath)
     {
+        // Bessel interpolation.
         for (var i = 0; i < 20; i++)
         {
             var t = i / 19f;

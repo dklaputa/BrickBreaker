@@ -18,6 +18,7 @@ public class BlackHoleScript : MonoBehaviour
         StartCoroutine("CheckBricks");
     }
 
+    // Destroy bricks that within the range every 0.5 seconds.
     private IEnumerator CheckBricks()
     {
         for (;;)
@@ -29,6 +30,7 @@ public class BlackHoleScript : MonoBehaviour
         }
     }
 
+    // Black hole lasts 1.5 seconds.
     private IEnumerator Destory()
     {
         yield return new WaitForSeconds(1.5f);

@@ -23,7 +23,7 @@ public class BrickScript : MonoBehaviour
     {
         isContainItem = true;
         brickBackground.color = Color.white;
-        StartCoroutine("RemoveItem");
+        StartCoroutine("RemoveItem"); // Item should be removed after 20 seconds if player does not break it.
     }
 
     private IEnumerator RemoveItem()
@@ -58,9 +58,13 @@ public class BrickScript : MonoBehaviour
         BrickParticleManager.instance.ShowParticle(transform.position, Colors[level]);
     }
 
+    /// <summary>
+    /// The brick broken.
+    /// </summary>
+    /// <returns>Points the player should get.</returns>
     public int Break()
     {
-        if (dead) return 0;
+        if (dead) return 0; // Check whether the brick is already dead to avoid duplicated breaks.
         dead = true;
         if (isContainItem)
         {

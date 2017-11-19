@@ -54,7 +54,7 @@ public class ItemManager : MonoBehaviour
         };
     }
 
-    // Update is called once per frame
+    // Rearrange the item duration icons layout when a item's duration is end.
     private IEnumerator Move()
     {
         isMoving = true;
@@ -88,11 +88,13 @@ public class ItemManager : MonoBehaviour
         isMoving = false;
     }
 
+    // Get the current level of a item. Return 0 if the item is inactivated. 
     public int CheckItemLevel(int item)
     {
         return !itemDurationScripts[item].gameObject.activeInHierarchy ? 0 : itemDurationScripts[item].GetLevel();
     }
 
+    // Obtain a item by break the brick that containing item (white brick).
     public void ObtainItem()
     {
         //Need improve.
@@ -126,7 +128,7 @@ public class ItemManager : MonoBehaviour
 
             itemDurationScripts[item].gameObject.SetActive(true);
             itemDurationList.Add(item);
-            needMove.Add(item);
+            needMove.Add(item); // Because the duration icons may be moving, so the layout of the duration icon should be rearranged.
         }
     }
 

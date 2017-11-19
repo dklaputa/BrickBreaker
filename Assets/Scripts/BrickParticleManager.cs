@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
-
+/// <inheritdoc />
+/// <summary>
+/// Brick particle generator. 
+/// </summary>
 public class BrickParticleManager : ObjectPoolBehavior
 { 
     public static BrickParticleManager instance; 

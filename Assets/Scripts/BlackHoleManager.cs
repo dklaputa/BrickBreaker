@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+/// <inheritdoc />
+/// <summary>
+/// Black hole generator
+/// </summary>
 public class BlackHoleManager : ObjectPoolBehavior
 {
     public static BlackHoleManager instance;

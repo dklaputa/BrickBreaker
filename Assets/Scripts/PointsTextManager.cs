@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
-
+/// <inheritdoc />
+/// <summary>
+/// Points text generator.
+/// </summary>
 public class PointsTextManager : ObjectPoolBehavior
 { 
     public static PointsTextManager instance; 

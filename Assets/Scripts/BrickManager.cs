@@ -4,11 +4,18 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+/// <inheritdoc />
+/// <summary>
+/// Brick generator
+/// </summary>
 public class BrickManager : ObjectPoolBehavior
 {
     public static BrickManager instance;
+
+    // The position where the brick parent should be.
     private Vector2 targetPosition;
 
+    // Probability of each brick level for each stage level. 
     private static readonly float[][] Possibility =
     {
         new[] {.8f, .2f, 0, 0}, new[] {.7f, .25f, .05f, 0}, new[] {.6f, .3f, .1f, 0}, new[] {.5f, .35f, .1f, .05f},
@@ -17,7 +24,6 @@ public class BrickManager : ObjectPoolBehavior
 
     private int stage;
     private float nextRowPosition;
-
     private int nextRow;
 
     private bool isCheckinigAllDead;
@@ -48,6 +54,12 @@ public class BrickManager : ObjectPoolBehavior
         targetPosition = transform.position;
     }
 
+    /// <summary>
+    /// Generate a row of bricks. Each brick is presented as a vector3 (x, y, z) which means the brick is at the position (x, y) with brick level z.
+    /// </summary>
+    /// <param name="stage">Current stage.</param>
+    /// <param name="flag">The row should has 6 or 7 bricks? true for 6 bricks and false for 7 bricks.</param>
+    /// <param name="vPosition">Position of the row related to the parent.</param>
     private static IEnumerable<Vector3> RandomRow(int stage, bool flag, float vPosition)
     {
         var length = flag ? 6 : 7;
@@ -152,6 +164,11 @@ public class BrickManager : ObjectPoolBehavior
         StartCoroutine("AddItem");
     }
 
+    /// <summary>
+    /// Need stage up?
+    /// </summary>
+    /// <param name="points">Current total points</param>
+    /// <returns>New stage level if should stage up, or -1 otherwise.</returns>
     public int CheckStage(int points)
     {
         if (points / (50000 * Mathf.Pow(2, stage)) < 1) return -1;
@@ -169,6 +186,7 @@ public class BrickManager : ObjectPoolBehavior
         if (!isCheckinigAllDead) StartCoroutine("CheckAllDead");
     }
 
+    // Add item to random bricks every 20 seconds. If the player breaks the brick, he/she will get a item.
     private IEnumerator AddItem()
     {
         for (;;)
