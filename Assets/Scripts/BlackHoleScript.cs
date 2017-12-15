@@ -24,8 +24,12 @@ public class BlackHoleScript : MonoBehaviour
         for (;;)
         {
             var collider2Ds = Physics2D.OverlapCircleAll(transform.position, 2.56f * size, LayerMask.GetMask("Brick"));
-            var score = collider2Ds.Sum(col => col.gameObject.GetComponent<BrickScript>().Break());
-            if (score > 0) PointsTextManager.instance.ShowPointsText(transform.position, score);
+            var points = collider2Ds.Sum(col => col.gameObject.GetComponent<BrickScript>().Break());
+            if (points > 0)
+            {
+                GameController.instance.AddPointsIgnoreCombo(points);
+                PointsTextManager.instance.ShowPointsText(transform.position, points);
+            }
             yield return new WaitForSeconds(.5f);
         }
     }

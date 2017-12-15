@@ -171,7 +171,7 @@ public class BrickManager : ObjectPoolBehavior
     /// <returns>New stage level if should stage up, or -1 otherwise.</returns>
     public int CheckStage(int points)
     {
-        if (points / (50000 * Mathf.Pow(2, stage)) < 1) return -1;
+        if (points / (40000 * Mathf.Pow(2, stage)) < 1) return -1;
         stage++;
         return stage;
     }

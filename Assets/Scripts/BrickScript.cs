@@ -73,6 +73,6 @@ public class BrickScript : MonoBehaviour
         }
         Remove();
         BrickManager.instance.CheckIsBrickAllDead();
-        return GameController.instance.BreakBrick(points);
+        return points;
     }
 }

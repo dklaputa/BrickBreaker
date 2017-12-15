@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
 /// <inheritdoc />
 /// <summary>
 /// Game conductor.
@@ -33,7 +34,6 @@ public class GameController : MonoBehaviour
     private Text gameOverHighestScore;
     private Text gameOverTotalStarNum;
 
-    private GameObject introductionInfo;
     private GameObject introductionAnimation;
 
     private int perfectShootCount;
@@ -56,7 +56,6 @@ public class GameController : MonoBehaviour
         assessmentCount = GameObject.Find("AssessmentCount").GetComponent<Text>();
         scoreText = GameObject.Find("Score").GetComponent<Text>();
         stageText = GameObject.Find("StageNum").GetComponent<Text>();
-        introductionInfo = GameObject.Find("IntroInfo");
         introductionAnimation = GameObject.Find("IntroAnim");
 
         energyText = GameObject.Find("EnergyLvl").GetComponent<Text>();
@@ -77,7 +76,7 @@ public class GameController : MonoBehaviour
 
     private IEnumerator ShowTutorial()
     {
-        yield return new WaitForSeconds(.1f);
+        yield return new WaitForSeconds(.01f);
         tutorial1.SetActive(true);
         sampleBrick.SetActive(true);
         isShowingTutorial = true;
@@ -192,7 +191,6 @@ public class GameController : MonoBehaviour
     public void HideIntroductionInfo()
     {
         if (introductionAnimation.activeInHierarchy) introductionAnimation.SetActive(false);
-        if (introductionInfo.activeInHierarchy) introductionInfo.SetActive(false);
     }
 
     /// <summary>
@@ -238,18 +236,28 @@ public class GameController : MonoBehaviour
     }
 
     /// <summary>
-    /// A brick is broken. We calculate the points that the player should get.
+    /// According to combo and perfect count, we calculate the points that the player should get.
     /// Final points = brick points * combo count * (perfect count + 1)
     /// </summary>
-    /// <param name="points">Points that brick has.</param>
-    /// <returns>Final points that the player should get by breaking the brick.</returns>
-    public int BreakBrick(int points)
+    /// <param name="points">Points that brick(s) has.</param>
+    /// <returns>Final points that the player should get by breaking the brick(s).</returns>
+    public int AddPointsConsiderCombo(int points)
     {
         comboCount++;
         var finalPoint = points * comboCount * (perfectShootCount + 1);
         totalPoints += finalPoint;
         if (!isRefreshingScore) StartCoroutine("RefreshScore");
         return finalPoint;
+    }
+
+    /// <summary>
+    /// Add points without considering combo and perfect count.
+    /// </summary>
+    /// <param name="points">Points that brick(s) has.</param> 
+    public void AddPointsIgnoreCombo(int points)
+    {
+        totalPoints += points;
+        if (!isRefreshingScore) StartCoroutine("RefreshScore");
     }
 
     public void ResetComboCount()
@@ -293,7 +301,7 @@ public class GameController : MonoBehaviour
 
     private IEnumerator RestoreTimeScale()
     {
-        yield return new WaitForSecondsRealtime(1);
+        yield return new WaitForSecondsRealtime(.5f);
         for (;;)
         {
             Time.timeScale += 2 * Time.deltaTime;
