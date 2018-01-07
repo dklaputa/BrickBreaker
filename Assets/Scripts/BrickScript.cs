@@ -37,6 +37,8 @@ public class BrickScript : MonoBehaviour
     {
         level = lvl;
         points = (lvl + 1) * 100;
+//        brickBackground.color = Colors[level];
+//        textLvl.sprite = numbers[level];
     }
 
     private void Awake()
@@ -72,7 +74,7 @@ public class BrickScript : MonoBehaviour
             isContainItem = false;
         }
         Remove();
-        BrickManager.instance.CheckIsBrickAllDead();
+        BrickManager.instance.CheckNeedNewRow();
         return points;
     }
 }

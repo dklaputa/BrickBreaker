@@ -142,7 +142,6 @@ public class GameController : MonoBehaviour
         ball.transform.position = (position1 + position2) / 2 + up;
         ball.GetComponent<BallScript>().SetInitialSpeedDirection(-up);
         ball.SetActive(true);
-        BrickManager.instance.GameStart();
     }
 
     public void GameOver()
@@ -170,7 +169,6 @@ public class GameController : MonoBehaviour
         gameOverHighestScore.text = "Highest: " + highest;
 
         gameOverMenu.SetActive(true);
-        BrickManager.instance.GameOver();
     }
 
     public void GameRestart()

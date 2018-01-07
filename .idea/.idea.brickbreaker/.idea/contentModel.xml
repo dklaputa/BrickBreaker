@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="C:\Users\dklap\.Rider2017.2\system\resharper-host\local\Transient\ReSharperHost\v10\SolutionCaches\_BrickBreaker.-42171486.00" t="ExcludeRecursive" />
+    <e p="C:\Users\dklap\.Rider2017.3\system\resharper-host\local\Transient\ReSharperHost\v11\SolutionCaches\_BrickBreaker.-42171486.00" t="ExcludeRecursive" />
     <e p="D:\WorkSpace\Unity\brickbreaker" t="IncludeRecursive">
       <e p="Assembly-CSharp-Editor-firstpass.csproj" t="IncludeRecursive" />
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
@@ -21,6 +21,7 @@
           <e p="BrickManager.cs" t="Include" />
           <e p="BrickParticleManager.cs" t="Include" />
           <e p="BrickParticleScript.cs" t="Include" />
+          <e p="BrickRow.cs" t="Include" />
           <e p="BrickScript.cs" t="Include" />
           <e p="CloneBallManager.cs" t="Include" />
           <e p="CloneBallScript.cs" t="Include" />
