@@ -119,8 +119,10 @@ public class BallScript : MonoBehaviour
                     remainTime -= hit.distance / speed.magnitude;
                     transform.position = hit.point + hit.normal * ballSize;
                     var brick = o.GetComponent<BrickScript>();
+                    var brickLevel =
+                        brick.level == -1 ? 0 : brick.level; //Item brick can be treated as a level 0 brick.
                     // If speed level is not larger than the brick level, the ball should reflect.
-                    if (speedLvl <= brick.level)
+                    if (speedLvl <= brickLevel)
                     {
                         speed = Vector2.Reflect(speed, hit.normal);
                         var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
@@ -129,10 +131,10 @@ public class BallScript : MonoBehaviour
                     }
 
                     // If speed level is not smaller than the brick level, the brick should be destroyed.
-                    if (speedLvl >= brick.level)
+                    if (speedLvl >= brickLevel)
                     {
                         if (speedLvl > 3) GameController.instance.SlowDownTimeScale();
-                        SpeedLevelChange(-brick.level - 1); // Speed level decreases.
+                        SpeedLevelChange(-brickLevel - 1); // Speed level decreases.
                         var points = brick.Break();
                         if (points > 0)
                             PointsTextManager.instance.ShowPointsText(brick.transform.position,

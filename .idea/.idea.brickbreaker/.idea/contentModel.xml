@@ -29,11 +29,13 @@
           <e p="GameController.cs" t="Include" />
           <e p="ItemDurationScript.cs" t="Include" />
           <e p="ItemManager.cs" t="Include" />
+          <e p="MenuController.cs" t="Include" />
           <e p="ObjectPoolBehavior.cs" t="Include" />
           <e p="PointsTextManager.cs" t="Include" />
           <e p="PointsTextScript.cs" t="Include" />
           <e p="RopeManager.cs" t="Include" />
           <e p="RopeScript.cs" t="Include" />
+          <e p="SimpleBallScript.cs" t="Include" />
         </e>
       </e>
       <e p="brickbreaker.sln" t="IncludeFlat" />

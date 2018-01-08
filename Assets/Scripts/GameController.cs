@@ -199,6 +199,11 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene("Main");
     }
 
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+    
     private IEnumerator TotalStarNumberAnimation(int old, int diff)
     {
         yield return new WaitForSeconds(1.1f);
