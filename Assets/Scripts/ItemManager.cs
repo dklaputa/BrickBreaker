@@ -10,19 +10,14 @@ public class ItemManager : MonoBehaviour
     public const int BlackHole = 1;
 
     public static ItemManager instance;
-    public GameObject[] itemDuration;
-    public GameObject[] itemButtons;
 
-    private ItemDurationScript[] itemDurationScripts;
-    private const float itemDurationDistance = 90 / 192f;
-    private List<int> itemDurationList;
-    private HashSet<int> needMove;
-    private bool isMoving;
-
+    private Image[] itemCovers;
     private Text[] itemNumTexts;
     private Animator[] itemNumAnimators;
     private int[] itemNum;
-    private Vector3 itemDurationOriginPosition;
+    private int[] itemDuration;
+    private int[] itemLevel;
+    private bool[] itemActivated;
 
     // Use this for initialization
     private void Awake()
@@ -32,73 +27,41 @@ public class ItemManager : MonoBehaviour
 
     private void Start()
     {
-        itemDurationList = new List<int>();
-        needMove = new HashSet<int>();
-        itemDurationScripts = new ItemDurationScript[2];
-        itemDurationScripts[0] = itemDuration[0].GetComponent<ItemDurationScript>();
-        itemDurationScripts[0].GetComponent<ItemDurationScript>().Initialize(0, 10);
-        itemDurationScripts[1] = itemDuration[1].GetComponent<ItemDurationScript>();
-        itemDurationScripts[1].GetComponent<ItemDurationScript>().Initialize(1, 10);
-        itemDurationOriginPosition = itemDuration[0].transform.position;
+        itemCovers = new[]
+        {
+            transform.GetChild(0).GetChild(0).gameObject.GetComponent<Image>(),
+            transform.GetChild(1).GetChild(0).gameObject.GetComponent<Image>()
+        };
+        itemNumTexts = new[]
+        {
+            transform.GetChild(0).GetChild(1).GetChild(0).gameObject.GetComponent<Text>(),
+            transform.GetChild(1).GetChild(1).GetChild(0).gameObject.GetComponent<Text>()
+        };
+        itemNumAnimators = new[]
+        {
+            transform.GetChild(0).GetChild(1).gameObject.GetComponent<Animator>(),
+            transform.GetChild(1).GetChild(1).gameObject.GetComponent<Animator>()
+        };
+        itemActivated = new[] {false, false};
 
         if (!PlayerPrefs.HasKey("DivisionCount")) PlayerPrefs.SetInt("DivisionCount", 1);
         if (!PlayerPrefs.HasKey("BlackHoleCount")) PlayerPrefs.SetInt("BlackHoleCount", 1);
+        if (!PlayerPrefs.HasKey("DivisionLevel")) PlayerPrefs.SetInt("DivisionLevel", 1);
+        if (!PlayerPrefs.HasKey("BlackHoleLevel")) PlayerPrefs.SetInt("BlackHoleLevel", 1);
+        if (!PlayerPrefs.HasKey("DivisionTime")) PlayerPrefs.SetInt("DivisionTime", 1);
+        if (!PlayerPrefs.HasKey("BlackHoleTime")) PlayerPrefs.SetInt("BlackHoleTime", 1);
         itemNum = new[] {PlayerPrefs.GetInt("DivisionCount"), PlayerPrefs.GetInt("BlackHoleCount")};
-        itemNumTexts = new[]
-        {
-            itemButtons[0].transform.GetChild(0).GetChild(0).GetComponent<Text>(),
-            itemButtons[1].transform.GetChild(0).GetChild(0).GetComponent<Text>()
-        };
-        itemNumTexts[0].text = itemNum[0].ToString();
-        itemNumTexts[1].text = itemNum[1].ToString();
-        itemNumAnimators = new[]
-        {
-            itemButtons[0].transform.GetChild(0).GetComponent<Animator>(),
-            itemButtons[1].transform.GetChild(0).GetComponent<Animator>()
-        };
+        itemDuration = new[] {PlayerPrefs.GetInt("DivisionTime") * 5 + 5, PlayerPrefs.GetInt("BlackHoleTime") * 5 + 5};
+        itemLevel = new[] {PlayerPrefs.GetInt("DivisionLevel"), PlayerPrefs.GetInt("BlackHoleLevel")};
+
+        itemNumTexts[Division].text = itemNum[Division].ToString();
+        itemNumTexts[BlackHole].text = itemNum[BlackHole].ToString();
     }
 
-    // Rearrange the item duration icons layout when a item's duration is end.
-    private IEnumerator Move()
+    // Check whether the item is activated. If activated reture the item level. Otherwise reture -1.
+    public int CheckItemActivated(int item)
     {
-        isMoving = true;
-        for (;;)
-        {
-            if (needMove.Count > 0)
-            {
-                var l = needMove.ToList();
-                foreach (var i in l)
-                {
-                    if (!itemDurationList.Contains(i))
-                    {
-                        needMove.Remove(i);
-                        continue;
-                    }
-
-                    var position = itemDurationOriginPosition +
-                                   Vector3.right * itemDurationDistance * itemDurationList.IndexOf(i);
-                    if (itemDurationScripts[i].transform.position != position)
-                        itemDurationScripts[i].transform.position = Vector2.MoveTowards(
-                            itemDurationScripts[i].transform.position,
-                            position, 2 * Time.deltaTime * itemDurationDistance);
-                    else
-                    {
-                        needMove.Remove(i);
-                    }
-                }
-
-                yield return null;
-            }
-            else break;
-        }
-
-        isMoving = false;
-    }
-
-    // Get the current level of a item. Return 0 if the item is inactivated. 
-    public int CheckItemLevel(int item)
-    {
-        return !itemDurationScripts[item].gameObject.activeInHierarchy ? 0 : itemDurationScripts[item].GetLevel();
+        return itemActivated[item] ? itemLevel[item] : -1;
     }
 
     // Obtain a item by break the item brick.
@@ -106,52 +69,50 @@ public class ItemManager : MonoBehaviour
     {
         if (Random.value < .5f)
         {
-            itemNum[0]++;
-            PlayerPrefs.SetInt("DivisionCount", itemNum[0]);
-            itemNumTexts[0].text = itemNum[0].ToString();
-            itemNumAnimators[0].SetTrigger("Shake");
+            itemNum[Division]++;
+            PlayerPrefs.SetInt("DivisionCount", itemNum[Division]);
+            itemNumTexts[Division].text = itemNum[Division].ToString();
+            itemNumAnimators[Division].SetTrigger("Shake");
         }
         else
         {
-            itemNum[1]++;
-            PlayerPrefs.SetInt("BlackHoleCount", itemNum[1]);
-            itemNumTexts[1].text = itemNum[1].ToString();
-            itemNumAnimators[1].SetTrigger("Shake");
+            itemNum[BlackHole]++;
+            PlayerPrefs.SetInt("BlackHoleCount", itemNum[BlackHole]);
+            itemNumTexts[BlackHole].text = itemNum[BlackHole].ToString();
+            itemNumAnimators[BlackHole].SetTrigger("Shake");
         }
     }
 
     public void OnItemClick(int item)
     {
-        if (itemNum[item] < 1 || !GameController.instance.IsGameStart()) return;
+        if (itemActivated[item] || itemNum[item] < 1 || !GameController.instance.IsGameStart()) return;
         itemNum[item]--;
-        if (item == 0) PlayerPrefs.SetInt("DivisionCount", itemNum[0]);
-        else PlayerPrefs.SetInt("BlackHoleCount", itemNum[1]);
+        PlayerPrefs.SetInt(item == Division ? "DivisionCount" : "BlackHoleCount", itemNum[item]);
         itemNumTexts[item].text = itemNum[item].ToString();
-        if (itemDurationList.Contains(item)) itemDurationScripts[item].LevelUp();
-        else
-        {
-            if (itemDurationList.Count > 0)
-                itemDurationScripts[item].transform.position =
-                    itemDurationScripts[itemDurationList[itemDurationList.Count - 1]].transform.position +
-                    Vector3.right * itemDurationDistance;
-            else itemDurationScripts[item].transform.position = itemDurationOriginPosition;
-
-            itemDurationScripts[item].gameObject.SetActive(true);
-            itemDurationList.Add(item);
-            needMove.Add(
-                item); // Because the duration icons may be moving, so the layout of the duration icon should be rearranged.
-        }
+        itemActivated[item] = true;
+        itemCovers[item].fillAmount = 1;
+        itemCovers[item].gameObject.SetActive(true);
+        StartCoroutine("CountDown", item);
     }
 
     public void OnItemDurationEnd(int item)
     {
-        var index = itemDurationList.IndexOf(item);
-        for (var i = index + 1; i < itemDurationList.Count; i++)
-        {
-            needMove.Add(itemDurationList[i]);
-        }
+        itemActivated[item] = false;
+    }
 
-        itemDurationList.RemoveAt(index);
-        if (!isMoving) StartCoroutine("Move");
+    private IEnumerator CountDown(int item)
+    {
+        for (;;)
+        {
+            itemCovers[item].fillAmount -= .05f / itemDuration[item];
+            if (itemCovers[item].fillAmount <= 0)
+            {
+                OnItemDurationEnd(item);
+                itemCovers[item].gameObject.SetActive(false);
+                break;
+            }
+
+            yield return new WaitForSeconds(.05f);
+        }
     }
 }

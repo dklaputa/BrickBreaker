@@ -13,8 +13,9 @@ public class BlackHoleManager : ObjectPoolBehavior
         instance = this;
     }
 
-    public void ShowBlackHole(Vector2 position, float size)
+    public void ShowBlackHole(Vector2 position, int itemLevel)
     {
+        var size = .1f + itemLevel * .1f;
         var hole = GetAvailableObject();
         hole.transform.position = position;
         hole.GetComponent<BlackHoleScript>().SetRange(size);

@@ -19,7 +19,7 @@ public class BrickManager : MonoBehaviour
 
     // The position where the brick container should be.
     private Vector2 targetPosition;
-
+    // The total rows the player has broken
     private int distance;
     private int stage;
     private float nextRowPosition;
@@ -42,7 +42,7 @@ public class BrickManager : MonoBehaviour
         {
             var row = Instantiate(rowPrefab, transform).GetComponent<BrickRow>();
             row.transform.position = new Vector2(0, transform.position.y + nextRowPosition);
-            row.Initialize(i % 2 == 0 ? 6 : 7);
+            row.Initialize(i % 2 == 0 ? 6 : 7); // 6 bricks for odd row, and 7 bricks for even row, from bottom to top. 
             row.SetStage(stage);
             rows.Enqueue(row);
             nextRowPosition += vSpacing + brickHeight;
@@ -91,7 +91,7 @@ public class BrickManager : MonoBehaviour
 
     private void CheckStage()
     {
-        if (distance / (5 * Mathf.Pow(2, stage)) > 1) stage++;
+        if (distance / (5 * Mathf.Pow(2, stage)) > 1) stage++; // When distance reaches 5, 10, 20, 40, ..., go to the next stage.
     }
 
     public void CheckNeedNewRow()

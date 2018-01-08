@@ -58,8 +58,9 @@ public class BallScript : MonoBehaviour
                     isAttachedToRope = false;
                     if (isBeforeStart) isBeforeStart = false; // Game really starts.
                     // Check whether the item Division is playing effects.
-                    var divisionLevel = ItemManager.instance.CheckItemLevel(ItemManager.Division);
-                    CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionLevel);
+                    var divisionLevel = ItemManager.instance.CheckItemActivated(ItemManager.Division);
+                    if (divisionLevel >= 0)
+                        CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionLevel);
                 }
             }
         }
@@ -110,9 +111,9 @@ public class BallScript : MonoBehaviour
                     transform.position = hit.point + hit.normal * ballSize;
                     speed = Vector2.Reflect(speed, hit.normal);
                     // Check whether the item BlackHole is playing effects.
-                    var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
-                    if (blackHoleItem > 0)
-                        BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
+                    var blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
+                    if (blackHoleLevel >= 0)
+                        BlackHoleManager.instance.ShowBlackHole(transform.position, blackHoleLevel);
                 }
                 else if (o.CompareTag("Brick"))
                 {
@@ -125,9 +126,9 @@ public class BallScript : MonoBehaviour
                     if (speedLvl <= brickLevel)
                     {
                         speed = Vector2.Reflect(speed, hit.normal);
-                        var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
-                        if (blackHoleItem > 0)
-                            BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
+                        var blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
+                        if (blackHoleLevel >= 0)
+                            BlackHoleManager.instance.ShowBlackHole(transform.position, blackHoleLevel);
                     }
 
                     // If speed level is not smaller than the brick level, the brick should be destroyed.

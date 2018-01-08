@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using UnityEngine;
+/// <inheritdoc />
+/// <summary>
+/// A simple ball that bounces when it hits wall.
+/// </summary>
 public class SimpleBallScript : MonoBehaviour
 {
     private const float ballSize = .125f;

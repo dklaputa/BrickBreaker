@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class BlackHoleScript : MonoBehaviour
 {
-    private float size;
+    private float scale;
+    private const float radius = 2.56f;
 
     public void SetRange(float range)
     {
-        size = range;
+        scale = range;
     }
 
     private void OnEnable()
     {
-        transform.localScale = new Vector2(size, size);
+        transform.localScale = new Vector2(scale, scale);
         StartCoroutine("Destory");
         StartCoroutine("CheckBricks");
     }
@@ -23,13 +24,15 @@ public class BlackHoleScript : MonoBehaviour
     {
         for (;;)
         {
-            var collider2Ds = Physics2D.OverlapCircleAll(transform.position, 2.56f * size, LayerMask.GetMask("Brick"));
+            var collider2Ds =
+                Physics2D.OverlapCircleAll(transform.position, radius * scale, LayerMask.GetMask("Brick"));
             var points = collider2Ds.Sum(col => col.gameObject.GetComponent<BrickScript>().Break());
             if (points > 0)
             {
                 GameController.instance.AddPointsIgnoreCombo(points);
                 PointsTextManager.instance.ShowPointsText(transform.position, points);
             }
+
             yield return new WaitForSeconds(.5f);
         }
     }

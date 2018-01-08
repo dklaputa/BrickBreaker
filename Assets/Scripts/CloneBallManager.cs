@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+
 /// <inheritdoc />
 /// <summary>
 /// Division balls generator.
@@ -12,8 +13,9 @@ public class CloneBallManager : ObjectPoolBehavior
         instance = this;
     }
 
-    public void ShowCloneBalls(Vector2 position, Vector2 direction, int speedLvl, int pairNum)
+    public void ShowCloneBalls(Vector2 position, Vector2 direction, int speedLvl, int itemLevel)
     {
+        var pairNum = itemLevel;
         for (var i = 1; i <= pairNum; i++)
         {
             var ball1 = GetAvailableObject();
