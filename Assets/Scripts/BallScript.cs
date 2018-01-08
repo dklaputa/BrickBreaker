@@ -8,6 +8,8 @@ public class BallScript : MonoBehaviour
     private static readonly Color Yellow = new Color(255f / 255, 197f / 255, 71f / 255);
     private static readonly Color Red = new Color(255f / 255, 73f / 255, 122f / 255);
 
+    private const float ballSize = .125f;
+
     private SpriteRenderer spriteRenderer;
     private ParticleSystem.MainModule mainModule;
     private ParticleSystem particle;
@@ -45,7 +47,7 @@ public class BallScript : MonoBehaviour
             // Acceleration increases as speed increases.
             speed += accelerationDirection * (20 + 10 * speed.magnitude) * Time.deltaTime;
             // Detect whether the ball is detached from rope.
-            var hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * Time.deltaTime,
+            var hit = Physics2D.CircleCast(transform.position, ballSize, speed, speed.magnitude * Time.deltaTime,
                 LayerMask.GetMask("Rope"));
             if (hit.collider != null)
             {
@@ -64,7 +66,7 @@ public class BallScript : MonoBehaviour
         else if (isBeforeStart)
         {
             // Game does not really start. We should ignore all collisions but that with rope.
-            var hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * Time.deltaTime,
+            var hit = Physics2D.CircleCast(transform.position, ballSize, speed, speed.magnitude * Time.deltaTime,
                 LayerMask.GetMask("Rope"));
             if (hit.collider != null)
             {
@@ -76,7 +78,7 @@ public class BallScript : MonoBehaviour
         else
         {
             // Check if there are collisions with rope, walls, and bricks.
-            var hit = Physics2D.CircleCast(transform.position, .125f, speed,
+            var hit = Physics2D.CircleCast(transform.position, ballSize, speed,
                 speed.magnitude * remainTime);
             var count = 0; // We check collisions iteratively. The max iterations num is 5. 
             while (hit.collider != null && count < 5)
@@ -86,24 +88,26 @@ public class BallScript : MonoBehaviour
                 {
                     var rope = o.GetComponent<RopeScript>();
                     // Ball reaction determined by the rope.
-                    var result = rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart); 
-                    if (result == RopeScript.BallTriggerResult.BallBounce) 
+                    var result = rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
+                    if (result == RopeScript.BallTriggerResult.BallBounce)
                     {
                         // Ball hits one of the two sides of the rope, the ball should bounce back.
                         speed = -speed;
-                    } 
+                    }
                     else if (result == RopeScript.BallTriggerResult.BallAttach)
                     {
                         speed = -accelerationDirection * speed.magnitude;
                         isAttachedToRope = true;
                         GameController.instance.ResetComboCount();
                     }
+
                     break;
                 }
+
                 if (o.CompareTag("Wall"))
                 {
                     remainTime -= hit.distance / speed.magnitude;
-                    transform.position = hit.point + hit.normal * .125f;
+                    transform.position = hit.point + hit.normal * ballSize;
                     speed = Vector2.Reflect(speed, hit.normal);
                     // Check whether the item BlackHole is playing effects.
                     var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
@@ -113,7 +117,7 @@ public class BallScript : MonoBehaviour
                 else if (o.CompareTag("Brick"))
                 {
                     remainTime -= hit.distance / speed.magnitude;
-                    transform.position = hit.point + hit.normal * .125f;
+                    transform.position = hit.point + hit.normal * ballSize;
                     var brick = o.GetComponent<BrickScript>();
                     // If speed level is not larger than the brick level, the ball should reflect.
                     if (speedLvl <= brick.level)
@@ -123,14 +127,16 @@ public class BallScript : MonoBehaviour
                         if (blackHoleItem > 0)
                             BlackHoleManager.instance.ShowBlackHole(transform.position, .1f + blackHoleItem * .1f);
                     }
+
                     // If speed level is not smaller than the brick level, the brick should be destroyed.
                     if (speedLvl >= brick.level)
                     {
                         if (speedLvl > 3) GameController.instance.SlowDownTimeScale();
                         SpeedLevelChange(-brick.level - 1); // Speed level decreases.
                         var points = brick.Break();
-                        if (points > 0) PointsTextManager.instance.ShowPointsText(brick.transform.position,
-                            GameController.instance.AddPointsConsiderCombo(points));
+                        if (points > 0)
+                            PointsTextManager.instance.ShowPointsText(brick.transform.position,
+                                GameController.instance.AddPointsConsiderCombo(points));
                     }
                 }
                 else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
@@ -141,11 +147,14 @@ public class BallScript : MonoBehaviour
                     StartCoroutine("Destroy");
                     break;
                 }
-                else break;
-                hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * remainTime);
+                else
+                    break;
+
+                hit = Physics2D.CircleCast(transform.position, ballSize, speed, speed.magnitude * remainTime);
                 count++;
             }
         }
+
         transform.position += (Vector3) speed * remainTime;
     }
 
@@ -175,6 +184,7 @@ public class BallScript : MonoBehaviour
             color = Color.Lerp(Yellow, Red,
                 (float) (speedLvl - half) / (SpeedArray.Length - half - 1));
         }
+
         spriteRenderer.color = color;
         if (speedLvl > 3)
         {
@@ -185,6 +195,7 @@ public class BallScript : MonoBehaviour
         {
             if (!particle.isStopped) particle.Stop(false, ParticleSystemStopBehavior.StopEmitting);
         }
+
         GameController.instance.SetBallLevel(speedLvl, SpeedArray.Length, color);
     }
 

@@ -17,12 +17,12 @@ public class BrickManager : MonoBehaviour
     private const float brickHeight = 0.256f;
     private Queue<BrickRow> rows;
 
-    // The position where the brick parent should be.
+    // The position where the brick container should be.
     private Vector2 targetPosition;
 
+    private int distance;
     private int stage;
     private float nextRowPosition;
-    private int nextRow;
 
     private bool isCheckingNeedNewRow;
     private bool isMoving;
@@ -38,11 +38,11 @@ public class BrickManager : MonoBehaviour
         targetPosition = new Vector2(0, playAreaTop - (vSpacing + brickHeight) * (rowCount - .5f));
         transform.position = targetPosition;
         rows = new Queue<BrickRow>(rowCount);
-        for (; nextRow < rowCount; nextRow++)
+        for (var i = 0; i < rowCount; i++)
         {
             var row = Instantiate(rowPrefab, transform).GetComponent<BrickRow>();
             row.transform.position = new Vector2(0, transform.position.y + nextRowPosition);
-            row.Initialize(nextRow % 2 == 0 ? 6 : 7);
+            row.Initialize(i % 2 == 0 ? 6 : 7);
             row.SetStage(stage);
             rows.Enqueue(row);
             nextRowPosition += vSpacing + brickHeight;
@@ -79,6 +79,9 @@ public class BrickManager : MonoBehaviour
 
         if (count != 0)
         {
+            distance += count;
+            GameController.instance.SetDistance(distance);
+            CheckStage();
             targetPosition += Vector2.down * (vSpacing + brickHeight) * count;
             if (!isMoving) StartCoroutine("StartMove");
         }
@@ -86,16 +89,9 @@ public class BrickManager : MonoBehaviour
         isCheckingNeedNewRow = false;
     }
 
-    /// <summary>
-    /// Need stage up?
-    /// </summary>
-    /// <param name="points">Current total points</param>
-    /// <returns>New stage level if should stage up, or -1 otherwise.</returns>
-    public int CheckStage(int points)
+    private void CheckStage()
     {
-        if (points / (40000 * Mathf.Pow(2, stage)) < 1) return -1;
-        stage++;
-        return stage;
+        if (distance / (5 * Mathf.Pow(2, stage)) > 1) stage++;
     }
 
     public void CheckNeedNewRow()

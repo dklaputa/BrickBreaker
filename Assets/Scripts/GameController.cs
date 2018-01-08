@@ -20,7 +20,7 @@ public class GameController : MonoBehaviour
     public string miss;
     public string[] perfect;
 
-    private Text stageText;
+    private Text distanceText;
     private Text assessmentText;
     private Text assessmentCount;
     private Text scoreText;
@@ -39,11 +39,14 @@ public class GameController : MonoBehaviour
     private int perfectShootCount;
     private int comboCount;
     private int totalPoints;
+    private int distanceUI;
+    private int distance;
 
     private bool isGameStart;
     private bool isGameOver;
     private bool isShowingTutorial;
     private bool isRefreshingScore;
+    private bool isRefreshingDistance;
     private static bool showTutorial = true;
 
     // Use this for initialization
@@ -55,7 +58,7 @@ public class GameController : MonoBehaviour
         assessmentText = GameObject.Find("AssessmentText").GetComponent<Text>();
         assessmentCount = GameObject.Find("AssessmentCount").GetComponent<Text>();
         scoreText = GameObject.Find("Score").GetComponent<Text>();
-        stageText = GameObject.Find("StageNum").GetComponent<Text>();
+        distanceText = GameObject.Find("DistanceNum").GetComponent<Text>();
         introductionAnimation = GameObject.Find("IntroAnim");
 
         energyText = GameObject.Find("EnergyLvl").GetComponent<Text>();
@@ -116,9 +119,28 @@ public class GameController : MonoBehaviour
         isRefreshingScore = true;
         yield return new WaitForEndOfFrame();
         scoreText.text = totalPoints.ToString();
-        int s;
-        if ((s = BrickManager.instance.CheckStage(totalPoints)) > 0) stageText.text = (s + 1).ToString();
         isRefreshingScore = false;
+    }
+
+    // Refresh score at the end of the frame.
+    private IEnumerator RefreshDistance()
+    {
+        isRefreshingDistance = true;
+        for (;;)
+        {
+            distanceUI++;
+            distanceText.text = distanceUI.ToString();
+            yield return new WaitForSeconds(.05f);
+            if (distanceUI == distance) break;
+        }
+
+        isRefreshingDistance = false;
+    }
+
+    public void SetDistance(int d)
+    {
+        distance = d;
+        if (!isRefreshingDistance) StartCoroutine("RefreshDistance");
     }
 
     public bool IsGameStart()
@@ -166,6 +188,7 @@ public class GameController : MonoBehaviour
             highest = totalPoints;
             PlayerPrefs.SetInt("HighestScore", highest);
         }
+
         gameOverHighestScore.text = "Highest: " + highest;
 
         gameOverMenu.SetActive(true);
@@ -204,6 +227,7 @@ public class GameController : MonoBehaviour
             assessmentText.text = perfect[perfect.Length - 1];
             assessmentCount.text = "×" + (perfectShootCount - perfect.Length + 1);
         }
+
         StartCoroutine("HideAssessment");
     }
 
@@ -263,7 +287,7 @@ public class GameController : MonoBehaviour
         comboCount = 0;
     }
 
-    // Show ball level use UI.
+    // Show ball level on UI.
     public void SetBallLevel(int level, int maxLevel, Color ballColor)
     {
         energyText.text = level == maxLevel - 1 ? "MAX" : (level + 1).ToString();
@@ -284,9 +308,11 @@ public class GameController : MonoBehaviour
                 energyFill.fillAmount = energyFillAmount;
                 break;
             }
+
             energyFill.fillAmount += .03f * diff / (energyFillAmount - energyFill.fillAmount);
             yield return new WaitForSeconds(.03f);
         }
+
         isChangingEnergyFillAmount = false;
     }
 

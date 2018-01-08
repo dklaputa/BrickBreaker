@@ -9,7 +9,7 @@ public class BrickRow : MonoBehaviour
     private const float brickWidth = 0.512f;
 
     // Probability of each brick level for each stage level. 
-    private static readonly float[][] Possibility =
+    private static readonly float[][] Probability =
     {
         new[] {.8f, .2f, 0, 0}, new[] {.7f, .25f, .05f, 0}, new[] {.6f, .3f, .1f, 0}, new[] {.5f, .35f, .1f, .05f},
         new[] {.4f, .4f, .15f, .05f}, new[] {.3f, .4f, .15f, .1f}, new[] {.3f, .4f, .1f, .1f}
@@ -38,28 +38,28 @@ public class BrickRow : MonoBehaviour
     }
 
     /// <summary>
-    /// Generate a row of bricks. Each brick is presented as a vector3 (x, y, z) which means the brick is at the position (x, y) with brick level z.
+    /// Randomly set brick levels according to current stage.
     /// </summary>
     /// <param name="stage">Current stage.</param>
     public void SetStage(int stage)
     {
-        var accumPos = new float[4];
+        var accumProbability = new float[4];
         var level = Mathf.Min(stage, 6);
-        accumPos[0] = Possibility[level][0];
+        accumProbability[0] = Probability[level][0];
         for (var n = 1; n < 4; n++)
         {
-            accumPos[n] = accumPos[n - 1] + Possibility[level][n];
+            accumProbability[n] = accumProbability[n - 1] + Probability[level][n];
         }
 
         for (var i = 0; i < count; i++)
         {
             var random = Random.value;
-            if (random < accumPos[0]) bricks[i].SetLevel(0);
-            else if (random < accumPos[1])
+            if (random < accumProbability[0]) bricks[i].SetLevel(0);
+            else if (random < accumProbability[1])
                 bricks[i].SetLevel(1);
-            else if (random < accumPos[2])
+            else if (random < accumProbability[2])
                 bricks[i].SetLevel(2);
-            else if (random < accumPos[3])
+            else if (random < accumProbability[3])
                 bricks[i].SetLevel(3);
             else
                 bricks[i].SetLevel(4);

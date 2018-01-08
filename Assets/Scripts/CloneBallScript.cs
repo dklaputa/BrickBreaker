@@ -8,6 +8,8 @@ public class CloneBallScript : MonoBehaviour
 {
     private static readonly float[] SpeedArray = {8, 9, 10, 11, 12, 12.5f, 13, 13.5f, 14};
 
+    private const float ballSize = .1f;
+    
     private Vector2 speed;
     private int speedLvl;
 
@@ -21,7 +23,7 @@ public class CloneBallScript : MonoBehaviour
     private void Update()
     {
         var remainTime = Time.deltaTime;
-        var hit = Physics2D.CircleCast(transform.position, .125f, speed,
+        var hit = Physics2D.CircleCast(transform.position, ballSize, speed,
             speed.magnitude * remainTime);
         var count = 0;
         while (hit.collider != null && count < 5)
@@ -31,7 +33,7 @@ public class CloneBallScript : MonoBehaviour
             if (o.CompareTag("Wall"))
             {
                 remainTime -= hit.distance / speed.magnitude;
-                transform.position = hit.point + hit.normal * .125f;
+                transform.position = hit.point + hit.normal * ballSize;
                 speed = Vector2.Reflect(speed, hit.normal);
                 var blackHoleItem = ItemManager.instance.CheckItemLevel(ItemManager.BlackHole);
                 if (blackHoleItem > 0)
@@ -40,7 +42,7 @@ public class CloneBallScript : MonoBehaviour
             else if (o.CompareTag("Brick"))
             {
                 remainTime -= hit.distance / speed.magnitude;
-                transform.position = hit.point + hit.normal * .125f;
+                transform.position = hit.point + hit.normal * ballSize;
                 var brick = o.GetComponent<BrickScript>();
                 if (speedLvl <= brick.level)
                 {
@@ -62,7 +64,7 @@ public class CloneBallScript : MonoBehaviour
                 break;
             }
             else break;
-            hit = Physics2D.CircleCast(transform.position, .125f, speed, speed.magnitude * remainTime);
+            hit = Physics2D.CircleCast(transform.position, ballSize, speed, speed.magnitude * remainTime);
             count++;
         }
         transform.position += (Vector3) speed * remainTime;
