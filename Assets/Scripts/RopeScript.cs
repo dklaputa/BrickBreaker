@@ -101,6 +101,7 @@ public class RopeScript : MonoBehaviour
                     ropePath);
                 break;
         }
+
         lineRenderer.SetPositions(ropePath);
     }
 
@@ -138,13 +139,17 @@ public class RopeScript : MonoBehaviour
                 if (newEnterDirection == enterDirection) return BallTriggerResult.NotTrigger;
                 if (isNormalCase)
                 {
-                    int speedUp = 0;
-                    if (ropeLength < lengthStall1) speedUp = 2;
-                    else if (ropeLength < lengthStall2) speedUp = 1;
+                    int speedUp;
+                    if (ropeLength < lengthStall1) speedUp = 3;
+                    else if (ropeLength < lengthStall2)
+                        speedUp = 2;
+                    else
+                        speedUp = 1;
                     if (isPerfect) speedUp += 2;
                     callback.SpeedLevelChange(speedUp);
                 }
                 else callback.SpeedLevelChange(0);
+
                 ball = null;
                 // Start simple harmonic motion.
                 ropeNodeMiddle.transform.position = position;
@@ -180,6 +185,7 @@ public class RopeScript : MonoBehaviour
                         // If the ball closes to one side of the rope, it should not be attached, otherwise problem may occur.
                         return BallTriggerResult.BallBounce;
                     }
+
                     if (Mathf.Abs(lLeft - ropeLength / 2) < PerfectRange)
                     {
                         isPerfect = true;
@@ -187,6 +193,7 @@ public class RopeScript : MonoBehaviour
                     }
                     else GameController.instance.ResetPerfectCount();
                 }
+
                 ball = callback;
                 status = Status.DuringTouchBall;
                 RopeManager.instance.PreventNewRope(true);
@@ -216,6 +223,7 @@ public class RopeScript : MonoBehaviour
             // If the distance is smaller than r, the ball should be bounced back, rather than attaching to the rope.
             return;
         }
+
         var fL = Mathf.Acos(r / dL);
         var fR = Mathf.Acos(r / dR);
 
@@ -233,15 +241,18 @@ public class RopeScript : MonoBehaviour
             rotated[0] = r * RotateVector(normalizedL, -fL);
             rotated[1] = r * RotateVector(normalizedR, fR);
         }
+
         Vector3[] tangents = {rotated[0] + circleCenter, rotated[1] + circleCenter};
         for (var i = 0; i < 5; i++)
         {
             ropePath[i] = Vector3.Lerp(pointL, tangents[0], i / 4f);
         }
+
         for (var i = 5; i < 15; i++)
         {
             ropePath[i] = Vector3.Slerp(rotated[0], rotated[1], (i - 5) / 9f) + circleCenter;
         }
+
         for (var i = 15; i < 20; i++)
         {
             ropePath[i] = Vector3.Lerp(tangents[1], pointR, (i - 10) / 4f);
@@ -262,6 +273,7 @@ public class RopeScript : MonoBehaviour
                     points[n] = (1 - t) * points[n] + t * points[n + 1];
                 }
             }
+
             ropePath[i] = points[0];
         }
     }

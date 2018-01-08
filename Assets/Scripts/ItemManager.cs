@@ -94,10 +94,9 @@ public class ItemManager : MonoBehaviour
         return !itemDurationScripts[item].gameObject.activeInHierarchy ? 0 : itemDurationScripts[item].GetLevel();
     }
 
-    // Obtain a item by break the brick that containing item (white brick).
+    // Obtain a item by break the item brick.
     public void ObtainItem()
-    {
-        //Need improve.
+    { 
         if (Random.value < .5f)
         {
             itemNum[0]++;

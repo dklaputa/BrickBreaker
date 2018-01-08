@@ -18,12 +18,12 @@ public class CloneBallManager : ObjectPoolBehavior
         {
             var ball1 = GetAvailableObject();
             ball1.transform.position = position;
-            ball1.GetComponent<CloneBallScript>().setInitialSpeed(RotateVector(direction, .2f * i / pairNum), speedLvl);
+            ball1.GetComponent<CloneBallScript>().SetInitialSpeed(RotateVector(direction, .2f * i / pairNum), speedLvl);
             ball1.SetActive(true);
             var ball2 = GetAvailableObject();
             ball2.transform.position = position;
             ball2.GetComponent<CloneBallScript>()
-                .setInitialSpeed(RotateVector(direction, -.2f * i / pairNum), speedLvl);
+                .SetInitialSpeed(RotateVector(direction, -.2f * i / pairNum), speedLvl);
             ball2.SetActive(true);
         }
     }

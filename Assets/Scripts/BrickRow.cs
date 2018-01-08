@@ -15,6 +15,9 @@ public class BrickRow : MonoBehaviour
         new[] {.4f, .4f, .15f, .05f}, new[] {.3f, .4f, .15f, .1f}, new[] {.3f, .4f, .1f, .1f}
     };
 
+    private const float itemProbability = .01f;
+
+
     private int count;
     private BrickScript[] bricks;
 
@@ -54,6 +57,14 @@ public class BrickRow : MonoBehaviour
         for (var i = 0; i < count; i++)
         {
             var random = Random.value;
+            if (random < itemProbability)
+            {
+                bricks[i].SetLevel(-1);
+                bricks[i].gameObject.SetActive(true);
+                continue;
+            }
+
+            random = Random.value;
             if (random < accumProbability[0]) bricks[i].SetLevel(0);
             else if (random < accumProbability[1])
                 bricks[i].SetLevel(1);

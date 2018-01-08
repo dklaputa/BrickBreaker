@@ -5,11 +5,13 @@ public class BrickScript : MonoBehaviour
 {
     public int level;
     public Sprite[] numbers;
+    public Sprite normalBrick;
+    public Sprite itemBrick;
+
     private int points;
 
     private SpriteRenderer textLvl;
     private SpriteRenderer brickBackground;
-    private bool isContainItem;
     private bool dead;
 
     private static readonly Color[] Colors =
@@ -19,24 +21,10 @@ public class BrickScript : MonoBehaviour
         new Color(180f / 255, 135f / 255, 255f / 255)
     };
 
-    public void AddItem()
-    {
-        isContainItem = true;
-        brickBackground.color = Color.white;
-        StartCoroutine("RemoveItem"); // Item should be removed after 20 seconds if player does not break it.
-    }
-
-    private IEnumerator RemoveItem()
-    {
-        yield return new WaitForSeconds(20);
-        isContainItem = false;
-        brickBackground.color = Colors[level];
-    }
-
     public void SetLevel(int lvl)
     {
         level = lvl;
-        points = (lvl + 1) * 100;
+        points = lvl == -1 ? 100 : (lvl + 1) * 100;
 //        brickBackground.color = Colors[level];
 //        textLvl.sprite = numbers[level];
     }
@@ -49,15 +37,26 @@ public class BrickScript : MonoBehaviour
 
     private void OnEnable()
     {
-        brickBackground.color = Colors[level];
-        textLvl.sprite = numbers[level];
+        if (level == -1)
+        {
+            brickBackground.sprite = itemBrick;
+            brickBackground.color = Color.white;
+            textLvl.sprite = numbers[0];
+        }
+        else
+        {
+            brickBackground.sprite = normalBrick;
+            brickBackground.color = Colors[level];
+            textLvl.sprite = numbers[level];
+        }
+
         dead = false;
     }
 
     private void Remove()
     {
         gameObject.SetActive(false);
-        BrickParticleManager.instance.ShowParticle(transform.position, Colors[level]);
+        BrickParticleManager.instance.ShowParticle(transform.position, level == -1 ? Color.white : Colors[level]);
     }
 
     /// <summary>
@@ -68,11 +67,7 @@ public class BrickScript : MonoBehaviour
     {
         if (dead) return 0; // Check whether the brick is already dead to avoid duplicated breaks.
         dead = true;
-        if (isContainItem)
-        {
-            ItemManager.instance.ObtainItem();
-            isContainItem = false;
-        }
+        if (level == -1) ItemManager.instance.ObtainItem();
         Remove();
         BrickManager.instance.CheckNeedNewRow();
         return points;

@@ -13,7 +13,7 @@ public class CloneBallScript : MonoBehaviour
     private Vector2 speed;
     private int speedLvl;
 
-    public void setInitialSpeed(Vector2 direction, int speedLevel)
+    public void SetInitialSpeed(Vector2 direction, int speedLevel)
     {
         speedLvl = speedLevel;
         speed = direction * SpeedArray[speedLvl];
