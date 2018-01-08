@@ -36,6 +36,7 @@
           <e p="RopeManager.cs" t="Include" />
           <e p="RopeScript.cs" t="Include" />
           <e p="SimpleBallScript.cs" t="Include" />
+          <e p="StoreController.cs" t="Include" />
         </e>
       </e>
       <e p="brickbreaker.sln" t="IncludeFlat" />

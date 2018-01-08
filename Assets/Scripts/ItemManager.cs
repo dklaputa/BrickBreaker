@@ -41,12 +41,16 @@ public class ItemManager : MonoBehaviour
         itemDurationScripts[1].GetComponent<ItemDurationScript>().Initialize(1, 10);
         itemDurationOriginPosition = itemDuration[0].transform.position;
 
-        itemNum = new[] {1, 1};
+        if (!PlayerPrefs.HasKey("DivisionCount")) PlayerPrefs.SetInt("DivisionCount", 1);
+        if (!PlayerPrefs.HasKey("BlackHoleCount")) PlayerPrefs.SetInt("BlackHoleCount", 1);
+        itemNum = new[] {PlayerPrefs.GetInt("DivisionCount"), PlayerPrefs.GetInt("BlackHoleCount")};
         itemNumTexts = new[]
         {
             itemButtons[0].transform.GetChild(0).GetChild(0).GetComponent<Text>(),
             itemButtons[1].transform.GetChild(0).GetChild(0).GetComponent<Text>()
         };
+        itemNumTexts[0].text = itemNum[0].ToString();
+        itemNumTexts[1].text = itemNum[1].ToString();
         itemNumAnimators = new[]
         {
             itemButtons[0].transform.GetChild(0).GetComponent<Animator>(),
@@ -70,6 +74,7 @@ public class ItemManager : MonoBehaviour
                         needMove.Remove(i);
                         continue;
                     }
+
                     var position = itemDurationOriginPosition +
                                    Vector3.right * itemDurationDistance * itemDurationList.IndexOf(i);
                     if (itemDurationScripts[i].transform.position != position)
@@ -81,10 +86,12 @@ public class ItemManager : MonoBehaviour
                         needMove.Remove(i);
                     }
                 }
+
                 yield return null;
             }
             else break;
         }
+
         isMoving = false;
     }
 
@@ -96,16 +103,18 @@ public class ItemManager : MonoBehaviour
 
     // Obtain a item by break the item brick.
     public void ObtainItem()
-    { 
+    {
         if (Random.value < .5f)
         {
             itemNum[0]++;
+            PlayerPrefs.SetInt("DivisionCount", itemNum[0]);
             itemNumTexts[0].text = itemNum[0].ToString();
             itemNumAnimators[0].SetTrigger("Shake");
         }
         else
         {
             itemNum[1]++;
+            PlayerPrefs.SetInt("BlackHoleCount", itemNum[1]);
             itemNumTexts[1].text = itemNum[1].ToString();
             itemNumAnimators[1].SetTrigger("Shake");
         }
@@ -115,6 +124,8 @@ public class ItemManager : MonoBehaviour
     {
         if (itemNum[item] < 1 || !GameController.instance.IsGameStart()) return;
         itemNum[item]--;
+        if (item == 0) PlayerPrefs.SetInt("DivisionCount", itemNum[0]);
+        else PlayerPrefs.SetInt("BlackHoleCount", itemNum[1]);
         itemNumTexts[item].text = itemNum[item].ToString();
         if (itemDurationList.Contains(item)) itemDurationScripts[item].LevelUp();
         else
@@ -127,7 +138,8 @@ public class ItemManager : MonoBehaviour
 
             itemDurationScripts[item].gameObject.SetActive(true);
             itemDurationList.Add(item);
-            needMove.Add(item); // Because the duration icons may be moving, so the layout of the duration icon should be rearranged.
+            needMove.Add(
+                item); // Because the duration icons may be moving, so the layout of the duration icon should be rearranged.
         }
     }
 
@@ -138,6 +150,7 @@ public class ItemManager : MonoBehaviour
         {
             needMove.Add(itemDurationList[i]);
         }
+
         itemDurationList.RemoveAt(index);
         if (!isMoving) StartCoroutine("Move");
     }

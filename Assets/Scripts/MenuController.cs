@@ -45,4 +45,9 @@ public class MenuController : MonoBehaviour
     {
         Application.Quit();
     }
+    
+    public void onStoreClick()
+    {
+        SceneManager.LoadScene("Store");
+    }
 }
