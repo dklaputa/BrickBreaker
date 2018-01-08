@@ -15,7 +15,7 @@ public class BrickRow : MonoBehaviour
         new[] {.4f, .4f, .15f, .05f}, new[] {.3f, .4f, .15f, .1f}, new[] {.3f, .4f, .1f, .1f}
     };
 
-    private const float itemProbability = .01f;
+    private const float itemProbability = .005f;
 
 
     private int count;

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class StoreController : MonoBehaviour
 {
     private static readonly Color starNotEnough = new Color(255f / 255, 135f / 255, 135f / 255);
-    private const int price = 10;
+    private const int price = 20;
     private Text totalStarText;
     private Text divisionCountText;
     private Text blackHoleCountText;
