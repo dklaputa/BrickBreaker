@@ -1,25 +1,24 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BrickScript : MonoBehaviour
 {
-    public int level;
-    public Sprite[] numbers;
-    public Sprite normalBrick;
-    public Sprite itemBrick;
-
-    private int points;
-
-    private SpriteRenderer textLvl;
-    private SpriteRenderer brickBackground;
-    private bool dead;
-
     private static readonly Color[] Colors =
     {
         new Color(255f / 255, 207f / 255, 135f / 255), new Color(255f / 255, 135f / 255, 135f / 255),
         new Color(135f / 255, 195f / 255, 255f / 255), new Color(139f / 255, 135f / 255, 255f / 255),
         new Color(180f / 255, 135f / 255, 255f / 255)
     };
+
+    public Sprite itemBrick;
+    public int level;
+    public Sprite normalBrick;
+    public Sprite[] numbers;
+
+    private int points;
+    private bool dead;
+
+    private SpriteRenderer textLvl;
+    private SpriteRenderer brickBackground;
 
     public void SetLevel(int lvl)
     {
@@ -60,7 +59,7 @@ public class BrickScript : MonoBehaviour
     }
 
     /// <summary>
-    /// The brick broken.
+    ///     The brick broken.
     /// </summary>
     /// <returns>Points the player should get.</returns>
     public int Break()

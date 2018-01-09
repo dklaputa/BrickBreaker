@@ -1,22 +1,23 @@
 ﻿using UnityEngine;
+
 /// <inheritdoc />
 /// <summary>
-/// Brick particle generator. 
+///     Brick particle generator.
 /// </summary>
 public class BrickParticleManager : ObjectPoolBehavior
-{ 
-    public static BrickParticleManager instance; 
+{
+    public static BrickParticleManager instance;
 
     private void Awake()
     {
         instance = this;
-    } 
+    }
 
     public void ShowParticle(Vector2 position, Color color)
     {
-        var particle = GetAvailableObject();
+        GameObject particle = GetAvailableObject();
         particle.transform.position = position;
         particle.GetComponent<BrickParticleScript>().SetColor(color);
         particle.SetActive(true);
-    } 
+    }
 }

@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,12 +10,13 @@ public class ItemManager : MonoBehaviour
     public static ItemManager instance;
 
     private Image[] itemCovers;
-    private Text[] itemNumTexts;
     private Animator[] itemNumAnimators;
-    private int[] itemNum;
+    private Text[] itemNumTexts;
+
+    private bool[] itemActivated;
     private int[] itemDuration;
     private int[] itemLevel;
-    private bool[] itemActivated;
+    private int[] itemNum;
 
     // Use this for initialization
     private void Awake()

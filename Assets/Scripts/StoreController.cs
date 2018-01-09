@@ -4,17 +4,18 @@ using UnityEngine.UI;
 
 public class StoreController : MonoBehaviour
 {
-    private static readonly Color starNotEnough = new Color(255f / 255, 135f / 255, 135f / 255);
-    private const int price = 20;
-    private Text totalStarText;
-    private Text divisionCountText;
-    private Text blackHoleCountText;
+    private const int Price = 20;
+    private static readonly Color StarNotEnoughColor = new Color(255f / 255, 135f / 255, 135f / 255);
+
     private Text divisionCostText;
     private Text blackHoleCostText;
+    private Text divisionCountText;
+    private Text blackHoleCountText;
+    private Text totalStarText;
 
-    private int totalStar;
     private int divisionCount;
     private int blackHoleCount;
+    private int totalStar;
 
     public void onExitClick()
     {
@@ -36,36 +37,36 @@ public class StoreController : MonoBehaviour
         blackHoleCountText.text = blackHoleCount.ToString();
         divisionCostText = GameObject.Find("DivisionCost").GetComponent<Text>();
         blackHoleCostText = GameObject.Find("BlackHoleCost").GetComponent<Text>();
-        if (totalStar >= price) return;
-        divisionCostText.color = starNotEnough;
-        blackHoleCostText.color = starNotEnough;
+        if (totalStar >= Price) return;
+        divisionCostText.color = StarNotEnoughColor;
+        blackHoleCostText.color = StarNotEnoughColor;
     }
 
     public void onBuyDivisionItem()
     {
-        if (totalStar < price) return;
-        totalStar -= price;
+        if (totalStar < Price) return;
+        totalStar -= Price;
         divisionCount++;
         PlayerPrefs.SetInt("StarNumber", totalStar);
         PlayerPrefs.SetInt("DivisionCount", divisionCount);
         totalStarText.text = totalStar.ToString();
         divisionCountText.text = divisionCount.ToString();
-        if (totalStar >= price) return;
-        divisionCostText.color = starNotEnough;
-        blackHoleCostText.color = starNotEnough;
+        if (totalStar >= Price) return;
+        divisionCostText.color = StarNotEnoughColor;
+        blackHoleCostText.color = StarNotEnoughColor;
     }
 
     public void onBuyBlackHoleItem()
     {
-        if (totalStar < price) return;
-        totalStar -= price;
+        if (totalStar < Price) return;
+        totalStar -= Price;
         blackHoleCount++;
         PlayerPrefs.SetInt("StarNumber", totalStar);
         PlayerPrefs.SetInt("BlackHoleCount", blackHoleCount);
         totalStarText.text = totalStar.ToString();
         blackHoleCountText.text = blackHoleCount.ToString();
-        if (totalStar >= price) return;
-        divisionCostText.color = starNotEnough;
-        blackHoleCostText.color = starNotEnough;
+        if (totalStar >= Price) return;
+        divisionCostText.color = StarNotEnoughColor;
+        blackHoleCostText.color = StarNotEnoughColor;
     }
 }

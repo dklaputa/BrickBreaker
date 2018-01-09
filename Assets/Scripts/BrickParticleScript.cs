@@ -4,8 +4,8 @@ using UnityEngine;
 public class BrickParticleScript : MonoBehaviour
 {
     private Color color;
-    private ParticleSystem particle;
     private ParticleSystem.MainModule mainModule;
+    private ParticleSystem particle;
 
     public void SetColor(Color particleColor)
     {

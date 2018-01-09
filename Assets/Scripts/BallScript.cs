@@ -3,26 +3,26 @@ using UnityEngine;
 
 public class BallScript : MonoBehaviour
 {
+    private const float BallSize = .125f;
     private static readonly float[] SpeedArray = {8, 9, 10, 11, 12, 12.5f, 13, 13.5f, 14};
     private static readonly Color Blue = new Color(57f / 255, 196f / 255, 215f / 255);
     private static readonly Color Yellow = new Color(255f / 255, 197f / 255, 71f / 255);
     private static readonly Color Red = new Color(255f / 255, 73f / 255, 122f / 255);
 
-    private const float ballSize = .125f;
-
-    private SpriteRenderer spriteRenderer;
-    private ParticleSystem.MainModule mainModule;
-    private ParticleSystem particle;
-    private Vector2 speed;
-    private Animator animator;
-    private int speedLvl;
-    private bool isAttachedToRope;
     private Vector2 accelerationDirection;
+    private Vector2 speed;
+    private int speedLvl;
 
     // Whether the game really started.
     // We say a game really starts after the ball is detached from the rope for the first time.
     // Before that, we should ignore all the collisions of the ball (with walls and bricks)
     private bool isBeforeStart = true;
+    private bool isAttachedToRope;
+
+    private Animator animator;
+    private ParticleSystem.MainModule mainModule;
+    private ParticleSystem particle;
+    private SpriteRenderer spriteRenderer;
 
     public void SetInitialSpeedDirection(Vector2 direction)
     {
@@ -41,24 +41,26 @@ public class BallScript : MonoBehaviour
     // Refresh ball position
     private void Update()
     {
-        var remainTime = Time.deltaTime;
+        float remainTime = Time.deltaTime;
         if (isAttachedToRope)
         {
             // Acceleration increases as speed increases.
             speed += accelerationDirection * (20 + 10 * speed.magnitude) * Time.deltaTime;
             // Detect whether the ball is detached from rope.
-            var hit = Physics2D.CircleCast(transform.position, ballSize, speed, speed.magnitude * Time.deltaTime,
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, BallSize, speed,
+                speed.magnitude * Time.deltaTime,
                 LayerMask.GetMask("Rope"));
             if (hit.collider != null)
             {
-                var rope = hit.collider.gameObject.GetComponent<RopeScript>();
-                var result = rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
+                RopeScript rope = hit.collider.gameObject.GetComponent<RopeScript>();
+                RopeScript.BallTriggerResult result =
+                    rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
                 if (result == RopeScript.BallTriggerResult.BallDetach)
                 {
                     isAttachedToRope = false;
                     if (isBeforeStart) isBeforeStart = false; // Game really starts.
                     // Check whether the item Division is playing effects.
-                    var divisionLevel = ItemManager.instance.CheckItemActivated(ItemManager.Division);
+                    int divisionLevel = ItemManager.instance.CheckItemActivated(ItemManager.Division);
                     if (divisionLevel >= 0)
                         CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionLevel);
                 }
@@ -67,11 +69,12 @@ public class BallScript : MonoBehaviour
         else if (isBeforeStart)
         {
             // Game does not really start. We should ignore all collisions but that with rope.
-            var hit = Physics2D.CircleCast(transform.position, ballSize, speed, speed.magnitude * Time.deltaTime,
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, BallSize, speed,
+                speed.magnitude * Time.deltaTime,
                 LayerMask.GetMask("Rope"));
             if (hit.collider != null)
             {
-                var rope = hit.collider.gameObject.GetComponent<RopeScript>();
+                RopeScript rope = hit.collider.gameObject.GetComponent<RopeScript>();
                 rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
                 isAttachedToRope = true;
             }
@@ -79,17 +82,18 @@ public class BallScript : MonoBehaviour
         else
         {
             // Check if there are collisions with rope, walls, and bricks.
-            var hit = Physics2D.CircleCast(transform.position, ballSize, speed,
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, BallSize, speed,
                 speed.magnitude * remainTime);
-            var count = 0; // We check collisions iteratively. The max iterations num is 5. 
+            int count = 0; // We check collisions iteratively. The max iterations num is 5. 
             while (hit.collider != null && count < 5)
             {
-                var o = hit.collider.gameObject;
+                GameObject o = hit.collider.gameObject;
                 if (o.CompareTag("Rope"))
                 {
-                    var rope = o.GetComponent<RopeScript>();
+                    RopeScript rope = o.GetComponent<RopeScript>();
                     // Ball reaction determined by the rope.
-                    var result = rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
+                    RopeScript.BallTriggerResult result =
+                        rope.OnBallTrigger(transform.position, speed, this, !isBeforeStart);
                     if (result == RopeScript.BallTriggerResult.BallBounce)
                     {
                         // Ball hits one of the two sides of the rope, the ball should bounce back.
@@ -108,25 +112,25 @@ public class BallScript : MonoBehaviour
                 if (o.CompareTag("Wall"))
                 {
                     remainTime -= hit.distance / speed.magnitude;
-                    transform.position = hit.point + hit.normal * ballSize;
+                    transform.position = hit.point + hit.normal * BallSize;
                     speed = Vector2.Reflect(speed, hit.normal);
                     // Check whether the item BlackHole is playing effects.
-                    var blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
+                    int blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
                     if (blackHoleLevel >= 0)
                         BlackHoleManager.instance.ShowBlackHole(transform.position, blackHoleLevel);
                 }
                 else if (o.CompareTag("Brick"))
                 {
                     remainTime -= hit.distance / speed.magnitude;
-                    transform.position = hit.point + hit.normal * ballSize;
-                    var brick = o.GetComponent<BrickScript>();
-                    var brickLevel =
+                    transform.position = hit.point + hit.normal * BallSize;
+                    BrickScript brick = o.GetComponent<BrickScript>();
+                    int brickLevel =
                         brick.level == -1 ? 0 : brick.level; //Item brick can be treated as a level 0 brick.
                     // If speed level is not larger than the brick level, the ball should reflect.
                     if (speedLvl <= brickLevel)
                     {
                         speed = Vector2.Reflect(speed, hit.normal);
-                        var blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
+                        int blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
                         if (blackHoleLevel >= 0)
                             BlackHoleManager.instance.ShowBlackHole(transform.position, blackHoleLevel);
                     }
@@ -136,7 +140,7 @@ public class BallScript : MonoBehaviour
                     {
                         if (speedLvl > 3) GameController.instance.SlowDownTimeScale();
                         SpeedLevelChange(-brickLevel - 1); // Speed level decreases.
-                        var points = brick.Break();
+                        int points = brick.Break();
                         if (points > 0)
                             PointsTextManager.instance.ShowPointsText(brick.transform.position,
                                 GameController.instance.AddPointsConsiderCombo(points));
@@ -151,9 +155,11 @@ public class BallScript : MonoBehaviour
                     break;
                 }
                 else
+                {
                     break;
+                }
 
-                hit = Physics2D.CircleCast(transform.position, ballSize, speed, speed.magnitude * remainTime);
+                hit = Physics2D.CircleCast(transform.position, BallSize, speed, speed.magnitude * remainTime);
                 count++;
             }
         }
@@ -177,16 +183,12 @@ public class BallScript : MonoBehaviour
     {
         speed = speed.normalized * SpeedArray[speedLvl];
         Color color;
-        var half = SpeedArray.Length / 2;
+        int half = SpeedArray.Length / 2;
         if (speedLvl < half)
-        {
             color = Color.Lerp(Blue, Yellow, (float) speedLvl / half);
-        }
         else
-        {
             color = Color.Lerp(Yellow, Red,
                 (float) (speedLvl - half) / (SpeedArray.Length - half - 1));
-        }
 
         spriteRenderer.color = color;
         if (speedLvl > 3)

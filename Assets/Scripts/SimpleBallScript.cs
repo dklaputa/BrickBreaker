@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
+
 /// <inheritdoc />
 /// <summary>
-/// A simple ball that bounces when it hits wall.
+///     A simple ball that bounces when it hits wall.
 /// </summary>
 public class SimpleBallScript : MonoBehaviour
 {
-    private const float ballSize = .125f;
+    private const float BallSize = .125f;
     private Vector3 speed;
 
     private void Start()
@@ -15,24 +16,26 @@ public class SimpleBallScript : MonoBehaviour
 
     private void Update()
     {
-        var remainTime = Time.deltaTime;
-        var hit = Physics2D.CircleCast(transform.position, ballSize, speed,
+        float remainTime = Time.deltaTime;
+        RaycastHit2D hit = Physics2D.CircleCast(transform.position, BallSize, speed,
             speed.magnitude * remainTime);
-        var count = 0;
+        int count = 0;
         while (hit.collider != null && count < 5)
         {
-            var o = hit.collider.gameObject;
+            GameObject o = hit.collider.gameObject;
 
             if (o.CompareTag("Wall"))
             {
                 remainTime -= hit.distance / speed.magnitude;
-                transform.position = hit.point + hit.normal * ballSize;
+                transform.position = hit.point + hit.normal * BallSize;
                 speed = Vector2.Reflect(speed, hit.normal);
             }
             else
+            {
                 break;
+            }
 
-            hit = Physics2D.CircleCast(transform.position, ballSize, speed, speed.magnitude * remainTime);
+            hit = Physics2D.CircleCast(transform.position, BallSize, speed, speed.magnitude * remainTime);
             count++;
         }
 

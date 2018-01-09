@@ -14,7 +14,7 @@ public class FpsScript : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        var fps = Time.timeScale / Time.deltaTime;
+        float fps = Time.timeScale / Time.deltaTime;
         text.text = fps <= 59 ? fps.ToString() : "";
     }
 }

@@ -2,7 +2,7 @@
 
 /// <inheritdoc />
 /// <summary>
-/// Division balls generator.
+///     Division balls generator.
 /// </summary>
 public class CloneBallManager : ObjectPoolBehavior
 {
@@ -15,14 +15,14 @@ public class CloneBallManager : ObjectPoolBehavior
 
     public void ShowCloneBalls(Vector2 position, Vector2 direction, int speedLvl, int itemLevel)
     {
-        var pairNum = itemLevel;
-        for (var i = 1; i <= pairNum; i++)
+        int pairNum = itemLevel;
+        for (int i = 1; i <= pairNum; i++)
         {
-            var ball1 = GetAvailableObject();
+            GameObject ball1 = GetAvailableObject();
             ball1.transform.position = position;
             ball1.GetComponent<CloneBallScript>().SetInitialSpeed(RotateVector(direction, .2f * i / pairNum), speedLvl);
             ball1.SetActive(true);
-            var ball2 = GetAvailableObject();
+            GameObject ball2 = GetAvailableObject();
             ball2.transform.position = position;
             ball2.GetComponent<CloneBallScript>()
                 .SetInitialSpeed(RotateVector(direction, -.2f * i / pairNum), speedLvl);

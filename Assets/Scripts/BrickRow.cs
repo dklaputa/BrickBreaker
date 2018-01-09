@@ -3,10 +3,8 @@ using UnityEngine;
 
 public class BrickRow : MonoBehaviour
 {
-    public GameObject brickPrefab;
-    public float hSpacing;
-
-    private const float brickWidth = 0.512f;
+    private const float BrickWidth = 0.512f; 
+    private const float ItemProbability = .005f;
 
     // Probability of each brick level for each stage level. 
     private static readonly float[][] Probability =
@@ -15,22 +13,22 @@ public class BrickRow : MonoBehaviour
         new[] {.4f, .4f, .15f, .05f}, new[] {.3f, .4f, .15f, .1f}, new[] {.3f, .4f, .1f, .1f}
     };
 
-    private const float itemProbability = .005f;
-
-
-    private int count;
+    public GameObject brickPrefab;
+    public float hSpacing;
+    
     private BrickScript[] bricks;
+    private int count;
 
     public void Initialize(int brickCount)
     {
         count = brickCount;
         bricks = new BrickScript[count];
-        var hPosition = -(brickWidth + hSpacing) * (count - 1) / 2;
+        float hPosition = -(BrickWidth + hSpacing) * (count - 1) / 2;
 
-        for (var i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
-            var brick = Instantiate(brickPrefab, transform);
-            brick.transform.position = new Vector2(hPosition + (hSpacing + brickWidth) * i, transform.position.y);
+            GameObject brick = Instantiate(brickPrefab, transform);
+            brick.transform.position = new Vector2(hPosition + (hSpacing + BrickWidth) * i, transform.position.y);
             bricks[i] = brick.GetComponent<BrickScript>();
         }
     }
@@ -41,23 +39,20 @@ public class BrickRow : MonoBehaviour
     }
 
     /// <summary>
-    /// Randomly set brick levels according to current stage.
+    ///     Randomly set brick levels according to current stage.
     /// </summary>
     /// <param name="stage">Current stage.</param>
     public void SetStage(int stage)
     {
-        var accumProbability = new float[4];
-        var level = Mathf.Min(stage, 6);
+        float[] accumProbability = new float[4];
+        int level = Mathf.Min(stage, 6);
         accumProbability[0] = Probability[level][0];
-        for (var n = 1; n < 4; n++)
-        {
-            accumProbability[n] = accumProbability[n - 1] + Probability[level][n];
-        }
+        for (int n = 1; n < 4; n++) accumProbability[n] = accumProbability[n - 1] + Probability[level][n];
 
-        for (var i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
-            var random = Random.value;
-            if (random < itemProbability)
+            float random = Random.value;
+            if (random < ItemProbability)
             {
                 bricks[i].SetLevel(-1);
                 bricks[i].gameObject.SetActive(true);

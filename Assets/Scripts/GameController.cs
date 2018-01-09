@@ -5,49 +5,46 @@ using UnityEngine.UI;
 
 /// <inheritdoc />
 /// <summary>
-/// Game conductor.
+///     Game conductor.
 /// </summary>
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
+    private static bool showTutorial = true;
 
     public GameObject ball;
     public GameObject gameOverMenu;
-    public GameObject tutorial1;
-    public GameObject tutorial2;
-    public GameObject sampleBrick;
-
     public string miss;
     public string[] perfect;
+    public GameObject sampleBrick;
+    public GameObject tutorial1;
+    public GameObject tutorial2;
 
-    private Text distanceText;
-    private Text assessmentText;
     private Text assessmentCount;
-    private Text scoreText;
-    private Text energyText;
+    private Text assessmentText;
+    private Text distanceText;
     private Image energyFill;
-    private float energyFillAmount;
-    private bool isChangingEnergyFillAmount;
-
+    private Text energyText;
+    private Text gameOverHighestScore;
     private Text gameOverScore;
     private Text gameOverStarNum;
-    private Text gameOverHighestScore;
     private Text gameOverTotalStarNum;
-
     private GameObject introductionAnimation;
+    private Text scoreText;
 
-    private int perfectShootCount;
     private int comboCount;
-    private int totalPoints;
-    private int distanceUI;
     private int distance;
+    private int distanceOnUI;
+    private int perfectShootCount;
+    private int totalPoints;
+    private float energyFillAmount;
 
-    private bool isGameStart;
+    private bool isChangingEnergyFillAmount;
     private bool isGameOver;
-    private bool isShowingTutorial;
-    private bool isRefreshingScore;
+    private bool isGameStart;
     private bool isRefreshingDistance;
-    private static bool showTutorial = true;
+    private bool isRefreshingScore;
+    private bool isShowingTutorial;
 
     // Use this for initialization
     private void Awake()
@@ -64,7 +61,7 @@ public class GameController : MonoBehaviour
         energyText = GameObject.Find("EnergyLvl").GetComponent<Text>();
         energyFill = GameObject.Find("EnergyFill").GetComponent<Image>();
 
-        var gameOverTransform = gameOverMenu.transform;
+        Transform gameOverTransform = gameOverMenu.transform;
         gameOverStarNum = gameOverTransform.GetChild(2).gameObject.GetComponent<Text>();
         gameOverScore = gameOverTransform.GetChild(4).gameObject.GetComponent<Text>();
         gameOverHighestScore = gameOverTransform.GetChild(5).gameObject.GetComponent<Text>();
@@ -128,10 +125,10 @@ public class GameController : MonoBehaviour
         isRefreshingDistance = true;
         for (;;)
         {
-            distanceUI++;
-            distanceText.text = distanceUI.ToString();
+            distanceOnUI++;
+            distanceText.text = distanceOnUI.ToString();
             yield return new WaitForSeconds(.05f);
-            if (distanceUI == distance) break;
+            if (distanceOnUI == distance) break;
         }
 
         isRefreshingDistance = false;
@@ -156,8 +153,8 @@ public class GameController : MonoBehaviour
     public void GameStart(Vector2 position1, Vector2 position2)
     {
         isGameStart = true;
-        var ropeVector = position1 - position2;
-        var up = ropeVector.x < 0
+        Vector2 ropeVector = position1 - position2;
+        Vector2 up = ropeVector.x < 0
             ? new Vector2(ropeVector.y, -ropeVector.x).normalized
             : new Vector2(-ropeVector.y, ropeVector.x).normalized;
         // Let the ball appear above the rope.
@@ -170,10 +167,10 @@ public class GameController : MonoBehaviour
     {
         isGameOver = true;
 
-        var starNumber = totalPoints / 20000;
+        int starNumber = totalPoints / 20000;
         gameOverStarNum.text = starNumber.ToString();
 
-        var totalStar = PlayerPrefs.GetInt("StarNumber");
+        int totalStar = PlayerPrefs.GetInt("StarNumber");
         gameOverTotalStarNum.text = totalStar.ToString();
         if (starNumber > 0)
         {
@@ -182,7 +179,7 @@ public class GameController : MonoBehaviour
         }
 
         gameOverScore.text = "Score: " + totalPoints;
-        var highest = PlayerPrefs.GetInt("HighestScore");
+        int highest = PlayerPrefs.GetInt("HighestScore");
         if (totalPoints > highest)
         {
             highest = totalPoints;
@@ -203,11 +200,11 @@ public class GameController : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
     }
-    
+
     private IEnumerator TotalStarNumberAnimation(int old, int diff)
     {
         yield return new WaitForSeconds(1.1f);
-        for (var i = 1; i <= diff; i++)
+        for (int i = 1; i <= diff; i++)
         {
             gameOverTotalStarNum.text = (old + i).ToString();
             yield return new WaitForSeconds(.01f);
@@ -220,13 +217,16 @@ public class GameController : MonoBehaviour
     }
 
     /// <summary>
-    /// The ball hits the middle of the rope. Show UI and perfect count plus 1.
+    ///     The ball hits the middle of the rope. Show UI and perfect count plus 1.
     /// </summary>
     public void PerfectShoot()
     {
         StopCoroutine("HideAssessment");
         perfectShootCount++;
-        if (perfectShootCount <= perfect.Length) assessmentText.text = perfect[perfectShootCount - 1];
+        if (perfectShootCount <= perfect.Length)
+        {
+            assessmentText.text = perfect[perfectShootCount - 1];
+        }
         else
         {
             assessmentText.text = perfect[perfect.Length - 1];
@@ -237,7 +237,7 @@ public class GameController : MonoBehaviour
     }
 
     /// <summary>
-    /// Reset perfect count.
+    ///     Reset perfect count.
     /// </summary>
     public void ResetPerfectCount()
     {
@@ -245,7 +245,7 @@ public class GameController : MonoBehaviour
     }
 
     /// <summary>
-    /// The ball hits the side of the rope and gets reflected. Show UI and perfect count reset.
+    ///     The ball hits the side of the rope and gets reflected. Show UI and perfect count reset.
     /// </summary>
     public void Miss()
     {
@@ -263,24 +263,24 @@ public class GameController : MonoBehaviour
     }
 
     /// <summary>
-    /// According to combo and perfect count, we calculate the points that the player should get.
-    /// Final points = brick points * combo count * (perfect count + 1)
+    ///     According to combo and perfect count, we calculate the points that the player should get.
+    ///     Final points = brick points * combo count * (perfect count + 1)
     /// </summary>
     /// <param name="points">Points that brick(s) has.</param>
     /// <returns>Final points that the player should get by breaking the brick(s).</returns>
     public int AddPointsConsiderCombo(int points)
     {
         comboCount++;
-        var finalPoint = points * comboCount * (perfectShootCount + 1);
+        int finalPoint = points * comboCount * (perfectShootCount + 1);
         totalPoints += finalPoint;
         if (!isRefreshingScore) StartCoroutine("RefreshScore");
         return finalPoint;
     }
 
     /// <summary>
-    /// Add points without considering combo and perfect count.
+    ///     Add points without considering combo and perfect count.
     /// </summary>
-    /// <param name="points">Points that brick(s) has.</param> 
+    /// <param name="points">Points that brick(s) has.</param>
     public void AddPointsIgnoreCombo(int points)
     {
         totalPoints += points;
@@ -307,7 +307,7 @@ public class GameController : MonoBehaviour
         isChangingEnergyFillAmount = true;
         for (;;)
         {
-            var diff = Mathf.Abs(energyFillAmount - energyFill.fillAmount);
+            float diff = Mathf.Abs(energyFillAmount - energyFill.fillAmount);
             if (diff < .03f)
             {
                 energyFill.fillAmount = energyFillAmount;
@@ -334,7 +334,10 @@ public class GameController : MonoBehaviour
         for (;;)
         {
             Time.timeScale += 2 * Time.deltaTime;
-            if (Time.timeScale < 1) yield return null;
+            if (Time.timeScale < 1)
+            {
+                yield return null;
+            }
             else
             {
                 Time.timeScale = 1;

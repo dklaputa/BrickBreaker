@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class RopeScript : MonoBehaviour
 {
+    public enum BallTriggerResult
+    {
+        BallAttach,
+        BallDetach,
+        BallBounce,
+        NotTrigger
+    }
     private enum Status
     {
         BeforeTouchBall,
@@ -16,37 +23,28 @@ public class RopeScript : MonoBehaviour
         UpDown,
         DownUp
     }
-
-    public enum BallTriggerResult
-    {
-        BallAttach,
-        BallDetach,
-        BallBounce,
-        NotTrigger
-    }
+    
+    private const float BallRange = .175f;
+    private const float PerfectRange = .125f;
 
     public float lengthStall1;
     public float lengthStall2;
 
-    private const float BallRange = .175f;
-    private const float PerfectRange = .125f;
-
-    private Vector2[] endPointPositions;
-
-    private LineRenderer lineRenderer;
+    private BallScript ball;
+    private EdgeCollider2D edgeCollider2D;
     private GameObject ropeNodeMiddle;
     private Rigidbody2D ropeNodeMiddleRigidBody;
     private SpringJoint2D[] springJointsMiddle;
-    private EdgeCollider2D edgeCollider2D;
+    private LineRenderer lineRenderer;
 
-    private Status status = Status.BeforeTouchBall;
+    private float ropeLength;
+    private Vector2[] endPointPositions;
+    private Vector3[] ropePath;
+    private Vector2 ropeVector;
     private bool isPerfect;
     private bool isRemoving;
     private BallEnterDirection enterDirection;
-    private Vector3[] ropePath;
-    private BallScript ball;
-    private Vector2 ropeVector;
-    private float ropeLength;
+    private Status status = Status.BeforeTouchBall;
 
     public void Initialize(Vector2 position1, Vector2 position2)
     {
@@ -110,8 +108,8 @@ public class RopeScript : MonoBehaviour
     {
         for (;;)
         {
-            var color1 = lineRenderer.startColor;
-            var color2 = lineRenderer.endColor;
+            Color color1 = lineRenderer.startColor;
+            Color color2 = lineRenderer.endColor;
             color1.a -= .12f;
             color2.a -= .12f;
             lineRenderer.startColor = color1;
@@ -121,7 +119,7 @@ public class RopeScript : MonoBehaviour
     }
 
     /// <summary>
-    /// Ball crosses the rope edge.
+    ///     Ball crosses the rope edge.
     /// </summary>
     /// <param name="position">Ball position</param>
     /// <param name="speed">Ball speed</param>
@@ -133,7 +131,7 @@ public class RopeScript : MonoBehaviour
         switch (status)
         {
             case Status.DuringTouchBall:
-                var newEnterDirection =
+                BallEnterDirection newEnterDirection =
                     Vector3.Cross(speed, ropeVector).z < 0 ? BallEnterDirection.DownUp : BallEnterDirection.UpDown;
                 // Ball speed direction is same as the one when the ball attaches to the rope, so we ignore the trigger.
                 if (newEnterDirection == enterDirection) return BallTriggerResult.NotTrigger;
@@ -148,7 +146,10 @@ public class RopeScript : MonoBehaviour
                     if (isPerfect) speedUp += 2;
                     callback.SpeedLevelChange(speedUp);
                 }
-                else callback.SpeedLevelChange(0);
+                else
+                {
+                    callback.SpeedLevelChange(0);
+                }
 
                 ball = null;
                 // Start simple harmonic motion.
@@ -171,10 +172,10 @@ public class RopeScript : MonoBehaviour
                 callback.SetAccelerationDirection(accelerationDirection);
                 if (isNormalCase)
                 {
-                    var vLeft = endPointPositions[0] - position;
-                    var vRight = endPointPositions[1] - position;
-                    var lLeft = Vector3.Dot(vLeft, ropeVector) / ropeLength;
-                    var lRight = -Vector3.Dot(vRight, ropeVector) / ropeLength;
+                    Vector2 vLeft = endPointPositions[0] - position;
+                    Vector2 vRight = endPointPositions[1] - position;
+                    float lLeft = Vector3.Dot(vLeft, ropeVector) / ropeLength;
+                    float lRight = -Vector3.Dot(vRight, ropeVector) / ropeLength;
                     if (lLeft < BallRange || lRight < BallRange)
                     {
                         ropeNodeMiddle.SetActive(true);
@@ -191,7 +192,10 @@ public class RopeScript : MonoBehaviour
                         isPerfect = true;
                         GameController.instance.PerfectShoot();
                     }
-                    else GameController.instance.ResetPerfectCount();
+                    else
+                    {
+                        GameController.instance.ResetPerfectCount();
+                    }
                 }
 
                 ball = callback;
@@ -205,17 +209,14 @@ public class RopeScript : MonoBehaviour
 
     private static void RopePathBeforeTouch(Vector3 pointL, Vector3 pointR, IList<Vector3> ropePath)
     {
-        for (var i = 0; i < 20; i++)
-        {
-            ropePath[i] = Vector3.Lerp(pointL, pointR, i / 19f);
-        }
+        for (int i = 0; i < 20; i++) ropePath[i] = Vector3.Lerp(pointL, pointR, i / 19f);
     }
 
     private static void RopePathDuringTouch(Vector3 pointL, Vector3 pointR, Vector3 circleCenter, float r,
         BallEnterDirection direction, IList<Vector3> ropePath)
     {
-        var dL = (pointL - circleCenter).magnitude;
-        var dR = (pointR - circleCenter).magnitude;
+        float dL = (pointL - circleCenter).magnitude;
+        float dR = (pointR - circleCenter).magnitude;
         if (r > dL || r > dR)
         {
             Debug.Log("Illegal parameter.");
@@ -224,13 +225,13 @@ public class RopeScript : MonoBehaviour
             return;
         }
 
-        var fL = Mathf.Acos(r / dL);
-        var fR = Mathf.Acos(r / dR);
+        float fL = Mathf.Acos(r / dL);
+        float fR = Mathf.Acos(r / dR);
 
-        var normalizedL = (pointL - circleCenter).normalized;
-        var normalizedR = (pointR - circleCenter).normalized;
+        Vector3 normalizedL = (pointL - circleCenter).normalized;
+        Vector3 normalizedR = (pointR - circleCenter).normalized;
 
-        var rotated = new Vector3[2];
+        Vector3[] rotated = new Vector3[2];
         if (direction == BallEnterDirection.DownUp)
         {
             rotated[0] = r * RotateVector(normalizedL, fL);
@@ -243,36 +244,23 @@ public class RopeScript : MonoBehaviour
         }
 
         Vector3[] tangents = {rotated[0] + circleCenter, rotated[1] + circleCenter};
-        for (var i = 0; i < 5; i++)
-        {
-            ropePath[i] = Vector3.Lerp(pointL, tangents[0], i / 4f);
-        }
+        for (int i = 0; i < 5; i++) ropePath[i] = Vector3.Lerp(pointL, tangents[0], i / 4f);
 
-        for (var i = 5; i < 15; i++)
-        {
-            ropePath[i] = Vector3.Slerp(rotated[0], rotated[1], (i - 5) / 9f) + circleCenter;
-        }
+        for (int i = 5; i < 15; i++) ropePath[i] = Vector3.Slerp(rotated[0], rotated[1], (i - 5) / 9f) + circleCenter;
 
-        for (var i = 15; i < 20; i++)
-        {
-            ropePath[i] = Vector3.Lerp(tangents[1], pointR, (i - 10) / 4f);
-        }
+        for (int i = 15; i < 20; i++) ropePath[i] = Vector3.Lerp(tangents[1], pointR, (i - 10) / 4f);
     }
 
     private static void RopePathAfterTouch(Vector3 pointL, Vector3 pointM, Vector3 pointR, IList<Vector3> ropePath)
     {
         // Bessel interpolation.
-        for (var i = 0; i < 20; i++)
+        for (int i = 0; i < 20; i++)
         {
-            var t = i / 19f;
+            float t = i / 19f;
             Vector3[] points = {pointL, pointM, pointR};
-            for (var m = 2; m > 0; m--)
-            {
-                for (var n = 0; n < m; n++)
-                {
-                    points[n] = (1 - t) * points[n] + t * points[n + 1];
-                }
-            }
+            for (int m = 2; m > 0; m--)
+            for (int n = 0; n < m; n++)
+                points[n] = (1 - t) * points[n] + t * points[n + 1];
 
             ropePath[i] = points[0];
         }
@@ -298,8 +286,8 @@ public class RopeScript : MonoBehaviour
         yield return new WaitForSeconds(.25f);
         StopCoroutine("Fade");
         lineRenderer.positionCount = 0;
-        var color1 = lineRenderer.startColor;
-        var color2 = lineRenderer.endColor;
+        Color color1 = lineRenderer.startColor;
+        Color color2 = lineRenderer.endColor;
         color1.a = 1;
         color2.a = 1;
         lineRenderer.startColor = color1;
@@ -309,5 +297,5 @@ public class RopeScript : MonoBehaviour
         gameObject.SetActive(false);
         isPerfect = false;
         isRemoving = false;
-    }
+    } 
 }

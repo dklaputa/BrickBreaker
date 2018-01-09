@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BlackHoleScript : MonoBehaviour
 {
+    private const float Radius = 2.56f;
     private float scale;
-    private const float radius = 2.56f;
 
     public void SetRange(float range)
     {
@@ -24,9 +24,9 @@ public class BlackHoleScript : MonoBehaviour
     {
         for (;;)
         {
-            var collider2Ds =
-                Physics2D.OverlapCircleAll(transform.position, radius * scale, LayerMask.GetMask("Brick"));
-            var points = collider2Ds.Sum(col => col.gameObject.GetComponent<BrickScript>().Break());
+            Collider2D[] collider2Ds =
+                Physics2D.OverlapCircleAll(transform.position, Radius * scale, LayerMask.GetMask("Brick"));
+            int points = collider2Ds.Sum(col => col.gameObject.GetComponent<BrickScript>().Break());
             if (points > 0)
             {
                 GameController.instance.AddPointsIgnoreCombo(points);
