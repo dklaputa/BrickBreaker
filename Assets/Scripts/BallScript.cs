@@ -18,6 +18,7 @@ public class BallScript : MonoBehaviour
     // Before that, we should ignore all the collisions of the ball (with walls and bricks)
     private bool isBeforeStart = true;
     private bool isAttachedToRope;
+    private bool isCountingCombo;
 
     private Animator animator;
     private ParticleSystem.MainModule mainModule;
@@ -48,8 +49,7 @@ public class BallScript : MonoBehaviour
             speed += accelerationDirection * (20 + 10 * speed.magnitude) * Time.deltaTime;
             // Detect whether the ball is detached from rope.
             RaycastHit2D hit = Physics2D.CircleCast(transform.position, BallSize, speed,
-                speed.magnitude * Time.deltaTime,
-                LayerMask.GetMask("Rope"));
+                speed.magnitude * Time.deltaTime, LayerMask.GetMask("Rope"));
             if (hit.collider != null)
             {
                 RopeScript rope = hit.collider.gameObject.GetComponent<RopeScript>();
@@ -103,7 +103,6 @@ public class BallScript : MonoBehaviour
                     {
                         speed = -accelerationDirection * speed.magnitude;
                         isAttachedToRope = true;
-                        GameController.instance.ResetComboCount();
                     }
 
                     break;
@@ -138,12 +137,15 @@ public class BallScript : MonoBehaviour
                     // If speed level is not smaller than the brick level, the brick should be destroyed.
                     if (speedLvl >= brickLevel)
                     {
-                        if (speedLvl > 3) GameController.instance.SlowDownTimeScale();
+                        if (speedLvl > 4) GameController.instance.SlowDownTimeScale();
                         SpeedLevelChange(-brickLevel - 1); // Speed level decreases.
                         int points = brick.Break();
                         if (points > 0)
+                        {
                             PointsTextManager.instance.ShowPointsText(brick.transform.position,
                                 GameController.instance.AddPointsConsiderCombo(points));
+                            isCountingCombo = true;
+                        }
                     }
                 }
                 else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
@@ -155,9 +157,7 @@ public class BallScript : MonoBehaviour
                     break;
                 }
                 else
-                {
                     break;
-                }
 
                 hit = Physics2D.CircleCast(transform.position, BallSize, speed, speed.magnitude * remainTime);
                 count++;
@@ -165,6 +165,10 @@ public class BallScript : MonoBehaviour
         }
 
         transform.position += (Vector3) speed * remainTime;
+        // If the ball goes through the middle line from up to down, we should stop counting combo.
+        if (!isCountingCombo || transform.position.y > 0 + BallSize) return; 
+        isCountingCombo = false;
+        GameController.instance.ResetComboCount();
     }
 
     public void SetAccelerationDirection(Vector2 direction)

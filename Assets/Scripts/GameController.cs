@@ -12,13 +12,19 @@ public class GameController : MonoBehaviour
     public static GameController instance;
     private static bool showTutorial = true;
 
-    public GameObject ball;
-    public GameObject gameOverMenu;
     public string miss;
     public string[] perfect;
+    public GameObject ball;
+    public GameObject gameOverMenu;
     public GameObject sampleBrick;
     public GameObject tutorial1;
     public GameObject tutorial2;
+    public GameObject assessmentUI;
+    public GameObject comboUI;
+    public GameObject scoreUI;
+    public GameObject distanceUI;
+    public GameObject introductionAnimation;
+    public GameObject energyUI;
 
     private Text assessmentCount;
     private Text assessmentText;
@@ -29,8 +35,9 @@ public class GameController : MonoBehaviour
     private Text gameOverScore;
     private Text gameOverStarNum;
     private Text gameOverTotalStarNum;
-    private GameObject introductionAnimation;
     private Text scoreText;
+    private Text comboText;
+    private Text comboPoints;
 
     private int comboCount;
     private int distance;
@@ -52,20 +59,20 @@ public class GameController : MonoBehaviour
         instance = this;
         Input.multiTouchEnabled = false;
 
-        assessmentText = GameObject.Find("AssessmentText").GetComponent<Text>();
-        assessmentCount = GameObject.Find("AssessmentCount").GetComponent<Text>();
-        scoreText = GameObject.Find("Score").GetComponent<Text>();
-        distanceText = GameObject.Find("DistanceNum").GetComponent<Text>();
-        introductionAnimation = GameObject.Find("IntroAnim");
+        assessmentText = assessmentUI.transform.GetChild(0).GetComponent<Text>();
+        assessmentCount = assessmentUI.transform.GetChild(1).GetComponent<Text>();
+        scoreText = scoreUI.GetComponent<Text>();
+        distanceText = distanceUI.GetComponent<Text>();
+        comboText = comboUI.transform.GetChild(1).GetComponent<Text>();
+        comboPoints = comboUI.transform.GetChild(2).GetComponent<Text>();
 
-        energyText = GameObject.Find("EnergyLvl").GetComponent<Text>();
-        energyFill = GameObject.Find("EnergyFill").GetComponent<Image>();
+        energyText = energyUI.transform.GetChild(1).GetComponent<Text>();
+        energyFill = energyUI.transform.GetChild(0).GetComponent<Image>();
 
-        Transform gameOverTransform = gameOverMenu.transform;
-        gameOverStarNum = gameOverTransform.GetChild(2).gameObject.GetComponent<Text>();
-        gameOverScore = gameOverTransform.GetChild(4).gameObject.GetComponent<Text>();
-        gameOverHighestScore = gameOverTransform.GetChild(5).gameObject.GetComponent<Text>();
-        gameOverTotalStarNum = gameOverTransform.GetChild(8).gameObject.GetComponent<Text>();
+        gameOverStarNum = gameOverMenu.transform.GetChild(2).GetComponent<Text>();
+        gameOverScore = gameOverMenu.transform.GetChild(4).GetComponent<Text>();
+        gameOverHighestScore = gameOverMenu.transform.GetChild(5).GetComponent<Text>();
+        gameOverTotalStarNum = gameOverMenu.transform.GetChild(8).GetComponent<Text>();
     }
 
     private void Start()
@@ -271,6 +278,12 @@ public class GameController : MonoBehaviour
     public int AddPointsConsiderCombo(int points)
     {
         comboCount++;
+        if (comboCount >= 5)
+        {
+            comboText.text = "×" + (comboCount - 1);
+            if (!comboUI.activeInHierarchy) comboUI.SetActive(true);
+        }
+
         int finalPoint = points * comboCount * (perfectShootCount + 1);
         totalPoints += finalPoint;
         if (!isRefreshingScore) StartCoroutine("RefreshScore");
@@ -289,7 +302,23 @@ public class GameController : MonoBehaviour
 
     public void ResetComboCount()
     {
+        if (comboCount >= 5)
+        {
+            int points = 2000 * (comboCount - 4);
+            AddPointsIgnoreCombo(points);
+            comboPoints.text = "+" + points;
+            comboPoints.gameObject.SetActive(true);
+            StartCoroutine("HideCombo");
+        }
+
         comboCount = 0;
+    }
+
+    private IEnumerator HideCombo()
+    {
+        yield return new WaitForSeconds(1);
+        comboPoints.gameObject.SetActive(false);
+        comboUI.SetActive(false);
     }
 
     // Show ball level on UI.
