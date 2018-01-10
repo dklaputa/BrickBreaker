@@ -22,10 +22,10 @@ public class BrickParticleScript : MonoBehaviour
     {
         mainModule.startColor = color;
         particle.Play();
-        StartCoroutine("Destory");
+        StartCoroutine("Remove");
     }
 
-    private IEnumerator Destory()
+    private IEnumerator Remove()
     {
         yield return new WaitForSeconds(.3f);
         if (!particle.isStopped) particle.Stop();

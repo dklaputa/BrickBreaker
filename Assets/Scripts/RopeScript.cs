@@ -157,7 +157,7 @@ public class RopeScript : MonoBehaviour
                 ropeNodeMiddle.SetActive(true);
                 ropeNodeMiddleRigidBody.velocity = speed * .5f;
                 status = Status.AfterTouchBall;
-                RopeManager.instance.PreventNewRope(false);
+                RopePoolScript.instance.PreventNewRope(false);
                 Remove();
                 return BallTriggerResult.BallDetach;
             case Status.BeforeTouchBall:
@@ -182,7 +182,7 @@ public class RopeScript : MonoBehaviour
                         ropeNodeMiddleRigidBody.velocity = speed * .2f;
                         status = Status.AfterTouchBall;
                         Remove();
-                        GameController.instance.Miss();
+                        GameControllerScript.instance.Miss();
                         // If the ball closes to one side of the rope, it should not be attached, otherwise problem may occur.
                         return BallTriggerResult.BallBounce;
                     }
@@ -190,17 +190,17 @@ public class RopeScript : MonoBehaviour
                     if (Mathf.Abs(lLeft - ropeLength / 2) < PerfectRange)
                     {
                         isPerfect = true;
-                        GameController.instance.PerfectShoot();
+                        GameControllerScript.instance.PerfectShoot();
                     }
                     else
                     {
-                        GameController.instance.ResetPerfectCount();
+                        GameControllerScript.instance.ResetPerfectCount();
                     }
                 }
 
                 ball = callback;
                 status = Status.DuringTouchBall;
-                RopeManager.instance.PreventNewRope(true);
+                RopePoolScript.instance.PreventNewRope(true);
                 return BallTriggerResult.BallAttach;
             default:
                 return BallTriggerResult.NotTrigger;
@@ -278,10 +278,10 @@ public class RopeScript : MonoBehaviour
         isRemoving = true;
         edgeCollider2D.enabled = false;
         StartCoroutine("Fade");
-        StartCoroutine("Destroy");
+        StartCoroutine("RemoveInternal");
     }
 
-    private IEnumerator Destroy()
+    private IEnumerator RemoveInternal()
     {
         yield return new WaitForSeconds(.25f);
         StopCoroutine("Fade");

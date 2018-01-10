@@ -15,7 +15,7 @@ public class BlackHoleScript : MonoBehaviour
     private void OnEnable()
     {
         transform.localScale = new Vector2(scale, scale);
-        StartCoroutine("Destory");
+        StartCoroutine("Remove");
         StartCoroutine("CheckBricks");
     }
 
@@ -29,8 +29,8 @@ public class BlackHoleScript : MonoBehaviour
             int points = collider2Ds.Sum(col => col.gameObject.GetComponent<BrickScript>().Break());
             if (points > 0)
             {
-                GameController.instance.AddPointsIgnoreCombo(points);
-                PointsTextManager.instance.ShowPointsText(transform.position, points);
+                GameControllerScript.instance.AddPointsIgnoreCombo(points);
+                PointsTextPoolScript.instance.ShowPointsText(transform.position, points);
             }
 
             yield return new WaitForSeconds(.5f);
@@ -38,7 +38,7 @@ public class BlackHoleScript : MonoBehaviour
     }
 
     // Black hole lasts 1.5 seconds.
-    private IEnumerator Destory()
+    private IEnumerator Remove()
     {
         yield return new WaitForSeconds(1.5f);
         StopCoroutine("CheckBricks");

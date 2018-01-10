@@ -26,7 +26,7 @@ public class PointsTextScript : MonoBehaviour
         else
             text.fontSize = 32;
         text.color = Color.white;
-        StartCoroutine("Destory");
+        StartCoroutine("Remove");
         StartCoroutine("Animation");
     }
 
@@ -42,7 +42,7 @@ public class PointsTextScript : MonoBehaviour
         }
     }
 
-    private IEnumerator Destory()
+    private IEnumerator Remove()
     {
         yield return new WaitForSeconds(1);
         StopCoroutine("Animation");

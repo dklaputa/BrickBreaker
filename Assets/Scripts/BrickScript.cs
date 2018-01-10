@@ -55,7 +55,7 @@ public class BrickScript : MonoBehaviour
     private void Remove()
     {
         gameObject.SetActive(false);
-        BrickParticleManager.instance.ShowParticle(transform.position, level == -1 ? Color.white : Colors[level]);
+        BrickParticlePoolScript.instance.ShowParticle(transform.position, level == -1 ? Color.white : Colors[level]);
     }
 
     /// <summary>
@@ -66,9 +66,9 @@ public class BrickScript : MonoBehaviour
     {
         if (dead) return 0; // Check whether the brick is already dead to avoid duplicated breaks.
         dead = true;
-        if (level == -1) ItemManager.instance.ObtainItem();
+        if (level == -1) ItemManagerScript.instance.ObtainItem();
         Remove();
-        BrickManager.instance.CheckNeedNewRow();
+        BrickManagerScript.instance.CheckNeedNewRow();
         return points;
     }
 }

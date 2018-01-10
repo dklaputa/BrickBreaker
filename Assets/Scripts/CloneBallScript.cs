@@ -35,9 +35,9 @@ public class CloneBallScript : MonoBehaviour
                 remainTime -= hit.distance / speed.magnitude;
                 transform.position = hit.point + hit.normal * BallSize;
                 speed = Vector2.Reflect(speed, hit.normal);
-                int blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
+                int blackHoleLevel = ItemManagerScript.instance.CheckItemActivated(ItemManagerScript.BlackHole);
                 if (blackHoleLevel >= 0)
-                    BlackHoleManager.instance.ShowBlackHole(transform.position, blackHoleLevel);
+                    BlackHolePoolScript.instance.ShowBlackHole(transform.position, blackHoleLevel);
             }
             else if (o.CompareTag("Brick"))
             {
@@ -49,9 +49,9 @@ public class CloneBallScript : MonoBehaviour
                 if (speedLvl <= brickLevel)
                 {
                     speed = Vector2.Reflect(speed, hit.normal);
-                    int blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
+                    int blackHoleLevel = ItemManagerScript.instance.CheckItemActivated(ItemManagerScript.BlackHole);
                     if (blackHoleLevel >= 0)
-                        BlackHoleManager.instance.ShowBlackHole(transform.position, blackHoleLevel);
+                        BlackHolePoolScript.instance.ShowBlackHole(transform.position, blackHoleLevel);
                 }
 
                 if (speedLvl >= brickLevel)
@@ -59,8 +59,8 @@ public class CloneBallScript : MonoBehaviour
                     SpeedLevelChange(-brickLevel - 1);
                     int points = brick.Break();
                     if (points > 0)
-                        PointsTextManager.instance.ShowPointsText(brick.transform.position,
-                            GameController.instance.AddPointsConsiderCombo(points));
+                        PointsTextPoolScript.instance.ShowPointsText(brick.transform.position,
+                            GameControllerScript.instance.AddPointsConsiderCombo(points));
                 }
             }
             else if (o.CompareTag("GameOverTrigger") && speed.y < 0)

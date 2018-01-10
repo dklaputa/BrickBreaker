@@ -9,6 +9,9 @@ public class BallScript : MonoBehaviour
     private static readonly Color Yellow = new Color(255f / 255, 197f / 255, 71f / 255);
     private static readonly Color Red = new Color(255f / 255, 73f / 255, 122f / 255);
 
+    public int slowDownSpeedLvl;
+    public int particleSpeedLvl;
+    
     private Vector2 accelerationDirection;
     private Vector2 speed;
     private int speedLvl;
@@ -60,9 +63,9 @@ public class BallScript : MonoBehaviour
                     isAttachedToRope = false;
                     if (isBeforeStart) isBeforeStart = false; // Game really starts.
                     // Check whether the item Division is playing effects.
-                    int divisionLevel = ItemManager.instance.CheckItemActivated(ItemManager.Division);
+                    int divisionLevel = ItemManagerScript.instance.CheckItemActivated(ItemManagerScript.Division);
                     if (divisionLevel >= 0)
-                        CloneBallManager.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionLevel);
+                        CloneBallPoolScript.instance.ShowCloneBalls(transform.position, speed, speedLvl, divisionLevel);
                 }
             }
         }
@@ -114,9 +117,9 @@ public class BallScript : MonoBehaviour
                     transform.position = hit.point + hit.normal * BallSize;
                     speed = Vector2.Reflect(speed, hit.normal);
                     // Check whether the item BlackHole is playing effects.
-                    int blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
+                    int blackHoleLevel = ItemManagerScript.instance.CheckItemActivated(ItemManagerScript.BlackHole);
                     if (blackHoleLevel >= 0)
-                        BlackHoleManager.instance.ShowBlackHole(transform.position, blackHoleLevel);
+                        BlackHolePoolScript.instance.ShowBlackHole(transform.position, blackHoleLevel);
                 }
                 else if (o.CompareTag("Brick"))
                 {
@@ -129,29 +132,29 @@ public class BallScript : MonoBehaviour
                     if (speedLvl <= brickLevel)
                     {
                         speed = Vector2.Reflect(speed, hit.normal);
-                        int blackHoleLevel = ItemManager.instance.CheckItemActivated(ItemManager.BlackHole);
+                        int blackHoleLevel = ItemManagerScript.instance.CheckItemActivated(ItemManagerScript.BlackHole);
                         if (blackHoleLevel >= 0)
-                            BlackHoleManager.instance.ShowBlackHole(transform.position, blackHoleLevel);
+                            BlackHolePoolScript.instance.ShowBlackHole(transform.position, blackHoleLevel);
                     }
 
                     // If speed level is not smaller than the brick level, the brick should be destroyed.
                     if (speedLvl >= brickLevel)
                     {
-                        if (speedLvl > 4) GameController.instance.SlowDownTimeScale();
+                        if (speedLvl > slowDownSpeedLvl) GameControllerScript.instance.SlowDownTimeScale();
                         SpeedLevelChange(-brickLevel - 1); // Speed level decreases.
                         int points = brick.Break();
                         if (points > 0)
                         {
-                            PointsTextManager.instance.ShowPointsText(brick.transform.position,
-                                GameController.instance.AddPointsConsiderCombo(points));
+                            PointsTextPoolScript.instance.ShowPointsText(brick.transform.position,
+                                GameControllerScript.instance.AddPointsConsiderCombo(points));
                             isCountingCombo = true;
                         }
                     }
                 }
                 else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
                 {
-                    if (!GameController.instance.IsGameOver())
-                        GameController.instance.GameOver();
+                    if (!GameControllerScript.instance.IsGameOver())
+                        GameControllerScript.instance.GameOver();
                     animator.SetTrigger("Die");
                     StartCoroutine("Destroy");
                     break;
@@ -168,7 +171,7 @@ public class BallScript : MonoBehaviour
         // If the ball goes through the middle line from up to down, we should stop counting combo.
         if (!isCountingCombo || transform.position.y > 0 + BallSize) return; 
         isCountingCombo = false;
-        GameController.instance.ResetComboCount();
+        GameControllerScript.instance.ResetComboCount();
     }
 
     public void SetAccelerationDirection(Vector2 direction)
@@ -195,7 +198,7 @@ public class BallScript : MonoBehaviour
                 (float) (speedLvl - half) / (SpeedArray.Length - half - 1));
 
         spriteRenderer.color = color;
-        if (speedLvl > 3)
+        if (speedLvl > particleSpeedLvl)
         {
             mainModule.startColor = color;
             if (!particle.isPlaying) particle.Play();
@@ -205,7 +208,7 @@ public class BallScript : MonoBehaviour
             if (!particle.isStopped) particle.Stop(false, ParticleSystemStopBehavior.StopEmitting);
         }
 
-        GameController.instance.SetBallLevel(speedLvl, SpeedArray.Length, color);
+        GameControllerScript.instance.SetBallLevel(speedLvl, SpeedArray.Length, color);
     }
 
     private IEnumerator Destroy()

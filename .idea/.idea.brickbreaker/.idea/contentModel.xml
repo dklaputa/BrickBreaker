@@ -16,26 +16,28 @@
         <e p="Scripts" t="Include">
           <e p="BackgroundScript.cs" t="Include" />
           <e p="BallScript.cs" t="Include" />
-          <e p="BlackHoleManager.cs" t="Include" />
+          <e p="BlackHolePoolScript.cs" t="Include" />
           <e p="BlackHoleScript.cs" t="Include" />
-          <e p="BrickManager.cs" t="Include" />
-          <e p="BrickParticleManager.cs" t="Include" />
+          <e p="BrickManagerScript.cs" t="Include" />
+          <e p="BrickParticlePoolScript.cs" t="Include" />
           <e p="BrickParticleScript.cs" t="Include" />
-          <e p="BrickRow.cs" t="Include" />
+          <e p="BrickRowScript.cs" t="Include" />
           <e p="BrickScript.cs" t="Include" />
-          <e p="CloneBallManager.cs" t="Include" />
+          <e p="CloneBallPoolScript.cs" t="Include" />
           <e p="CloneBallScript.cs" t="Include" />
+          <e p="ComboUIPoolScript.cs" t="Include" />
+          <e p="ComboUIScript.cs" t="Include" />
           <e p="FpsScript.cs" t="Include" />
-          <e p="GameController.cs" t="Include" />
-          <e p="ItemManager.cs" t="Include" />
-          <e p="MenuController.cs" t="Include" />
+          <e p="GameControllerScript.cs" t="Include" />
+          <e p="ItemManagerScript.cs" t="Include" />
+          <e p="MenuControllerScript.cs" t="Include" />
           <e p="ObjectPoolBehavior.cs" t="Include" />
-          <e p="PointsTextManager.cs" t="Include" />
+          <e p="PointsTextPoolScript.cs" t="Include" />
           <e p="PointsTextScript.cs" t="Include" />
-          <e p="RopeManager.cs" t="Include" />
+          <e p="RopePoolScript.cs" t="Include" />
           <e p="RopeScript.cs" t="Include" />
           <e p="SimpleBallScript.cs" t="Include" />
-          <e p="StoreController.cs" t="Include" />
+          <e p="StoreControllerScript.cs" t="Include" />
         </e>
       </e>
       <e p="brickbreaker.sln" t="IncludeFlat" />
