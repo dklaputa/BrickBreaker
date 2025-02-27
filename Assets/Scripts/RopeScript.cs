@@ -155,7 +155,7 @@ public class RopeScript : MonoBehaviour
                 // Start simple harmonic motion.
                 ropeNodeMiddle.transform.position = position;
                 ropeNodeMiddle.SetActive(true);
-                ropeNodeMiddleRigidBody.velocity = speed * .5f;
+                ropeNodeMiddleRigidBody.linearVelocity = speed * .5f;
                 status = Status.AfterTouchBall;
                 RopePoolScript.instance.PreventNewRope(false);
                 Remove();
@@ -179,7 +179,7 @@ public class RopeScript : MonoBehaviour
                     if (lLeft < BallRange || lRight < BallRange)
                     {
                         ropeNodeMiddle.SetActive(true);
-                        ropeNodeMiddleRigidBody.velocity = speed * .2f;
+                        ropeNodeMiddleRigidBody.linearVelocity = speed * .2f;
                         status = Status.AfterTouchBall;
                         Remove();
                         GameControllerScript.instance.Miss();
