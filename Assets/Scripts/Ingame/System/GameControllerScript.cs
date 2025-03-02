@@ -55,14 +55,6 @@ public class GameControllerScript : MonoBehaviour
     {
         instance = this;
         Input.multiTouchEnabled = false;
-
-        var mainCamera = Camera.main;
-        if (mainCamera == null) return;
-        var safeArea = Screen.safeArea;
-        var bottomLength = safeArea.yMin;
-        var topLength = Screen.height - safeArea.yMax;
-        var availableLength = Screen.height - 2 * Mathf.Max(bottomLength, topLength);
-        mainCamera.orthographicSize = 5 / availableLength * Screen.height;
     }
     
     private void OnDestroy()
