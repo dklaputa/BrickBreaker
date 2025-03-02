@@ -22,7 +22,7 @@ public class BlackHolePoolScript : ObjectPoolBehavior
     {
         float size = .1f + itemLevel * .1f;
         GameObject hole = GetAvailableObject();
-        hole.transform.position = position;
+        hole.transform.localPosition = position;
         hole.GetComponent<BlackHoleScript>().SetRange(size);
         hole.SetActive(true);
     }

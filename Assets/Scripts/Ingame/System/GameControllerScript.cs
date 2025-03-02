@@ -270,13 +270,16 @@ public class GameControllerScript : MonoBehaviour
     /// </summary>
     /// <param name="points">Points that brick(s) has.</param>
     /// <returns>Final points that the player should get by breaking the brick(s).</returns>
-    public int AddPointsConsiderCombo(int points)
+    public int AddPointsConsiderCombo(int points, bool triggerSlowDown = true)
     {
         comboCount++;
         if (comboCount >= comboBonusBeginAt)
         {
             ComboUIPoolScript.instance.UpdateCombo(comboCount);
-            SlowDownTimeScale();
+            if (triggerSlowDown)
+            {
+                SlowDownTimeScale();
+            }
         }
 
         int finalPoint = points * (comboCount + 1) * (perfectShootCount + 1);

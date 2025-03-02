@@ -60,7 +60,7 @@ public class CloneBallScript : MonoBehaviour
                     int points = brick.Break();
                     if (points > 0)
                         PointsTextPoolScript.instance.ShowPointsText(brick.transform.position,
-                            GameControllerScript.instance.AddPointsConsiderCombo(points));
+                            GameControllerScript.instance.AddPointsConsiderCombo(points, false));
                 }
             }
             else if (o.CompareTag("GameOverTrigger") && speed.y < 0)
